@@ -1,0 +1,54 @@
+---
+title: "Setup and prep"
+format: 
+  html:
+    embed-resources: true
+    toc: true
+editor: source
+execute:
+  echo: true
+  warning: false
+  message: false
+---
+
+## Setup and prep
+
+This document contains setup/prep steps for the opt-out privacy workflow.
+
+```{r setup}
+library(tidyverse)
+library(readxl)
+library(here)
+
+options(scipen = 999)
+```
+
+### Prep Stateside PUMS fixed-width layout file
+
+The excel layout file provides variable widths, names, dictionary values, etc. for the Census Stateside PUMS microdata. Use this layout file to help process the fixed-width stateside PUMS data.
+
+```{r}
+person_layout <- read_excel(here("resources", "2010 PUMS Record Layout.xlsx"), sheet = "Person", skip = 1)
+save(layout, file = paste(here("data", "layout"), "fwf-person-layout.rda", sep = "/"))
+
+housing_layout <- read_excel(here("resources", "2010 PUMS Record Layout.xlsx"), sheet = "Housing", skip = 1)
+save(layout, file = paste(here("data", "layout"), "fwf-housing-layout.rda", sep = "/"))
+
+layout <- rbind(person_layout, housing_layout)
+save(layout, file = paste(here("data", "layout"), "fwf-layout.rda", sep = "/"))
+```
+
+### Prep value description fields
+
+Variable values are encoded. Prep layout file dictionary description ("_VAL") fields to merge with data for easier use.
+
+```{r}
+layout_dict <- layout %>%
+  filter(is.na(HI) & !is.na(LO) & VARIABLE != "RECTYPE") %>%
+  select(c(VARIABLE, `VALUE DESCRIPTION`, LO)) %>%
+  group_by(VARIABLE) %>%
+  filter(n() > 1) %>%
+  ungroup()
+save(layout, file = paste(here("data", "layout"), "fwf-layout-dict.rda", sep = "/"))
+```
+
