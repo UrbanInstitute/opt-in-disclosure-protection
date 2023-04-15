@@ -49,6 +49,6 @@ layout_dict <- layout %>%
   group_by(VARIABLE) %>%
   filter(n() > 1) %>%
   ungroup()
-save(layout, file = paste(here("data", "layout"), "fwf-layout-dict.rda", sep = "/"))
+save(layout_dict, file = paste(here("data", "layout"), "fwf-layout-dict.rda", sep = "/"))
 ```
 
