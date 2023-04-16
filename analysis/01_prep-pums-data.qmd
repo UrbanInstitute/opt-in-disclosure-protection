@@ -1,0 +1,88 @@
+---
+title: "Prep PUMS data for analysis"
+format: 
+  html:
+    embed-resources: true
+    toc: true
+editor: source
+execute:
+  echo: true
+  warning: false
+  message: false
+---
+
+## Prep PUMS data
+
+```{r setup}
+library(tidyverse)
+library(purrr)
+library(here)
+
+source(here("R", "process-pums.R"))
+```
+
+### Prep layout dictionary and helper list
+
+```{r}
+load(here("data", "layout", "fwf-layout-dict.rda"))
+layout_dictlist <- unique(layout_dict$VARIABLE)
+```
+
+```{r}
+prep_layout_dict <- function(variable) {
+  
+  helper_dict <- layout_dict %>%
+    filter(VARIABLE == variable) %>%
+    select(-c(VARIABLE)) %>%
+    rename(!!as.name(variable) := LO,
+           !!paste0(variable, "_VAL") := `VALUE DESCRIPTION`)
+  
+  return(helper_dict)
+}
+```
+
+```{r}
+layout_list <- map(layout_dictlist, prep_layout_dict)
+```
+
+### DC only
+
+10% subsample of total population
+
+```{r}
+df_dc <- process_pums("DC")
+```
+
+```{r, message = FALSE}
+dc_merge_list <- append(layout_list, list(df_dc), after = 0)
+df_dc_full <- Reduce(left_join, dc_merge_list)
+
+rm(df_dc)
+rm(dc_merge_list)
+save(df_dc_full, file = paste(here("data", "pums"), "pums-dc.rda", sep = "/"))
+```
+
+### Multiple states
+
+0.1% subsample of total population (1% subsample of PUMS records)
+
+```{r}
+state_list <- c("DC", "NM", "OR", "MN", "FL", "NE")
+subsample_list <- list(c("00"))
+```
+
+```{r}
+pums_list <- map2(state_list, subsample_list, process_pums)
+df_mult_00 <- bind_rows(pums_list)
+rm(pums_list)
+```
+
+```{r, warning = FALSE}
+mult_merge_list <- append(layout_list, list(df_mult_00), after = 0)
+df_mult_00_full <- Reduce(left_join, mult_merge_list)
+
+rm(df_mult_00)
+rm(mult_merge_list)
+save(df_mult_00_full, file = paste(here("data", "pums"), "pums-mult-00.rda", sep = "/"))
+```
+
