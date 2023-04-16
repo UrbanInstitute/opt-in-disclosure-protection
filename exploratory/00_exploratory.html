@@ -2825,6 +2825,9 @@ vertical-align: -.125em;
 <div class="cell">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">Reduce</span>(left_join, merge_list)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">write.csv</span>(df, here<span class="sc">::</span><span class="fu">here</span>(<span class="st">&quot;data&quot;</span>, <span class="st">&quot;pums-dc.csv&quot;</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
 </section>
 </section>
 <section id="eda---geography" class="level2">
@@ -2838,14 +2841,14 @@ vertical-align: -.125em;
 </ul>
 <p>Washington, DC has 5 PUMAs.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>df <span class="sc">%&gt;%</span></span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(STATE, STATE_VAL, REGION, REGION_VAL, DIVISION, DIVISION_VAL, PUMA) <span class="sc">%&gt;%</span></span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">records =</span> <span class="fu">n</span>(),</span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>            <span class="at">persons =</span> <span class="fu">sum</span>(<span class="fu">as.numeric</span>(PWEIGHT)),</span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>            <span class="at">.groups =</span> <span class="st">&quot;drop&quot;</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">c</span>(records, persons),  <span class="sc">~</span> (.x <span class="sc">/</span> <span class="fu">sum</span>(.x)) <span class="sc">*</span> <span class="dv">100</span>,</span>
-<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>                <span class="at">.names =</span> <span class="st">&quot;{.col}_pct&quot;</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="at">digits =</span> <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>df <span class="sc">%&gt;%</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(STATE, STATE_VAL, REGION, REGION_VAL, DIVISION, DIVISION_VAL, PUMA) <span class="sc">%&gt;%</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">records =</span> <span class="fu">n</span>(),</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>            <span class="at">persons =</span> <span class="fu">sum</span>(<span class="fu">as.numeric</span>(PWEIGHT)),</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>            <span class="at">.groups =</span> <span class="st">&quot;drop&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">c</span>(records, persons),  <span class="sc">~</span> (.x <span class="sc">/</span> <span class="fu">sum</span>(.x)) <span class="sc">*</span> <span class="dv">100</span>,</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>                <span class="at">.names =</span> <span class="st">&quot;{.col}_pct&quot;</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="at">digits =</span> <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <table class="table table-sm table-striped">
 <colgroup>
@@ -2950,40 +2953,40 @@ vertical-align: -.125em;
 <section id="eda---housing" class="level2">
 <h2 class="anchored" data-anchor-id="eda---housing">EDA - Housing</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># helper functions</span></span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>housing_tab_fn <span class="ot">&lt;-</span> <span class="cf">function</span>(var_val){</span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>  tab <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span></span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(SERIALNO, HWEIGHT, {{var_val}}) <span class="sc">%&gt;%</span></span>
-<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">distinct</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">group_by</span>({{var_val}}) <span class="sc">%&gt;%</span></span>
-<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarize</span>(<span class="at">units =</span> <span class="fu">n</span>(),</span>
-<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>              <span class="at">weighted =</span> <span class="fu">sum</span>(<span class="fu">as.numeric</span>(HWEIGHT))) <span class="sc">%&gt;%</span></span>
-<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">c</span>(units, weighted), <span class="sc">~</span> (.x <span class="sc">/</span> <span class="fu">sum</span>(.x)) <span class="sc">*</span> <span class="dv">100</span>,</span>
-<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>                  <span class="at">.names =</span> <span class="st">&quot;{.col}_pct&quot;</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">arrange</span>(<span class="sc">-</span>weighted_pct) <span class="sc">%&gt;%</span></span>
-<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">kable</span>(<span class="at">digits =</span> <span class="dv">1</span>)</span>
-<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(tab)</span>
-<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a>housing_num_fn <span class="ot">&lt;-</span> <span class="cf">function</span>(var){</span>
-<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a>  sumdf <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span></span>
-<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(SERIALNO, HWEIGHT, {{var}}) <span class="sc">%&gt;%</span></span>
-<span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a>    <span class="fu">distinct</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb13-23"><a href="#cb13-23" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">num =</span> <span class="fu">as.numeric</span>({{var}}))</span>
-<span id="cb13-24"><a href="#cb13-24" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb13-25"><a href="#cb13-25" aria-hidden="true" tabindex="-1"></a>  summ <span class="ot">&lt;-</span> <span class="fu">summary</span>(sumdf<span class="sc">$</span>num)</span>
-<span id="cb13-26"><a href="#cb13-26" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb13-27"><a href="#cb13-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(summ)</span>
-<span id="cb13-28"><a href="#cb13-28" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># helper functions</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>housing_tab_fn <span class="ot">&lt;-</span> <span class="cf">function</span>(var_val){</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>  tab <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(SERIALNO, HWEIGHT, {{var_val}}) <span class="sc">%&gt;%</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">distinct</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">group_by</span>({{var_val}}) <span class="sc">%&gt;%</span></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarize</span>(<span class="at">units =</span> <span class="fu">n</span>(),</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>              <span class="at">weighted =</span> <span class="fu">sum</span>(<span class="fu">as.numeric</span>(HWEIGHT))) <span class="sc">%&gt;%</span></span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">c</span>(units, weighted), <span class="sc">~</span> (.x <span class="sc">/</span> <span class="fu">sum</span>(.x)) <span class="sc">*</span> <span class="dv">100</span>,</span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>                  <span class="at">.names =</span> <span class="st">&quot;{.col}_pct&quot;</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">arrange</span>(<span class="sc">-</span>weighted_pct) <span class="sc">%&gt;%</span></span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">kable</span>(<span class="at">digits =</span> <span class="dv">1</span>)</span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(tab)</span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a>housing_num_fn <span class="ot">&lt;-</span> <span class="cf">function</span>(var){</span>
+<span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a>  sumdf <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span></span>
+<span id="cb14-21"><a href="#cb14-21" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(SERIALNO, HWEIGHT, {{var}}) <span class="sc">%&gt;%</span></span>
+<span id="cb14-22"><a href="#cb14-22" aria-hidden="true" tabindex="-1"></a>    <span class="fu">distinct</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb14-23"><a href="#cb14-23" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">num =</span> <span class="fu">as.numeric</span>({{var}}))</span>
+<span id="cb14-24"><a href="#cb14-24" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb14-25"><a href="#cb14-25" aria-hidden="true" tabindex="-1"></a>  summ <span class="ot">&lt;-</span> <span class="fu">summary</span>(sumdf<span class="sc">$</span>num)</span>
+<span id="cb14-26"><a href="#cb14-26" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb14-27"><a href="#cb14-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(summ)</span>
+<span id="cb14-28"><a href="#cb14-28" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <section id="unit-type" class="level3">
 <h3 class="anchored" data-anchor-id="unit-type">Unit Type</h3>
 <p>Housing unit (occupied or vacant, 10% sample of units) or group quarters (noninstitutional and institutional, 10% sample of persons)</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">housing_tab_fn</span>(UNITTYPE_VAL)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">housing_tab_fn</span>(UNITTYPE_VAL)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <table class="table table-sm table-striped">
 <thead>
@@ -3019,7 +3022,7 @@ vertical-align: -.125em;
 <h3 class="anchored" data-anchor-id="vacancy-status">Vacancy Status</h3>
 <p>Vacant units were already removed in processing, only occupied and group quarters remain.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">housing_tab_fn</span>(VACS_VAL)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">housing_tab_fn</span>(VACS_VAL)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <table class="table table-sm table-striped">
 <colgroup>
@@ -3055,7 +3058,7 @@ vertical-align: -.125em;
 <h3 class="anchored" data-anchor-id="tenure">Tenure</h3>
 <p>Home ownership type</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">housing_tab_fn</span>(TENURE_VAL)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">housing_tab_fn</span>(TENURE_VAL)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <table class="table table-sm table-striped">
 <colgroup>
@@ -3118,7 +3121,7 @@ vertical-align: -.125em;
 <section id="householdfamily-type" class="level3">
 <h3 class="anchored" data-anchor-id="householdfamily-type">Household/family type</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">housing_tab_fn</span>(HHT_VAL)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">housing_tab_fn</span>(HHT_VAL)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <table class="table table-sm table-striped">
 <colgroup>
@@ -3202,7 +3205,7 @@ vertical-align: -.125em;
 <section id="presence-and-age-of-own-children-under-18-years" class="level3">
 <h3 class="anchored" data-anchor-id="presence-and-age-of-own-children-under-18-years">Presence and age of own children under 18 years</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">housing_tab_fn</span>(PAOC_VAL)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">housing_tab_fn</span>(PAOC_VAL)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <table class="table table-sm table-striped">
 <colgroup>
@@ -3265,7 +3268,7 @@ vertical-align: -.125em;
 <section id="presence-and-age-of-related-children-under-18-years" class="level3">
 <h3 class="anchored" data-anchor-id="presence-and-age-of-related-children-under-18-years">Presence and age of related children under 18 years</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">housing_tab_fn</span>(PARC_VAL)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">housing_tab_fn</span>(PARC_VAL)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <table class="table table-sm table-striped">
 <colgroup>
@@ -3328,7 +3331,7 @@ vertical-align: -.125em;
 <section id="presence-and-type-of-unmarried-partner-household" class="level3">
 <h3 class="anchored" data-anchor-id="presence-and-type-of-unmarried-partner-household">Presence and type of unmarried partner household</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">housing_tab_fn</span>(UPART_VAL)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">housing_tab_fn</span>(UPART_VAL)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <table class="table table-sm table-striped">
 <colgroup>
@@ -3398,7 +3401,7 @@ vertical-align: -.125em;
 <section id="multigenerational-household" class="level3">
 <h3 class="anchored" data-anchor-id="multigenerational-household">Multigenerational household</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">housing_tab_fn</span>(MULTG_VAL)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">housing_tab_fn</span>(MULTG_VAL)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <table class="table table-sm table-striped">
 <colgroup>
@@ -3447,14 +3450,14 @@ vertical-align: -.125em;
 <section id="number-of-persons-in-housing-record" class="level3">
 <h3 class="anchored" data-anchor-id="number-of-persons-in-housing-record">Number of persons in housing record</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">housing_num_fn</span>(PERSONS)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">housing_num_fn</span>(PERSONS)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
   1.000   1.000   1.000   1.963   2.000  19.000 </code></pre>
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">housing_tab_fn</span>(PERSONS)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">housing_tab_fn</span>(PERSONS)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <table class="table table-sm table-striped">
 <thead>
@@ -3587,14 +3590,14 @@ vertical-align: -.125em;
 <section id="number-of-persons-age-60-housing-record" class="level3">
 <h3 class="anchored" data-anchor-id="number-of-persons-age-60-housing-record">Number of persons age 60+ housing record</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">housing_num_fn</span>(P60)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">housing_num_fn</span>(P60)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
  0.0000  0.0000  0.0000  0.3078  0.0000 10.0000 </code></pre>
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">housing_tab_fn</span>(P60)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu">housing_tab_fn</span>(P60)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <table class="table table-sm table-striped">
 <thead>
@@ -3664,14 +3667,14 @@ vertical-align: -.125em;
 <section id="number-of-persons-age-65-housing-record" class="level3">
 <h3 class="anchored" data-anchor-id="number-of-persons-age-65-housing-record">Number of persons age 65+ housing record</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu">housing_num_fn</span>(P65)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">housing_num_fn</span>(P65)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
  0.0000  0.0000  0.0000  0.2132  0.0000  5.0000 </code></pre>
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="fu">housing_tab_fn</span>(P65)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">housing_tab_fn</span>(P65)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <table class="table table-sm table-striped">
 <thead>
@@ -3727,14 +3730,14 @@ vertical-align: -.125em;
 <section id="number-of-persons-under-age-18-in-housing-record" class="level3">
 <h3 class="anchored" data-anchor-id="number-of-persons-under-age-18-in-housing-record">Number of persons under age 18 in housing record</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">housing_num_fn</span>(P18)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="fu">housing_num_fn</span>(P18)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
  0.0000  0.0000  0.0000  0.3253  0.0000 10.0000 </code></pre>
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="fu">housing_tab_fn</span>(P18)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="fu">housing_tab_fn</span>(P18)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <table class="table table-sm table-striped">
 <thead>
@@ -3832,14 +3835,14 @@ vertical-align: -.125em;
 <section id="number-of-people-in-family-in-housing-record" class="level3">
 <h3 class="anchored" data-anchor-id="number-of-people-in-family-in-housing-record">Number of people in family in housing record</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="fu">housing_num_fn</span>(NPF)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="fu">housing_num_fn</span>(NPF)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
   0.000   0.000   0.000   1.102   2.000  14.000 </code></pre>
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="fu">housing_tab_fn</span>(NPF)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="fu">housing_tab_fn</span>(NPF)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <table class="table table-sm table-striped">
 <thead>
@@ -3958,14 +3961,14 @@ vertical-align: -.125em;
 <section id="number-of-own-children-under-age-18-in-housing-record" class="level3">
 <h3 class="anchored" data-anchor-id="number-of-own-children-under-age-18-in-housing-record">Number of own children under age 18 in housing record</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="fu">housing_num_fn</span>(NOCH)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="fu">housing_num_fn</span>(NOCH)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
  0.0000  0.0000  0.0000  0.2621  0.0000 10.0000 </code></pre>
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="fu">housing_tab_fn</span>(NOCH)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="fu">housing_tab_fn</span>(NOCH)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <table class="table table-sm table-striped">
 <thead>
@@ -4063,14 +4066,14 @@ vertical-align: -.125em;
 <section id="number-of-related-children-under-age-18-in-housing-record" class="level3">
 <h3 class="anchored" data-anchor-id="number-of-related-children-under-age-18-in-housing-record">Number of related children under age 18 in housing record</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="fu">housing_num_fn</span>(NRCH)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="fu">housing_num_fn</span>(NRCH)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
   0.000   0.000   0.000   0.319   0.000  10.000 </code></pre>
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="fu">housing_tab_fn</span>(NRCH)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="fu">housing_tab_fn</span>(NRCH)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <table class="table table-sm table-striped">
 <thead>
@@ -4169,21 +4172,21 @@ vertical-align: -.125em;
 <section id="eda---persons" class="level2">
 <h2 class="anchored" data-anchor-id="eda---persons">EDA - Persons</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="co"># helper function</span></span>
-<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a>persons_tab_fn <span class="ot">&lt;-</span> <span class="cf">function</span>(var_val){</span>
-<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a>  tab <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span></span>
-<span id="cb43-5"><a href="#cb43-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">group_by</span>({{var_val}}) <span class="sc">%&gt;%</span></span>
-<span id="cb43-6"><a href="#cb43-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarize</span>(<span class="at">persons =</span> <span class="fu">n</span>(),</span>
-<span id="cb43-7"><a href="#cb43-7" aria-hidden="true" tabindex="-1"></a>              <span class="at">weighted =</span> <span class="fu">sum</span>(<span class="fu">as.numeric</span>(PWEIGHT))) <span class="sc">%&gt;%</span></span>
-<span id="cb43-8"><a href="#cb43-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">c</span>(persons, weighted), <span class="sc">~</span> (.x <span class="sc">/</span> <span class="fu">sum</span>(.x)) <span class="sc">*</span> <span class="dv">100</span>,</span>
-<span id="cb43-9"><a href="#cb43-9" aria-hidden="true" tabindex="-1"></a>                  <span class="at">.names =</span> <span class="st">&quot;{.col}_pct&quot;</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb43-10"><a href="#cb43-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">arrange</span>(<span class="sc">-</span>weighted_pct) <span class="sc">%&gt;%</span></span>
-<span id="cb43-11"><a href="#cb43-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">kable</span>(<span class="at">digits =</span> <span class="dv">1</span>)</span>
-<span id="cb43-12"><a href="#cb43-12" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb43-13"><a href="#cb43-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(tab)</span>
-<span id="cb43-14"><a href="#cb43-14" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb43-15"><a href="#cb43-15" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="co"># helper function</span></span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a>persons_tab_fn <span class="ot">&lt;-</span> <span class="cf">function</span>(var_val){</span>
+<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb44-4"><a href="#cb44-4" aria-hidden="true" tabindex="-1"></a>  tab <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span></span>
+<span id="cb44-5"><a href="#cb44-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">group_by</span>({{var_val}}) <span class="sc">%&gt;%</span></span>
+<span id="cb44-6"><a href="#cb44-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarize</span>(<span class="at">persons =</span> <span class="fu">n</span>(),</span>
+<span id="cb44-7"><a href="#cb44-7" aria-hidden="true" tabindex="-1"></a>              <span class="at">weighted =</span> <span class="fu">sum</span>(<span class="fu">as.numeric</span>(PWEIGHT))) <span class="sc">%&gt;%</span></span>
+<span id="cb44-8"><a href="#cb44-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">c</span>(persons, weighted), <span class="sc">~</span> (.x <span class="sc">/</span> <span class="fu">sum</span>(.x)) <span class="sc">*</span> <span class="dv">100</span>,</span>
+<span id="cb44-9"><a href="#cb44-9" aria-hidden="true" tabindex="-1"></a>                  <span class="at">.names =</span> <span class="st">&quot;{.col}_pct&quot;</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb44-10"><a href="#cb44-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">arrange</span>(<span class="sc">-</span>weighted_pct) <span class="sc">%&gt;%</span></span>
+<span id="cb44-11"><a href="#cb44-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">kable</span>(<span class="at">digits =</span> <span class="dv">1</span>)</span>
+<span id="cb44-12"><a href="#cb44-12" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb44-13"><a href="#cb44-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(tab)</span>
+<span id="cb44-14"><a href="#cb44-14" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb44-15"><a href="#cb44-15" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <section id="coverage" class="level3">
 <h3 class="anchored" data-anchor-id="coverage">Coverage</h3>
@@ -4193,7 +4196,7 @@ vertical-align: -.125em;
 <section id="relationship" class="level3">
 <h3 class="anchored" data-anchor-id="relationship">Relationship</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="fu">persons_tab_fn</span>(RELATE_VAL)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="fu">persons_tab_fn</span>(RELATE_VAL)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <table class="table table-sm table-striped">
 <colgroup>
@@ -4340,7 +4343,7 @@ vertical-align: -.125em;
 <section id="own-child-indicator" class="level3">
 <h3 class="anchored" data-anchor-id="own-child-indicator">Own child indicator</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="fu">persons_tab_fn</span>(OC_VAL)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="fu">persons_tab_fn</span>(OC_VAL)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <table class="table table-sm table-striped">
 <colgroup>
@@ -4382,7 +4385,7 @@ vertical-align: -.125em;
 <section id="related-child-indicator" class="level3">
 <h3 class="anchored" data-anchor-id="related-child-indicator">Related child indicator</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="fu">persons_tab_fn</span>(RC_VAL)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="fu">persons_tab_fn</span>(RC_VAL)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <table class="table table-sm table-striped">
 <colgroup>
@@ -4424,7 +4427,7 @@ vertical-align: -.125em;
 <section id="sex" class="level3">
 <h3 class="anchored" data-anchor-id="sex">Sex</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="fu">persons_tab_fn</span>(SEX_VAL)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="fu">persons_tab_fn</span>(SEX_VAL)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <table class="table table-sm table-striped">
 <thead>
@@ -4460,7 +4463,7 @@ vertical-align: -.125em;
 <h3 class="anchored" data-anchor-id="same-sex-spouse-flag">Same sex spouse flag</h3>
 <p>Documentation: “includes a flag allowing for the identification of those same-sex couples who originally reported their relationship to householder as “husband or wife” but were changed to “unmarried partner” during the editing process”</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="fu">persons_tab_fn</span>(SSPA_VAL)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb49"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a><span class="fu">persons_tab_fn</span>(SSPA_VAL)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <table class="table table-sm table-striped">
 <colgroup>
@@ -4503,7 +4506,7 @@ vertical-align: -.125em;
 <h3 class="anchored" data-anchor-id="age">Age</h3>
 <p>Age values above the state topcode (age 90 for Washington, DC) are replaced with the mean of topcoded values (93 for Washington, DC).</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb49"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(<span class="fu">as.numeric</span>(df<span class="sc">$</span>AGE))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(<span class="fu">as.numeric</span>(df<span class="sc">$</span>AGE))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
    0.00   22.00   33.00   36.81   52.00   93.00 </code></pre>
@@ -4513,7 +4516,7 @@ vertical-align: -.125em;
 <section id="quarter-of-birth" class="level3">
 <h3 class="anchored" data-anchor-id="quarter-of-birth">Quarter of birth</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb51"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a><span class="fu">persons_tab_fn</span>(QTRBIR_VAL)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb52"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a><span class="fu">persons_tab_fn</span>(QTRBIR_VAL)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <table class="table table-sm table-striped">
 <thead>
@@ -4562,7 +4565,7 @@ vertical-align: -.125em;
 <section id="hispanic-or-latino-origin" class="level3">
 <h3 class="anchored" data-anchor-id="hispanic-or-latino-origin">Hispanic or Latino origin</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb52"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a><span class="fu">persons_tab_fn</span>(HISPAN_VAL)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb53"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a><span class="fu">persons_tab_fn</span>(HISPAN_VAL)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <table class="table table-sm table-striped">
 <thead>
@@ -4758,7 +4761,7 @@ vertical-align: -.125em;
 <section id="number-of-major-race-groups-marked" class="level3">
 <h3 class="anchored" data-anchor-id="number-of-major-race-groups-marked">Number of major race groups marked</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb53"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a><span class="fu">persons_tab_fn</span>(NUMRACE_VAL)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb54"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a><span class="fu">persons_tab_fn</span>(NUMRACE_VAL)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <table class="table table-sm table-striped">
 <thead>
@@ -4814,7 +4817,7 @@ vertical-align: -.125em;
 <section id="white-recode" class="level3">
 <h3 class="anchored" data-anchor-id="white-recode">White recode</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb54"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a><span class="fu">persons_tab_fn</span>(WHITE_VAL)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb55"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a><span class="fu">persons_tab_fn</span>(WHITE_VAL)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <table class="table table-sm table-striped">
 <colgroup>
@@ -4856,7 +4859,7 @@ vertical-align: -.125em;
 <section id="black-or-african-american-recode" class="level3">
 <h3 class="anchored" data-anchor-id="black-or-african-american-recode">Black or African American recode</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb55"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a><span class="fu">persons_tab_fn</span>(BLACK_VAL)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb56"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a><span class="fu">persons_tab_fn</span>(BLACK_VAL)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <table class="table table-sm table-striped">
 <colgroup>
@@ -4898,7 +4901,7 @@ vertical-align: -.125em;
 <section id="american-indian-and-alaska-native-recode" class="level3">
 <h3 class="anchored" data-anchor-id="american-indian-and-alaska-native-recode">American Indian and Alaska Native recode</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb56"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a><span class="fu">persons_tab_fn</span>(AIAN_VAL)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb57"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a><span class="fu">persons_tab_fn</span>(AIAN_VAL)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <table class="table table-sm table-striped">
 <colgroup>
@@ -4940,7 +4943,7 @@ vertical-align: -.125em;
 <section id="asian-recode" class="level3">
 <h3 class="anchored" data-anchor-id="asian-recode">Asian recode</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb57"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a><span class="fu">persons_tab_fn</span>(ASIAN_VAL)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb58"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a><span class="fu">persons_tab_fn</span>(ASIAN_VAL)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <table class="table table-sm table-striped">
 <colgroup>
@@ -4982,7 +4985,7 @@ vertical-align: -.125em;
 <section id="native-hawaiian-recode" class="level3">
 <h3 class="anchored" data-anchor-id="native-hawaiian-recode">Native Hawaiian recode</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb58"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a><span class="fu">persons_tab_fn</span>(NHAW_VAL)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb59"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a><span class="fu">persons_tab_fn</span>(NHAW_VAL)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <table class="table table-sm table-striped">
 <colgroup>
@@ -5024,7 +5027,7 @@ vertical-align: -.125em;
 <section id="other-pacific-islander-recode" class="level3">
 <h3 class="anchored" data-anchor-id="other-pacific-islander-recode">Other Pacific Islander recode</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb59"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a><span class="fu">persons_tab_fn</span>(OPI_VAL)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb60"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a><span class="fu">persons_tab_fn</span>(OPI_VAL)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <table class="table table-sm table-striped">
 <colgroup>
@@ -5066,7 +5069,7 @@ vertical-align: -.125em;
 <section id="some-other-race-recode" class="level3">
 <h3 class="anchored" data-anchor-id="some-other-race-recode">Some other race recode</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb60"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a><span class="fu">persons_tab_fn</span>(OTHER_VAL)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb61"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb61-1"><a href="#cb61-1" aria-hidden="true" tabindex="-1"></a><span class="fu">persons_tab_fn</span>(OTHER_VAL)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <table class="table table-sm table-striped">
 <colgroup>
@@ -5108,7 +5111,7 @@ vertical-align: -.125em;
 <section id="race-short-recode" class="level3">
 <h3 class="anchored" data-anchor-id="race-short-recode">Race short recode</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb61"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb61-1"><a href="#cb61-1" aria-hidden="true" tabindex="-1"></a><span class="fu">persons_tab_fn</span>(RACESHORT_VAL)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb62"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a><span class="fu">persons_tab_fn</span>(RACESHORT_VAL)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <table class="table table-sm table-striped">
 <colgroup>
@@ -5213,7 +5216,7 @@ vertical-align: -.125em;
 <section id="race-detailed-recode" class="level3">
 <h3 class="anchored" data-anchor-id="race-detailed-recode">Race detailed recode</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb62"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a><span class="fu">persons_tab_fn</span>(RACEDET_VAL)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb63"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb63-1"><a href="#cb63-1" aria-hidden="true" tabindex="-1"></a><span class="fu">persons_tab_fn</span>(RACEDET_VAL)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <table class="table table-sm table-striped">
 <colgroup>
@@ -5633,7 +5636,7 @@ vertical-align: -.125em;
 <section id="race-checkbox-recode" class="level3">
 <h3 class="anchored" data-anchor-id="race-checkbox-recode">Race checkbox recode</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb63"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb63-1"><a href="#cb63-1" aria-hidden="true" tabindex="-1"></a><span class="fu">persons_tab_fn</span>(RACECHKBX_VAL)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb64"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb64-1"><a href="#cb64-1" aria-hidden="true" tabindex="-1"></a><span class="fu">persons_tab_fn</span>(RACECHKBX_VAL)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <table class="table table-sm table-striped">
 <colgroup>
@@ -6326,7 +6329,7 @@ vertical-align: -.125em;
 <section id="group-quarters-type" class="level3">
 <h3 class="anchored" data-anchor-id="group-quarters-type">Group quarters type</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb64"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb64-1"><a href="#cb64-1" aria-hidden="true" tabindex="-1"></a><span class="fu">persons_tab_fn</span>(GQTYP_VAL)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb65"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb65-1"><a href="#cb65-1" aria-hidden="true" tabindex="-1"></a><span class="fu">persons_tab_fn</span>(GQTYP_VAL)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <table class="table table-sm table-striped">
 <colgroup>

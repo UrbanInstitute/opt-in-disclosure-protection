@@ -146,6 +146,10 @@ merge_list <- append(dict_prep, list(df_join_occ), after = 0)
 df <- Reduce(left_join, merge_list)
 ```
 
+```{r}
+write.csv(df, here::here("data", "pums-dc.csv"))
+```
+
 ## EDA - Geography
 
 Geographic fields include:
