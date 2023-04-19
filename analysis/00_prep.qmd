@@ -52,3 +52,26 @@ layout_dict <- layout %>%
 save(layout_dict, file = paste(here("data", "layout"), "fwf-layout-dict.rda", sep = "/"))
 ```
 
+### Prep layout dictionary and helper list
+
+```{r}
+layout_dictlist <- unique(layout_dict$VARIABLE)
+```
+
+```{r}
+prep_layout_dict <- function(variable) {
+  
+  helper_dict <- layout_dict %>%
+    filter(VARIABLE == variable) %>%
+    select(-c(VARIABLE)) %>%
+    rename(!!as.name(variable) := LO,
+           !!paste0(variable, "_VAL") := `VALUE DESCRIPTION`)
+  
+  return(helper_dict)
+}
+```
+
+```{r}
+layout_list <- map(layout_dictlist, prep_layout_dict)
+save(layout_list, file = paste(here("data", "layout"), "fwf-layout-list.rda", sep = "/"))
+```

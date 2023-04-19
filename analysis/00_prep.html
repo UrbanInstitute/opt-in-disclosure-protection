@@ -2611,6 +2611,7 @@ vertical-align: -.125em;
   <ul class="collapse">
   <li><a href="#prep-stateside-pums-fixed-width-layout-file" id="toc-prep-stateside-pums-fixed-width-layout-file" class="nav-link" data-scroll-target="#prep-stateside-pums-fixed-width-layout-file">Prep Stateside PUMS fixed-width layout file</a></li>
   <li><a href="#prep-value-description-fields" id="toc-prep-value-description-fields" class="nav-link" data-scroll-target="#prep-value-description-fields">Prep value description fields</a></li>
+  <li><a href="#prep-layout-dictionary-and-helper-list" id="toc-prep-layout-dictionary-and-helper-list" class="nav-link" data-scroll-target="#prep-layout-dictionary-and-helper-list">Prep layout dictionary and helper list</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -2669,6 +2670,28 @@ vertical-align: -.125em;
 <span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">n</span>() <span class="sc">&gt;</span> <span class="dv">1</span>) <span class="sc">%&gt;%</span></span>
 <span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span>
 <span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="fu">save</span>(layout_dict, <span class="at">file =</span> <span class="fu">paste</span>(<span class="fu">here</span>(<span class="st">&quot;data&quot;</span>, <span class="st">&quot;layout&quot;</span>), <span class="st">&quot;fwf-layout-dict.rda&quot;</span>, <span class="at">sep =</span> <span class="st">&quot;/&quot;</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="prep-layout-dictionary-and-helper-list" class="level3">
+<h3 class="anchored" data-anchor-id="prep-layout-dictionary-and-helper-list">Prep layout dictionary and helper list</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>layout_dictlist <span class="ot">&lt;-</span> <span class="fu">unique</span>(layout_dict<span class="sc">$</span>VARIABLE)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>prep_layout_dict <span class="ot">&lt;-</span> <span class="cf">function</span>(variable) {</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  helper_dict <span class="ot">&lt;-</span> layout_dict <span class="sc">%&gt;%</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(VARIABLE <span class="sc">==</span> variable) <span class="sc">%&gt;%</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(<span class="sc">-</span><span class="fu">c</span>(VARIABLE)) <span class="sc">%&gt;%</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">rename</span>(<span class="sc">!!</span><span class="fu">as.name</span>(variable) <span class="sc">:</span><span class="er">=</span> LO,</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>           <span class="sc">!!</span><span class="fu">paste0</span>(variable, <span class="st">&quot;_VAL&quot;</span>) <span class="sc">:</span><span class="er">=</span> <span class="st">`</span><span class="at">VALUE DESCRIPTION</span><span class="st">`</span>)</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(helper_dict)</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>layout_list <span class="ot">&lt;-</span> <span class="fu">map</span>(layout_dictlist, prep_layout_dict)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">save</span>(layout_list, <span class="at">file =</span> <span class="fu">paste</span>(<span class="fu">here</span>(<span class="st">&quot;data&quot;</span>, <span class="st">&quot;layout&quot;</span>), <span class="st">&quot;fwf-layout-list.rda&quot;</span>, <span class="at">sep =</span> <span class="st">&quot;/&quot;</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 </section>
