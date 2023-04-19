@@ -68,7 +68,8 @@ process_pums <- function(state_abb,
   # add dictionary values
   load(here::here("data", "layout", "fwf-layout-list.rda"))
   merge_list <- append(layout_list, list(df), after = 0)
-  df_full <- Reduce(left_join, merge_list)
+  df_full <- Reduce(left_join, merge_list) |>
+    dplyr::rename_with(tolower, everything())
   
   return(df_full)
   

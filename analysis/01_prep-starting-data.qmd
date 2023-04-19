@@ -24,7 +24,7 @@ source(here("R", "prep001.R"))
 
 ### DC only - for exploratory
 
-10% subsample of total population
+10% sample of total population
 
 ```{r, message = FALSE}
 df_dc <- process_pums("DC")
@@ -38,9 +38,10 @@ attributes: age bucket, sex, race simple
 
 ```{r, message = FALSE}
 prep001 <- prep001()
-df001 <- prep001$df
+starting001 <- prep001$starting
 lookup001 <- prep001$lookup
 
-save(df, file = paste(here("data", "starting"), "starting-data-001.rda", sep = "/"))
-save(df, file = paste(here("data", "lookup"), "lookup-data-001.rda", sep = "/"))
+save(starting001, file = paste(here("data", "starting"), "starting-data-001.rda", sep = "/"))
+save(lookup001, file = paste(here("data", "lookup"), "lookup-data-001.rda", sep = "/"))
 ```
+

@@ -15,31 +15,31 @@ prep001 <- function(){
   pums_list <- map(state_list, process_pums)
   df_comb <- bind_rows(pums_list)
   
-  keepvars <- c("SERIALNO", "STATE", "STATE_VAL", "PUMA", 
-                "SUBSAMPL", "HWEIGHT", "PERSONS", "UNITTYPE", "HSUBFLG", 
-                "PNUM", "PSUB", "PWEIGHT")
+  keepvars <- c("serialno", "state", "state_val", "puma", 
+                "subsampl", "hweight", "persons", "unittype", "hsubflg", 
+                "pnum", "psub", "pweight")
   
-  attributes <- c("AGEBUCKET", "SEX_VAL", "RACESIMPLE")
+  attribs <- c("age_bucket", "sex_val", "race_simple")
   
-  df <- df_comb |>
+  starting <- df_comb |>
     dplyr::mutate(
-      RACESIMPLE = case_when(
-        RACESHORT_VAL == "White alone" ~ "WHITE",
-        RACESHORT_VAL == "Black or African American alone" ~ "BLACK",
-        HISPAN_VAL != "Not Hispanic or Latino" ~ "HISPANIC",
-        .default = "OTHER"),
-      AGEBUCKET = case_when(
-        between(AGE, 0, 17) == TRUE ~ "CHILD",
-        between(AGE, 18, 64) == TRUE ~ "ADULT",
-        AGE >= 65 ~ "SENIOR")
+      race_simple = case_when(
+        raceshort_val == "White alone" ~ "White",
+        raceshort_val == "Black or African American alone" ~ "Black",
+        hispan_val != "Not Hispanic or Latino" ~ "Hispanic",
+        .default = "Other"),
+      age_bucket = case_when(
+        between(age, 0, 17) == TRUE ~ "Child",
+        between(age, 18, 64) == TRUE ~ "Adult",
+        age >= 65 ~ "Senior")
       ) |>
-    select(c(attributes, keepvars))
+    dplyr::select(all_of(c(attribs, keepvars)))
   
-  lookup <- df |>
-    dplyr::select(attributes) |>
+  lookup <- starting |>
+    dplyr::select(all_of(attribs)) |>
     dplyr::distinct()
   
-  prep001 <- list(df = df, lookup = lookup)
+  prep001 <- list(starting = starting, lookup = lookup)
   
   return(prep001)
   
