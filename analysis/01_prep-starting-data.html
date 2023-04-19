@@ -2642,7 +2642,9 @@ vertical-align: -.125em;
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(here)</span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="fu">here</span>(<span class="st">&quot;R&quot;</span>, <span class="st">&quot;process-pums.R&quot;</span>))</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="fu">here</span>(<span class="st">&quot;R&quot;</span>, <span class="st">&quot;prep001.R&quot;</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="fu">here</span>(<span class="st">&quot;R&quot;</span>, <span class="st">&quot;prep001.R&quot;</span>))</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="fu">here</span>(<span class="st">&quot;R&quot;</span>, <span class="st">&quot;add-opt-out-prob.R&quot;</span>))</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="fu">here</span>(<span class="st">&quot;R&quot;</span>, <span class="st">&quot;add-opt-out-decision.R&quot;</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <section id="dc-only---for-exploratory" class="level3">
 <h3 class="anchored" data-anchor-id="dc-only---for-exploratory">DC only - for exploratory</h3>
@@ -2657,11 +2659,15 @@ vertical-align: -.125em;
 <p>DC and IA only attributes: age bucket, sex, race simple</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>prep001 <span class="ot">&lt;-</span> <span class="fu">prep001</span>()</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>starting001 <span class="ot">&lt;-</span> prep001<span class="sc">$</span>starting</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>lookup001 <span class="ot">&lt;-</span> prep001<span class="sc">$</span>lookup</span>
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="fu">save</span>(starting001, <span class="at">file =</span> <span class="fu">paste</span>(<span class="fu">here</span>(<span class="st">&quot;data&quot;</span>, <span class="st">&quot;starting&quot;</span>), <span class="st">&quot;starting-data-001.rda&quot;</span>, <span class="at">sep =</span> <span class="st">&quot;/&quot;</span>))</span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="fu">save</span>(lookup001, <span class="at">file =</span> <span class="fu">paste</span>(<span class="fu">here</span>(<span class="st">&quot;data&quot;</span>, <span class="st">&quot;lookup&quot;</span>), <span class="st">&quot;lookup-data-001.rda&quot;</span>, <span class="at">sep =</span> <span class="st">&quot;/&quot;</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>starting001 <span class="ot">&lt;-</span> prep001<span class="sc">$</span>starting <span class="sc">%&gt;%</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_opt_out_prob</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_opt_out_decision</span>(opt_out_prob, .<span class="dv">5</span>)</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="fu">save</span>(starting001, <span class="at">file =</span> <span class="fu">paste</span>(<span class="fu">here</span>(<span class="st">&quot;data&quot;</span>, <span class="st">&quot;starting&quot;</span>), <span class="st">&quot;starting-data-001.rda&quot;</span>, <span class="at">sep =</span> <span class="st">&quot;/&quot;</span>))</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="fu">save</span>(lookup001, <span class="at">file =</span> <span class="fu">paste</span>(<span class="fu">here</span>(<span class="st">&quot;data&quot;</span>, <span class="st">&quot;lookup&quot;</span>), <span class="st">&quot;lookup-data-001.rda&quot;</span>, <span class="at">sep =</span> <span class="st">&quot;/&quot;</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 </section>

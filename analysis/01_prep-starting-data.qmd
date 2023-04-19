@@ -20,6 +20,8 @@ library(here)
 
 source(here("R", "process-pums.R"))
 source(here("R", "prep001.R"))
+source(here("R", "add-opt-out-prob.R"))
+source(here("R", "add-opt-out-decision.R"))
 ```
 
 ### DC only - for exploratory
@@ -38,9 +40,13 @@ attributes: age bucket, sex, race simple
 
 ```{r, message = FALSE}
 prep001 <- prep001()
-starting001 <- prep001$starting
+
 lookup001 <- prep001$lookup
 
+starting001 <- prep001$starting %>%
+  add_opt_out_prob() %>%
+  add_opt_out_decision(opt_out_prob, .5)
+  
 save(starting001, file = paste(here("data", "starting"), "starting-data-001.rda", sep = "/"))
 save(lookup001, file = paste(here("data", "lookup"), "lookup-data-001.rda", sep = "/"))
 ```
