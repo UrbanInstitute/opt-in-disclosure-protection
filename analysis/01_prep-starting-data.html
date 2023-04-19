@@ -2607,11 +2607,10 @@ vertical-align: -.125em;
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#prep-pums-data" id="toc-prep-pums-data" class="nav-link active" data-scroll-target="#prep-pums-data">Prep PUMS data</a>
+  <li><a href="#prep-starting-data" id="toc-prep-starting-data" class="nav-link active" data-scroll-target="#prep-starting-data">Prep starting data</a>
   <ul class="collapse">
-  <li><a href="#prep-layout-dictionary-and-helper-list" id="toc-prep-layout-dictionary-and-helper-list" class="nav-link" data-scroll-target="#prep-layout-dictionary-and-helper-list">Prep layout dictionary and helper list</a></li>
-  <li><a href="#dc-only" id="toc-dc-only" class="nav-link" data-scroll-target="#dc-only">DC only</a></li>
-  <li><a href="#multiple-states" id="toc-multiple-states" class="nav-link" data-scroll-target="#multiple-states">Multiple states</a></li>
+  <li><a href="#dc-only---for-exploratory" id="toc-dc-only---for-exploratory" class="nav-link" data-scroll-target="#dc-only---for-exploratory">DC only - for exploratory</a></li>
+  <li><a href="#starting-data-001" id="toc-starting-data-001" class="nav-link" data-scroll-target="#starting-data-001">starting-data-001</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -2635,71 +2634,34 @@ vertical-align: -.125em;
 
 </header>
 
-<section id="prep-pums-data" class="level2">
-<h2 class="anchored" data-anchor-id="prep-pums-data">Prep PUMS data</h2>
+<section id="prep-starting-data" class="level2">
+<h2 class="anchored" data-anchor-id="prep-starting-data">Prep starting data</h2>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(purrr)</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(here)</span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="fu">here</span>(<span class="st">&quot;R&quot;</span>, <span class="st">&quot;process-pums.R&quot;</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="fu">here</span>(<span class="st">&quot;R&quot;</span>, <span class="st">&quot;process-pums.R&quot;</span>))</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="fu">here</span>(<span class="st">&quot;R&quot;</span>, <span class="st">&quot;prep001.R&quot;</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<section id="prep-layout-dictionary-and-helper-list" class="level3">
-<h3 class="anchored" data-anchor-id="prep-layout-dictionary-and-helper-list">Prep layout dictionary and helper list</h3>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">load</span>(<span class="fu">here</span>(<span class="st">&quot;data&quot;</span>, <span class="st">&quot;layout&quot;</span>, <span class="st">&quot;fwf-layout-dict.rda&quot;</span>))</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>layout_dictlist <span class="ot">&lt;-</span> <span class="fu">unique</span>(layout_dict<span class="sc">$</span>VARIABLE)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>prep_layout_dict <span class="ot">&lt;-</span> <span class="cf">function</span>(variable) {</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  helper_dict <span class="ot">&lt;-</span> layout_dict <span class="sc">%&gt;%</span></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(VARIABLE <span class="sc">==</span> variable) <span class="sc">%&gt;%</span></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(<span class="sc">-</span><span class="fu">c</span>(VARIABLE)) <span class="sc">%&gt;%</span></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">rename</span>(<span class="sc">!!</span><span class="fu">as.name</span>(variable) <span class="sc">:</span><span class="er">=</span> LO,</span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>           <span class="sc">!!</span><span class="fu">paste0</span>(variable, <span class="st">&quot;_VAL&quot;</span>) <span class="sc">:</span><span class="er">=</span> <span class="st">`</span><span class="at">VALUE DESCRIPTION</span><span class="st">`</span>)</span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(helper_dict)</span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>layout_list <span class="ot">&lt;-</span> <span class="fu">map</span>(layout_dictlist, prep_layout_dict)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-</section>
-<section id="dc-only" class="level3">
-<h3 class="anchored" data-anchor-id="dc-only">DC only</h3>
+<section id="dc-only---for-exploratory" class="level3">
+<h3 class="anchored" data-anchor-id="dc-only---for-exploratory">DC only - for exploratory</h3>
 <p>10% subsample of total population</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>df_dc <span class="ot">&lt;-</span> <span class="fu">process_pums</span>(<span class="st">&quot;DC&quot;</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>dc_merge_list <span class="ot">&lt;-</span> <span class="fu">append</span>(layout_list, <span class="fu">list</span>(df_dc), <span class="at">after =</span> <span class="dv">0</span>)</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>df_dc_full <span class="ot">&lt;-</span> <span class="fu">Reduce</span>(left_join, dc_merge_list)</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="fu">rm</span>(df_dc)</span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="fu">rm</span>(dc_merge_list)</span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="fu">save</span>(df_dc_full, <span class="at">file =</span> <span class="fu">paste</span>(<span class="fu">here</span>(<span class="st">&quot;data&quot;</span>, <span class="st">&quot;pums&quot;</span>), <span class="st">&quot;pums-dc.rda&quot;</span>, <span class="at">sep =</span> <span class="st">&quot;/&quot;</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>df_dc <span class="ot">&lt;-</span> <span class="fu">process_pums</span>(<span class="st">&quot;DC&quot;</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">save</span>(df_dc, <span class="at">file =</span> <span class="fu">paste</span>(<span class="fu">here</span>(<span class="st">&quot;data&quot;</span>, <span class="st">&quot;pums&quot;</span>), <span class="st">&quot;pums-dc.rda&quot;</span>, <span class="at">sep =</span> <span class="st">&quot;/&quot;</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="multiple-states" class="level3">
-<h3 class="anchored" data-anchor-id="multiple-states">Multiple states</h3>
-<p>0.1% subsample of total population (1% subsample of PUMS records)</p>
+<section id="starting-data-001" class="level3">
+<h3 class="anchored" data-anchor-id="starting-data-001">starting-data-001</h3>
+<p>DC and IA only attributes: age bucket, sex, race simple</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>state_list <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;DC&quot;</span>, <span class="st">&quot;NM&quot;</span>, <span class="st">&quot;OR&quot;</span>, <span class="st">&quot;MN&quot;</span>, <span class="st">&quot;FL&quot;</span>, <span class="st">&quot;NE&quot;</span>)</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>subsample_list <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="fu">c</span>(<span class="st">&quot;00&quot;</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>pums_list <span class="ot">&lt;-</span> <span class="fu">map2</span>(state_list, subsample_list, process_pums)</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>df_mult_00 <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(pums_list)</span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="fu">rm</span>(pums_list)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>mult_merge_list <span class="ot">&lt;-</span> <span class="fu">append</span>(layout_list, <span class="fu">list</span>(df_mult_00), <span class="at">after =</span> <span class="dv">0</span>)</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>df_mult_00_full <span class="ot">&lt;-</span> <span class="fu">Reduce</span>(left_join, mult_merge_list)</span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="fu">rm</span>(df_mult_00)</span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="fu">rm</span>(mult_merge_list)</span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="fu">save</span>(df_mult_00_full, <span class="at">file =</span> <span class="fu">paste</span>(<span class="fu">here</span>(<span class="st">&quot;data&quot;</span>, <span class="st">&quot;pums&quot;</span>), <span class="st">&quot;pums-mult-00.rda&quot;</span>, <span class="at">sep =</span> <span class="st">&quot;/&quot;</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>prep001 <span class="ot">&lt;-</span> <span class="fu">prep001</span>()</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>df001 <span class="ot">&lt;-</span> prep001<span class="sc">$</span>df</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>lookup001 <span class="ot">&lt;-</span> prep001<span class="sc">$</span>lookup</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="fu">save</span>(df, <span class="at">file =</span> <span class="fu">paste</span>(<span class="fu">here</span>(<span class="st">&quot;data&quot;</span>, <span class="st">&quot;starting&quot;</span>), <span class="st">&quot;starting-data-001.rda&quot;</span>, <span class="at">sep =</span> <span class="st">&quot;/&quot;</span>))</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="fu">save</span>(df, <span class="at">file =</span> <span class="fu">paste</span>(<span class="fu">here</span>(<span class="st">&quot;data&quot;</span>, <span class="st">&quot;lookup&quot;</span>), <span class="st">&quot;lookup-data-001.rda&quot;</span>, <span class="at">sep =</span> <span class="st">&quot;/&quot;</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 </section>

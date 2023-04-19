@@ -1,0 +1,46 @@
+---
+title: "Prep PUMS data for analysis"
+format: 
+  html:
+    embed-resources: true
+    toc: true
+editor: source
+execute:
+  echo: true
+  warning: false
+  message: false
+---
+
+## Prep starting data
+
+```{r setup}
+library(tidyverse)
+library(purrr)
+library(here)
+
+source(here("R", "process-pums.R"))
+source(here("R", "prep001.R"))
+```
+
+### DC only - for exploratory
+
+10% subsample of total population
+
+```{r, message = FALSE}
+df_dc <- process_pums("DC")
+save(df_dc, file = paste(here("data", "pums"), "pums-dc.rda", sep = "/"))
+```
+
+### starting-data-001
+
+DC and IA only
+attributes: age bucket, sex, race simple
+
+```{r, message = FALSE}
+prep001 <- prep001()
+df001 <- prep001$df
+lookup001 <- prep001$lookup
+
+save(df, file = paste(here("data", "starting"), "starting-data-001.rda", sep = "/"))
+save(df, file = paste(here("data", "lookup"), "lookup-data-001.rda", sep = "/"))
+```
