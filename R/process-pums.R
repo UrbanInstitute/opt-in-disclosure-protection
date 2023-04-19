@@ -50,7 +50,8 @@ process_pums <- function(state_abb,
     dplyr::mutate(across(everything(), as.character))
   
   # join housing and person, exclude unoccupied housing units
-  df_join <- dplyr::full_join(housing, person, by = "SERIALNO")
+  df_join <- dplyr::full_join(housing, person, by = "SERIALNO") |>
+    dplyr::mutate(AGE = as.numeric(AGE))
   
   df_join_occ <- df_join |>
     dplyr::filter(!(UNITTYPE == "0" & is.na(PNUM)))
@@ -64,6 +65,11 @@ process_pums <- function(state_abb,
     df <- df_join_occ
   }
   
-  return(df)
+  # add dictionary values
+  load(here::here("data", "layout", "fwf-layout-list.rda"))
+  merge_list <- append(layout_list, list(df), after = 0)
+  df_full <- Reduce(left_join, merge_list)
+  
+  return(df_full)
   
 }
