@@ -1,34 +1,53 @@
+
+################################################################
+
 library(tidyverse)
+library(urbnthemes)
 
-# set.seed(1)
-# data <- tibble(x = rbinom(n = 100, size = 1, prob = 0.5)) %>%
-#   mutate(id = if_else(x == 0, "0001", "0002"))
+age_bucket <- c("Child", "Adult", "Senior")
+sex_val <- c("Male", "Female")
+race_simple <- c("White", "Black", "Hispanic", "Other")
+lookup <- expand.grid(age_bucket, sex_val, race_simple)
+attrbs <- c("age_bucket", "sex_val", "race_simple")
+names(lookup) <- attrbs
 
-data <- tibble(x = c(rep(0, 5000), rep(1, 5000), rep(2, 5000)))  %>%
-  mutate(id = case_when(x == 0 ~ "0001", 
-                        x == 1 ~ "0002",
-                        x == 2 ~ "0003"))
+data <- lookup %>%
+  mutate(freq = sample(1000:10000, n())) %>%
+  uncount(freq)
 
 sample_other_id <- function(id, ids) {
   
   ids_disjoint <- ids[ids != id] 
-  
   sample(ids_disjoint, size = 1)
   
 }
 
+grrout <- grr(data = data, lookup = lookup, epsilon = 3, attrbs = attrbs)
 
+# compare
+summ_fn <- function(input) {
+  
+  summ <- input %>%
+    group_by(across(all_of(attrbs))) %>%
+    summarize(pct = n() / nrow(input))    
+  
+  return(summ)
+  
+}
 
-lookup <- tibble(
-  x = c(0, 1, 2),
-  id = c("0001", "0002", "0003")
-)
+comp <- full_join(summ_fn(data), summ_fn(grrout), by = attrbs) %>%
+  mutate(diff = pct.y - pct.x,
+         diff_abs = abs(diff),
+         diff_pct = (diff_abs / pct.x) * 100)
 
-grr3(data = data, lookup = lookup, epsilon = 0.1)
+# pct difference
+summary(comp$diff_pct)
 
-map_dbl(.x = 1:10, ~mean(grr3(data = data, lookup = lookup, epsilon = 0.1)$data_synth$x == 1))
+comp %>%
+  arrange(-diff_pct)
 
-
-
-
+# inverse relationship: smaller group = larger pct difference noise
+ggplot(comp, aes(x = pct.x, y = diff_pct)) +
+  geom_point() +
+  geom_smooth(method = lm)
 

@@ -1,10 +1,21 @@
-grr3 <- function(data, lookup, epsilon) {
+
+grr <- function(data, lookup, epsilon, attrbs) {
   
-  k <- 3
+  # create id
+  data <- data %>%
+    group_by(across(all_of(attrbs))) %>%
+    mutate(id = str_pad(cur_group_id(), width = 3, side = "left", pad = "0"))
+  
+  lookup <- lookup %>%
+    group_by(across(all_of(attrbs))) %>%
+    mutate(id = str_pad(cur_group_id(), width = 3, side = "left", pad = "0"))
+  
+  # set k to number of combinations in lookup table
+  k <- nrow(lookup)
   
   # check inputs
   # all ids should be in lookup table
-  
+  stopifnot(data$id %in% lookup$id)
   
   # calculate the probability of telling the truth
   p <- exp(epsilon) / (exp(epsilon) + k - 1)
@@ -15,10 +26,8 @@ grr3 <- function(data, lookup, epsilon) {
     size = nrow(data), 
     replace = TRUE,
     prob = c(p, (1 - p))
-  ) 
-  
-  #print(mean(flips == "lie"))
-  
+  )
+
   # keep truth
   # if everything is truth, then return the original data
   data_keep <- data[flips == "truth", ]
@@ -36,46 +45,40 @@ grr3 <- function(data, lookup, epsilon) {
   
   new_ids <- map_chr(.x = ids_replace, .f = sample_other_id, ids = lookup$id)
   
+  # estimated number of each case, and total N
   N_hat_i <- table(c(new_ids, ids_keep))
-  N_hat_1 <- N_hat_i[1]
-  N_hat_2 <- N_hat_i[2]
-  N_hat_3 <- N_hat_i[3]
-  
-  #k <- length(N_hat_i)
-  
   N <- sum(N_hat_i)
   
-  #f_hat_i <- (p - 1) / (2 * p - 1) + (N_hat_i / ((2 * p - 1) * N))
+  # calculate estimated frequency of each class
+  # bound estimated proportions between 0 and 1
+  f_hat <- function(N_hat) {
+    f_hat_i <- ((N_hat / N) - (1 / (exp(epsilon) + k - 1))) * ((exp(epsilon) + k - 1) / (exp(epsilon) - 1))
+    f_hat_i_bound <- case_when(f_hat_i > 1 ~ 1,
+                               f_hat_i < 0 ~ 0,
+                               .default = f_hat_i)
+    return(f_hat_i_bound)
+  }
   
-  # f_hat_i <- ((N_hat_i / N) - (1 / (exp(epsilon) + k - 1))) *
-  #   ((exp(epsilon) + k - 1) / (exp(epsilon) - 1))
+  f_hat_list <- lapply(N_hat_i, f_hat)
   
-  f_hat_1 <- ((N_hat_1 / N) - (1 / (exp(epsilon) + k - 1))) * ((exp(epsilon) + k - 1) / (exp(epsilon) - 1))
-  f_hat_2 <- ((N_hat_2 / N) - (1 / (exp(epsilon) + k - 1))) * ((exp(epsilon) + k - 1) / (exp(epsilon) - 1))
-  f_hat_3 <- ((N_hat_3 / N) - (1 / (exp(epsilon) + k - 1))) * ((exp(epsilon) + k - 1) / (exp(epsilon) - 1))
-  
-  #if (f_hat_1 > 1){
-  #  f_hat_1 <- 1
-  #}
-  
-  #if (f_hat_1 < 0){
-  #  f_hat_1 <- 0
-  #}
-  
+  # if any estimated frequency < 0, redistribute to nonzero values
+  if (Reduce("+", f_hat_list) < 1){
+    remain <- (1 - Reduce("+", f_hat_list)) / sum(f_hat_list != 0)
+    f_hat_list <- lapply(f_hat_list[f_hat_list != 0], function(x) x = x + remain)
+  }
+
+  # use estimated frequencies to construct noisy data
+  # does this have to be a sample or can this be deterministic from estimated proportions?
   synth_ids <- sample(
     x = names(N_hat_i), 
     size = nrow(data), 
     replace = TRUE, 
-    prob = c(f_hat_1, f_hat_2, f_hat_3)
+    prob = f_hat_list
   )
   
   data_synth <- tibble(id = synth_ids) %>%
     left_join(lookup, by = "id")
-  
-  var_f_hat_1 <- (exp(epsilon) + k - 2) / (N * (exp(epsilon) - 1)**2)
-  
-  return_list <- list(data_synth = data_synth, var_f_hat_1 = var_f_hat_1)
-  
-  return(return_list)
+
+  return(data_synth)
   
 }
