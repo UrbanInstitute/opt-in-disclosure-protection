@@ -124,7 +124,7 @@ df_read <- read.csv("https://raw.githubusercontent.com/uvm-plaid/programming-dp/
 # right now the function has df$agg_group hard coded, so need to rename here
 df <- df_read %>%
   rename_with(tolower, everything()) %>%
-  mutate(occupation = ifelse(occupation == "", "Miss", occupation)) %>%
+  mutate(occupation = ifelse(occupation == "", "Missing", occupation)) %>%
   select(name, occupation) %>%
   rename(agg_group = occupation)
 
