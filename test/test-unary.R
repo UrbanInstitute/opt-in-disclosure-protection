@@ -3,6 +3,7 @@ library(tidyverse)
 
 # UNARY ENCODING
 # https://programming-dp.com/ch13.html#unary-encoding
+# follows along the python code steps
 
 # set p, q (and epsilon)
 p = .75
@@ -22,10 +23,12 @@ opt_prob <- 0.3
 
 df <- df_read %>%
   rename_with(tolower, everything()) %>%
-  mutate(occupation = ifelse(occupation == "", "Miss", occupation)) %>%
+  mutate(occupation = ifelse(occupation == "", "Missing", occupation)) %>%
   select(name, occupation)
 
-df$optout <- rbinom(n = nrow(df_read), size = 1, prob = opt_prob)
+df$optout <- rbinom(n = nrow(df_read), 
+                    size = 1, 
+                    prob = opt_prob)
 
 # create domain
 domain <- unique(df$occupation)
@@ -108,5 +111,7 @@ compare <- tibble(occupation = domain,
                   count_privacy = count_true_optout + count_perturbed_privacy,
                   pct_diff = (abs(count_privacy - count_true) / count_true) * 100)
 
+compare
 summary(compare$pct_diff)
 
+# negative counts -> post processing?

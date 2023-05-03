@@ -4,10 +4,11 @@ library(ggplot2)
 
 # UNARY ENCODING
 # https://programming-dp.com/ch13.html#unary-encoding
+# set up functions then iterate over opt out rates
 
 # epsilon function
-unary_epsilon <- function(p){
-  return(log((p*(1-(1-p))) / ((1-p)*(1-p))))
+unary_epsilon <- function(p, q){
+  return(log((p*(1-q)) / (q*q)))
 }
 
 # function for encoding
@@ -30,7 +31,7 @@ perturb <- function(bit){
   }
   
   else if (bit == 0){
-    if (sample <= (1-p)){
+    if (sample <= q){
       return(1)
     }
     else{
@@ -46,26 +47,26 @@ encode_perturb <- function(response, domain){
 }
 
 # aggregate and adjust
-agg_adjust <- function(responses, p){
+agg_adjust <- function(responses, p, q){
   
   sums <- Reduce("+", responses)
   n = length(responses)
   
   vec <- c()
   for (sum in sums){
-    vec <- append(vec, (sum - n*(1-p)) / (p-(1-p)) )
+    vec <- append(vec, (sum - n*q) / (p-q) )
   }
   
   return(vec)
 }
 
 # overall unary function
-unary <- function(opt_prob, p, df){
+unary <- function(opt_prob, p, q, df){
   
   # note: right now the function has df$agg_group hard coded as the grouping variable
   
   # printing epsilon
-  print(unary_epsilon(.75))
+  print(unary_epsilon(p, q))
   
   # create opt out rate probability
   df$optout <- rbinom(n = nrow(df), size = 1, prob = opt_prob)
@@ -93,7 +94,7 @@ unary <- function(opt_prob, p, df){
   
   # perturbed counts for those who do not opt out
   if(nrow(df_privacy) > 0){  
-    count_perturbed_privacy = agg_adjust(responses_optout, p)
+    count_perturbed_privacy = agg_adjust(responses_optout, p, q)
   }
   else{
     count_perturbed_privacy = rep(0, length(domain))
@@ -115,6 +116,7 @@ unary <- function(opt_prob, p, df){
 
 # set p
 p <- 0.75
+q <- 1 - p
 
 # prep dataset from Programming Differential Privacy
 df_read <- read.csv("https://raw.githubusercontent.com/uvm-plaid/programming-dp/master/notebooks/adult_with_pii.csv")
@@ -128,7 +130,7 @@ df <- df_read %>%
 
 # iterate over opt out rates
 opt_out_rates <- seq(0, 1, by = 0.05)
-results <- lapply(opt_out_rates, unary, .75, df)
+results <- lapply(opt_out_rates, unary, p, q, df)
 med_pct_diff <- sapply(results, function(x) {median(x$pct_diff)})
 
 ggplot() + 
