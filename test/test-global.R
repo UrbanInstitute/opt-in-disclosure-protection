@@ -21,7 +21,7 @@ counts <- df %>%
 # note: histograms automatically satisfy parallel composition
 
 # set epsilon, create noise function
-epsilon = .5
+epsilon = 1
 
 add_noise <- function(x){
   return(x + rLaplace(1, mu = 0, b = 1/epsilon))
