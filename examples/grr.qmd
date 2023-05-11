@@ -1,0 +1,49 @@
+---
+title: "GRR"
+format: html
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r}
+#| message: false
+
+library(tidyverse)
+
+source(here::here("R", "grr.R"))
+source(here::here("R", "add_D_i.R"))
+source(here::here("R", "create_D.R"))
+
+```
+
+Let's create a simple example with two variables from the diamonds data set. The cardinality of the cartesian product is 35 but we drop an observed combination to ensure that the combination is included in the noisy data. 
+
+```{r}
+data <- diamonds %>%
+  select(cut, color) %>%
+  mutate(across(everything(), as.character)) %>%
+  filter(!(cut == "Fair" & color == "D"))
+
+```
+
+`add_D_i()` and `create_D()` are important functions for ensuring the missing combinations are included. 
+
+```{r}
+add_D_i(data)
+create_D(data)
+
+
+```
+
+Demonstrate the method with $\epsilon = 1$ and $\epsilon = 10$.
+
+```{r}
+data %>%
+  add_D_i() %>%
+  grr(epsilon = 1)
+
+data %>%
+  add_D_i() %>%
+  grr(epsilon = 10)
+
+```
