@@ -1,16 +1,16 @@
-#' Add probability of opt out to starting data
+#' Add probability of opt in (household level) to starting data
 #'
 #' @param starting_data A dataframe of starting data
 #' 
 #' @return A dataframe of starting data with probability column added
 #'
-add_opt_out_prob <- function(starting_data) {
+add_prob_opt_in <- function(starting_data) {
   
   households <- starting_data |>
     dplyr::select(serialno) |>
     dplyr::distinct()
   
-  households$opt_out_prob <- runif(nrow(households))
+  households$prob_opt_in <- runif(nrow(households))
   
   new_df <- starting_data |>
     dplyr::full_join(households, by = "serialno")

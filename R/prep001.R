@@ -14,8 +14,8 @@ prep001 <- function() {
 
   df_comb <- map_dfr(state_list, process_pums)
 
+  keepvars <- c("serialno")
   geovars <- c("state", "puma")
-  
   attribs <- c("age_bucket", "sex_val", "race_simple")
   
   starting <- df_comb |>
@@ -30,7 +30,7 @@ prep001 <- function() {
         between(age, 18, 64) == TRUE ~ "Adult",
         age >= 65 ~ "Senior")
       ) |>
-    dplyr::select(all_of(c(geovars, attribs)))
+    dplyr::select(all_of(c(keepvars, geovars, attribs)))
   
   return(starting)
   
