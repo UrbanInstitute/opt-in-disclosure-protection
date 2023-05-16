@@ -29,13 +29,13 @@ The excel layout file provides variable widths, names, dictionary values, etc. f
 
 ```{r}
 person_layout <- read_excel(here("resources", "2010 PUMS Record Layout.xlsx"), sheet = "Person", skip = 1)
-save(layout, file = paste(here("data", "layout"), "fwf-person-layout.rda", sep = "/"))
+saveRDS(layout, file = paste(here("data", "layout"), "fwf-person-layout.rds", sep = "/"))
 
 housing_layout <- read_excel(here("resources", "2010 PUMS Record Layout.xlsx"), sheet = "Housing", skip = 1)
-save(layout, file = paste(here("data", "layout"), "fwf-housing-layout.rda", sep = "/"))
+saveRDS(layout, file = paste(here("data", "layout"), "fwf-housing-layout.rds", sep = "/"))
 
 layout <- rbind(person_layout, housing_layout)
-save(layout, file = paste(here("data", "layout"), "fwf-layout.rda", sep = "/"))
+saveRDS(layout, file = paste(here("data", "layout"), "fwf-layout.rds", sep = "/"))
 ```
 
 ### Prep value description fields
@@ -49,7 +49,7 @@ layout_dict <- layout %>%
   group_by(VARIABLE) %>%
   filter(n() > 1) %>%
   ungroup()
-save(layout_dict, file = paste(here("data", "layout"), "fwf-layout-dict.rda", sep = "/"))
+saveRDS(layout_dict, file = paste(here("data", "layout"), "fwf-layout-dict.rds", sep = "/"))
 ```
 
 ### Prep layout dictionary and helper list
@@ -73,5 +73,5 @@ prep_layout_dict <- function(variable) {
 
 ```{r}
 layout_list <- map(layout_dictlist, prep_layout_dict)
-save(layout_list, file = paste(here("data", "layout"), "fwf-layout-list.rda", sep = "/"))
+saveRDS(layout_list, file = paste(here("data", "layout"), "fwf-layout-list.rds", sep = "/"))
 ```
