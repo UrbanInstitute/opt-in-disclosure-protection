@@ -7,7 +7,7 @@
 #' @return A dataframe of PUMS observations for selected state and subsample, if provided
 #'
 process_pums <- function(state_abb, 
-                         subsample = NULL){
+                         subsample = NULL) {
   
   # validate state abbreviation and create url string
   state.abb.adj <- append(state.abb, "DC")
@@ -15,12 +15,14 @@ process_pums <- function(state_abb,
   
   stopifnot((toupper(state_abb) %in% state.abb.adj))
   
-  fwf <- sprintf("https://www2.census.gov/census_2010/12-Stateside_PUMS/%s/%s.2010.pums.01.txt", 
-                 gsub(" ", "_", state.name.adj[grep(toupper(state_abb), state.abb.adj)]),
-                 tolower(state_abb))
+  fwf <- paste0("https://www2.census.gov/census_2010/12-Stateside_PUMS/",
+                 str_replace_all(state.name.adj[str_detect(state.abb.adj, toupper(state_abb))], " ", "_"), 
+                 "/",
+                 tolower(state_abb),
+                 ".2010.pums.01.txt")
   
   # prep helper layout files, read PUMS fwf
-  load(here::here("data", "layout", "fwf-layout.rda"))
+  layout <- readRDS(here::here("data", "layout", "fwf-layout.rds"))
   housing_layout_vars <- layout |>
     dplyr::filter(RT == "H") |>
     dplyr::select(LEN, VARIABLE) |>
@@ -38,7 +40,7 @@ process_pums <- function(state_abb,
                                                col_names = housing_layout_vars$VARIABLE), 
                              show_col_types = FALSE) |>
     dplyr::filter(RECTYPE == "H") |>
-    dplyr::select(-any_of(c("PADDING", "RECTYPE"))) |>
+    dplyr::select(-RECTYPE) |>
     dplyr::mutate(across(everything(), as.character))
   
   person <- readr::read_fwf(fwf, 
@@ -46,7 +48,7 @@ process_pums <- function(state_abb,
                                               col_names = person_layout_vars$VARIABLE), 
                             show_col_types = FALSE) |>
     dplyr::filter(RECTYPE == "P") |>
-    dplyr::select(-any_of(c("PADDING", "RECTYPE"))) |>
+    dplyr::select(-c(PADDING, RECTYPE)) |>
     dplyr::mutate(across(everything(), as.character))
   
   # join housing and person, exclude unoccupied housing units
@@ -66,7 +68,7 @@ process_pums <- function(state_abb,
   }
   
   # add dictionary values
-  load(here::here("data", "layout", "fwf-layout-list.rda"))
+  layout_list <- readRDS(here::here("data", "layout", "fwf-layout-list.rds"))
   merge_list <- append(layout_list, list(df), after = 0)
   df_full <- Reduce(left_join, merge_list) |>
     dplyr::rename_with(tolower, everything())

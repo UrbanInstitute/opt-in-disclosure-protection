@@ -6,15 +6,14 @@
 #'
 #' @return A list containing starting data 001 and accompanying lookup table
 #'
-prep001 <- function(){
+prep001 <- function() {
   
   source(here("R", "process-pums.R"))
   
   state_list <- c("DC", "IA")
 
-  pums_list <- map(state_list, process_pums)
-  df_comb <- bind_rows(pums_list)
-  
+  df_comb <- map_dfr(state_list, process_pums)
+
   keepvars <- c("serialno", "state", "state_val", "puma", 
                 "subsampl", "hweight", "persons", "unittype", "hsubflg", 
                 "pnum", "psub", "pweight")

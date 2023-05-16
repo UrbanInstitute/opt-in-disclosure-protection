@@ -4,7 +4,7 @@
 #' 
 #' @return A dataframe of starting data with probability column added
 #'
-add_opt_out_prob <- function(starting_data){
+add_opt_out_prob <- function(starting_data) {
   
   households <- starting_data |>
     dplyr::select(serialno) |>
@@ -13,7 +13,7 @@ add_opt_out_prob <- function(starting_data){
   households$opt_out_prob <- runif(nrow(households))
   
   new_df <- starting_data |>
-    dplyr::full_join(households)
+    dplyr::full_join(households, by = "serialno")
   
   return(new_df)
   

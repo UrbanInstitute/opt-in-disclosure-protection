@@ -15,7 +15,6 @@ execute:
 
 ```{r setup}
 library(tidyverse)
-library(purrr)
 library(here)
 
 source(here("R", "process-pums.R"))
@@ -30,7 +29,7 @@ source(here("R", "add-opt-out-decision.R"))
 
 ```{r, message = FALSE}
 df_dc <- process_pums("DC")
-save(df_dc, file = paste(here("data", "pums"), "pums-dc.rda", sep = "/"))
+saveRDS(df_dc, file = paste(here("data", "pums"), "pums-dc.rds", sep = "/"))
 ```
 
 ### starting-data-001
@@ -45,9 +44,9 @@ lookup001 <- prep001$lookup
 
 starting001 <- prep001$starting %>%
   add_opt_out_prob() %>%
-  add_opt_out_decision(opt_out_prob, .5)
+  add_opt_out_decision(opt_out_prob, 0.5)
   
-save(starting001, file = paste(here("data", "starting"), "starting-data-001.rda", sep = "/"))
-save(lookup001, file = paste(here("data", "lookup"), "lookup-data-001.rda", sep = "/"))
+saveRDS(starting001, file = paste(here("data", "starting"), "starting-data-001.rds", sep = "/"))
+saveRDS(lookup001, file = paste(here("data", "lookup"), "lookup-data-001.rds", sep = "/"))
 ```
 

@@ -8,10 +8,10 @@
 #'
 add_opt_out_decision <- function(starting_data, 
                                  opt_out_prob,
-                                 threshold){
+                                 threshold) {
 
   new_df <- starting_data |>
-    dplyr::mutate(opt_out_decision = ifelse(opt_out_prob >= threshold, 1, 0))
+    dplyr::mutate(opt_out_decision = if_else(opt_out_prob >= threshold, 1, 0))
   
   return(new_df)
   
