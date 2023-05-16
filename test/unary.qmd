@@ -1,0 +1,33 @@
+---
+title: "Testing Unary Encoding"
+format: 
+  html:
+    embed-resources: true
+    toc: true
+editor: source
+execute:
+  echo: true
+  warning: false
+  message: false
+---
+
+## Unary encoding
+
+Following same example as GRR using diamonds data set.
+
+```{r}
+data <- diamonds %>%
+  select(cut, color) %>%
+  mutate(across(everything(), as.character)) %>%
+  filter(!(cut == "Fair" & color == "D"))
+```
+
+Copies of functions in here for now:
+
+```{r}
+
+```
+
+```{r}
+
+```
