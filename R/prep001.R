@@ -8,15 +8,13 @@
 #'
 prep001 <- function() {
   
-  source(here("R", "process-pums.R"))
+  source(here::here("R", "process-pums.R"))
   
   state_list <- c("DC", "IA")
 
   df_comb <- map_dfr(state_list, process_pums)
 
-  keepvars <- c("serialno", "state", "state_val", "puma", 
-                "subsampl", "hweight", "persons", "unittype", "hsubflg", 
-                "pnum", "psub", "pweight")
+  geovars <- c("state", "puma")
   
   attribs <- c("age_bucket", "sex_val", "race_simple")
   
@@ -32,14 +30,8 @@ prep001 <- function() {
         between(age, 18, 64) == TRUE ~ "Adult",
         age >= 65 ~ "Senior")
       ) |>
-    dplyr::select(all_of(c(attribs, keepvars)))
+    dplyr::select(all_of(c(geovars, attribs)))
   
-  lookup <- starting |>
-    dplyr::select(all_of(attribs)) |>
-    dplyr::distinct()
-  
-  prep001 <- list(starting = starting, lookup = lookup)
-  
-  return(prep001)
+  return(starting)
   
 }
