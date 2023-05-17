@@ -1,14 +1,22 @@
 ---
 title: "Unary Encoding Example"
-format: html
+format: 
+  html:
+    embed-resources: true
+    toc: true
+editor: source
+execute:
+  echo: true
+  warning: false
+  message: false
 ---
-
-## Unary Encoding Example
 
 This document walks through the workflow for applying unary encoding - either symmetric (SUE) or optimized (OUE).
 
 See: 
+
 * https://programming-dp.com/ch13.html#unary-encoding
+
 * Wang, Zhang, Feng, Yang 2020
 
 ```{r}
