@@ -1,0 +1,106 @@
+---
+title: "Unary Encoding Example"
+format: html
+---
+
+## Unary Encoding Example
+
+This document walks through the workflow for applying unary encoding - either symmetric (SUE) or optimized (OUE).
+
+See: 
+* https://programming-dp.com/ch13.html#unary-encoding
+* Wang, Zhang, Feng, Yang 2020
+
+```{r}
+library(tidyverse)
+library(here)
+
+source(here("R", "add-prob-opt-in.R"))
+source(here("R", "add-opt-in.R"))
+source(here("R", "hist-unaryencode.R"))
+```
+
+Grabbing create_D function from Aaron and putting it here for now.
+
+```{r}
+create_D <- function(data) {
+  
+  histogram <- data %>% 
+    dplyr::mutate(dplyr::across(dplyr::everything(), as.factor)) %>%
+    dplyr::count(dplyr::across(dplyr::everything()), .drop = FALSE)
+  
+  d <- nrow(histogram)
+  
+  D <- stringr::str_pad(1:d, width = 3, pad = "0", side = "left")
+  
+  return(D)
+  
+}
+```
+
+Grabbed add_D_i from Aaron but am editing it to add "attribs" parameter to make it easier to apply when there are also other variables I want to keep around but not include in histogram.
+
+```{r}
+add_D_i <- function(data, attribs) {
+  
+  histogram <- data %>% 
+    dplyr::mutate(dplyr::across(all_of(attribs), as.factor)) %>%
+    dplyr::count(dplyr::across(all_of(attribs)), .drop = FALSE)
+    
+  d <- nrow(histogram)
+  
+  ids <- bind_cols(
+    histogram,
+    D_i = stringr::str_pad(1:d, width = 3, pad = "0", side = "left")
+  ) %>%
+    dplyr::select(-n)
+  
+  data %>%
+    dplyr::left_join(ids, by = attribs)
+  
+}
+```
+
+Begin with starting data 001. Create a vector of attributes included in the histogram (open to considering other ways to handle this).
+
+```{r}
+starting <- readRDS(here("data", "starting", "starting-data-001.rds"))
+
+attribs <- c("age_bucket", "race_simple", "sex_val")
+```
+
+Add ids using the `attribs` vector. Add opt in probabilities (uniform random for now) and decisions using threshold of 0.5.
+
+```{r}
+data <- starting %>%
+  add_D_i(attribs) %>%
+  add_prob_opt_in() %>%
+  add_opt_in(prob_opt_in, 0.5)
+```
+
+Apply OUE separately by state.
+
+```{r}
+# split by state and do OUE with epsilon 2
+data %>%
+  group_split(state) %>%
+  map_dfr(hist_unaryencode, epsilon = 2, type = "OUE", attribs = attribs)
+
+# split by state and do SUE with epsilon 2
+data %>%
+  group_split(state) %>%
+  map_dfr(hist_unaryencode, epsilon = 2, type = "SUE", attribs = attribs)
+```
+
+```{r}
+# split by state and do OUE with epsilon 10
+data %>%
+  group_split(state) %>%
+  map_dfr(hist_unaryencode, epsilon = 10, type = "OUE", attribs = attribs)
+
+# split by state and do SUE with epsilon 10
+data %>%
+  group_split(state) %>%
+  map_dfr(hist_unaryencode, epsilon = 10, type = "SUE", attribs = attribs)
+```
+
