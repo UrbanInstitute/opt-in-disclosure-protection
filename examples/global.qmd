@@ -1,0 +1,63 @@
+---
+title: "Global DP Example"
+format: 
+  html:
+    embed-resources: true
+    toc: true
+editor: source
+execute:
+  echo: true
+  warning: false
+  message: false
+---
+
+This document walks through the workflow for applying a global DP approach - Laplace mechanism.
+
+```{r}
+library(tidyverse)
+library(here)
+
+source(here("R", "hist-global.R"))
+```
+
+Putting lap_mech function here for now.
+
+```{r}
+lap_mech <- function(n, eps, gs) {
+
+  # Calculating the scale
+  scale <- gs / eps
+
+  r <- stats::runif(n)
+
+  x <- ifelse(
+    test = r > 0.5,
+    yes = 0 - sign(r - 0.5) * scale * log(2 * (1 - r)),
+    no = 0 - sign(r - 0.5) * scale * log(2 * r)
+  )
+
+  return(x)
+}
+```
+
+Begin with starting data 001. Create a vector of attributes included in the histogram (open to considering other ways to handle this).
+
+```{r}
+starting <- readRDS(here("data", "starting", "starting-data-001.rds"))
+
+attribs <- c("age_bucket", "race_simple", "sex_val")
+```
+
+Apply separately by state.
+
+```{r}
+# split by state and use epsilon 2
+starting %>%
+  group_split(state) %>%
+  map_dfr(hist_global, epsilon = 2, attribs = attribs)
+
+# split by state and use epsilon 10
+starting %>%
+  group_split(state) %>%
+  map_dfr(hist_global, epsilon = 10, attribs = attribs)
+```
