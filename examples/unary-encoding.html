@@ -2685,8 +2685,8 @@ vertical-align: -.125em;
 <div class="cell">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>data <span class="ot">&lt;-</span> starting <span class="sc">%&gt;%</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_D_i</span>(attribs) <span class="sc">%&gt;%</span></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_prob_opt_in</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_opt_in</span>(prob_opt_in, <span class="fl">0.5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_prob_opt_in</span>(<span class="at">prob =</span> <span class="st">&quot;uniform&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_opt_in</span>(<span class="at">prob_opt_in =</span> prob_opt_in, <span class="at">threshold =</span> <span class="fl">0.5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Apply OUE separately by state.</p>
 <div class="cell">
@@ -2698,16 +2698,16 @@ vertical-align: -.125em;
 <pre><code># A tibble: 48 × 7
    age_bucket race_simple sex_val D_i       n n_noisy state
    &lt;chr&gt;      &lt;chr&gt;       &lt;chr&gt;   &lt;chr&gt; &lt;int&gt;   &lt;dbl&gt; &lt;chr&gt;
- 1 Adult      Black       Female  001   10633  10708. 11   
- 2 Adult      Black       Male    002    8913   8825. 11   
- 3 Adult      Hispanic    Female  003     946   1058. 11   
- 4 Adult      Hispanic    Male    004    1139   1057. 11   
- 5 Adult      Other       Female  005    1683   1847. 11   
- 6 Adult      Other       Male    006    1179   1381. 11   
- 7 Adult      White       Female  007    9401   9409. 11   
- 8 Adult      White       Male    008    9401   9503. 11   
- 9 Child      Black       Female  009    3326   3408. 11   
-10 Child      Black       Male    010    3400   3137. 11   
+ 1 Adult      Black       Female  001   10633  10632. 11   
+ 2 Adult      Black       Male    002    8913   9013. 11   
+ 3 Adult      Hispanic    Female  003     946    978. 11   
+ 4 Adult      Hispanic    Male    004    1139   1121. 11   
+ 5 Adult      Other       Female  005    1683   1624. 11   
+ 6 Adult      Other       Male    006    1179   1037. 11   
+ 7 Adult      White       Female  007    9401   9341. 11   
+ 8 Adult      White       Male    008    9401   9254. 11   
+ 9 Child      Black       Female  009    3326   3348. 11   
+10 Child      Black       Male    010    3400   3114. 11   
 # ℹ 38 more rows</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># split by state and do SUE with epsilon 2</span></span>
@@ -2718,16 +2718,16 @@ vertical-align: -.125em;
 <pre><code># A tibble: 48 × 7
    age_bucket race_simple sex_val D_i       n n_noisy state
    &lt;chr&gt;      &lt;chr&gt;       &lt;chr&gt;   &lt;chr&gt; &lt;int&gt;   &lt;dbl&gt; &lt;chr&gt;
- 1 Adult      Black       Female  001   10633  10787. 11   
- 2 Adult      Black       Male    002    8913   8905. 11   
- 3 Adult      Hispanic    Female  003     946    983. 11   
- 4 Adult      Hispanic    Male    004    1139   1127. 11   
- 5 Adult      Other       Female  005    1683   1695. 11   
- 6 Adult      Other       Male    006    1179   1533. 11   
- 7 Adult      White       Female  007    9401   9424. 11   
- 8 Adult      White       Male    008    9401   9318. 11   
- 9 Child      Black       Female  009    3326   3277. 11   
-10 Child      Black       Male    010    3400   3473. 11   
+ 1 Adult      Black       Female  001   10633  10839. 11   
+ 2 Adult      Black       Male    002    8913   8961. 11   
+ 3 Adult      Hispanic    Female  003     946   1269. 11   
+ 4 Adult      Hispanic    Male    004    1139    943. 11   
+ 5 Adult      Other       Female  005    1683   1332. 11   
+ 6 Adult      Other       Male    006    1179    887. 11   
+ 7 Adult      White       Female  007    9401   9312. 11   
+ 8 Adult      White       Male    008    9401   9459. 11   
+ 9 Child      Black       Female  009    3326   3308. 11   
+10 Child      Black       Male    010    3400   3386. 11   
 # ℹ 38 more rows</code></pre>
 </div>
 </div>
@@ -2740,16 +2740,16 @@ vertical-align: -.125em;
 <pre><code># A tibble: 48 × 7
    age_bucket race_simple sex_val D_i       n n_noisy state
    &lt;chr&gt;      &lt;chr&gt;       &lt;chr&gt;   &lt;chr&gt; &lt;int&gt;   &lt;dbl&gt; &lt;chr&gt;
- 1 Adult      Black       Female  001   10633  10614. 11   
- 2 Adult      Black       Male    002    8913   8888. 11   
- 3 Adult      Hispanic    Female  003     946    927. 11   
- 4 Adult      Hispanic    Male    004    1139   1104. 11   
- 5 Adult      Other       Female  005    1683   1687. 11   
- 6 Adult      Other       Male    006    1179   1145. 11   
- 7 Adult      White       Female  007    9401   9328. 11   
- 8 Adult      White       Male    008    9401   9453. 11   
- 9 Child      Black       Female  009    3326   3276. 11   
-10 Child      Black       Male    010    3400   3459. 11   
+ 1 Adult      Black       Female  001   10633  10727. 11   
+ 2 Adult      Black       Male    002    8913   8913. 11   
+ 3 Adult      Hispanic    Female  003     946    937. 11   
+ 4 Adult      Hispanic    Male    004    1139   1148. 11   
+ 5 Adult      Other       Female  005    1683   1678. 11   
+ 6 Adult      Other       Male    006    1179   1173. 11   
+ 7 Adult      White       Female  007    9401   9462. 11   
+ 8 Adult      White       Male    008    9401   9468. 11   
+ 9 Child      Black       Female  009    3326   3278. 11   
+10 Child      Black       Male    010    3400   3390. 11   
 # ℹ 38 more rows</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># split by state and do SUE with epsilon 10</span></span>
@@ -2760,16 +2760,16 @@ vertical-align: -.125em;
 <pre><code># A tibble: 48 × 7
    age_bucket race_simple sex_val D_i       n n_noisy state
    &lt;chr&gt;      &lt;chr&gt;       &lt;chr&gt;   &lt;chr&gt; &lt;int&gt;   &lt;dbl&gt; &lt;chr&gt;
- 1 Adult      Black       Female  001   10633  10626. 11   
- 2 Adult      Black       Male    002    8913   8912. 11   
- 3 Adult      Hispanic    Female  003     946    941. 11   
- 4 Adult      Hispanic    Male    004    1139   1139. 11   
- 5 Adult      Other       Female  005    1683   1698. 11   
- 6 Adult      Other       Male    006    1179   1192. 11   
- 7 Adult      White       Female  007    9401   9389. 11   
- 8 Adult      White       Male    008    9401   9424. 11   
- 9 Child      Black       Female  009    3326   3317. 11   
-10 Child      Black       Male    010    3400   3413. 11   
+ 1 Adult      Black       Female  001   10633  10636. 11   
+ 2 Adult      Black       Male    002    8913   8926. 11   
+ 3 Adult      Hispanic    Female  003     946    931. 11   
+ 4 Adult      Hispanic    Male    004    1139   1123. 11   
+ 5 Adult      Other       Female  005    1683   1681. 11   
+ 6 Adult      Other       Male    006    1179   1175. 11   
+ 7 Adult      White       Female  007    9401   9408. 11   
+ 8 Adult      White       Male    008    9401   9416. 11   
+ 9 Child      Black       Female  009    3326   3339. 11   
+10 Child      Black       Male    010    3400   3403. 11   
 # ℹ 38 more rows</code></pre>
 </div>
 </div>

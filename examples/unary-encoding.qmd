@@ -82,8 +82,8 @@ Add ids using the `attribs` vector. Add opt in probabilities (uniform random for
 ```{r}
 data <- starting %>%
   add_D_i(attribs) %>%
-  add_prob_opt_in() %>%
-  add_opt_in(prob_opt_in, 0.5)
+  add_prob_opt_in(prob = "uniform") %>%
+  add_opt_in(prob_opt_in = prob_opt_in, threshold = 0.5)
 ```
 
 Apply OUE separately by state.
