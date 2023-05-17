@@ -2629,58 +2629,41 @@ vertical-align: -.125em;
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(here)</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="fu">here</span>(<span class="st">&quot;R&quot;</span>, <span class="st">&quot;hist-global.R&quot;</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p>Putting lap_mech function here for now.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>lap_mech <span class="ot">&lt;-</span> <span class="cf">function</span>(n, eps, gs) {</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Calculating the scale</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  scale <span class="ot">&lt;-</span> gs <span class="sc">/</span> eps</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  r <span class="ot">&lt;-</span> stats<span class="sc">::</span><span class="fu">runif</span>(n)</span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>  x <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(</span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">test =</span> r <span class="sc">&gt;</span> <span class="fl">0.5</span>,</span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">yes =</span> <span class="dv">0</span> <span class="sc">-</span> <span class="fu">sign</span>(r <span class="sc">-</span> <span class="fl">0.5</span>) <span class="sc">*</span> scale <span class="sc">*</span> <span class="fu">log</span>(<span class="dv">2</span> <span class="sc">*</span> (<span class="dv">1</span> <span class="sc">-</span> r)),</span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">no =</span> <span class="dv">0</span> <span class="sc">-</span> <span class="fu">sign</span>(r <span class="sc">-</span> <span class="fl">0.5</span>) <span class="sc">*</span> scale <span class="sc">*</span> <span class="fu">log</span>(<span class="dv">2</span> <span class="sc">*</span> r)</span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(x)</span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="fu">here</span>(<span class="st">&quot;R&quot;</span>, <span class="st">&quot;hist-global.R&quot;</span>))</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="fu">here</span>(<span class="st">&quot;R&quot;</span>, <span class="st">&quot;lap-mech.R&quot;</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Begin with starting data 001. Create a vector of attributes included in the histogram (open to considering other ways to handle this).</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>starting <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="fu">here</span>(<span class="st">&quot;data&quot;</span>, <span class="st">&quot;starting&quot;</span>, <span class="st">&quot;starting-data-001.rds&quot;</span>))</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>attribs <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;age_bucket&quot;</span>, <span class="st">&quot;race_simple&quot;</span>, <span class="st">&quot;sex_val&quot;</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>starting <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="fu">here</span>(<span class="st">&quot;data&quot;</span>, <span class="st">&quot;starting&quot;</span>, <span class="st">&quot;starting-data-001.rds&quot;</span>))</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>attribs <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;age_bucket&quot;</span>, <span class="st">&quot;race_simple&quot;</span>, <span class="st">&quot;sex_val&quot;</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Apply separately by state.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># split by state and use epsilon 2</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>starting <span class="sc">%&gt;%</span></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_split</span>(state) <span class="sc">%&gt;%</span></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">map_dfr</span>(hist_global, <span class="at">epsilon =</span> <span class="dv">2</span>, <span class="at">attribs =</span> attribs)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># split by state and use epsilon 2</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>starting <span class="sc">%&gt;%</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_split</span>(state) <span class="sc">%&gt;%</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">map_dfr</span>(hist_global, <span class="at">epsilon =</span> <span class="dv">2</span>, <span class="at">attribs =</span> attribs)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 48 × 6
    age_bucket race_simple sex_val     n n_noisy state
    &lt;chr&gt;      &lt;chr&gt;       &lt;chr&gt;   &lt;int&gt;   &lt;dbl&gt; &lt;chr&gt;
- 1 Adult      Black       Female  10633  10633. 11   
- 2 Adult      Black       Male     8913   8910. 11   
- 3 Adult      Hispanic    Female    946    946. 11   
- 4 Adult      Hispanic    Male     1139   1138. 11   
- 5 Adult      Other       Female   1683   1682. 11   
- 6 Adult      Other       Male     1179   1180. 11   
+ 1 Adult      Black       Female  10633  10630. 11   
+ 2 Adult      Black       Male     8913   8913. 11   
+ 3 Adult      Hispanic    Female    946    947. 11   
+ 4 Adult      Hispanic    Male     1139   1139. 11   
+ 5 Adult      Other       Female   1683   1684. 11   
+ 6 Adult      Other       Male     1179   1179. 11   
  7 Adult      White       Female   9401   9401. 11   
- 8 Adult      White       Male     9401   9404. 11   
- 9 Child      Black       Female   3326   3325. 11   
-10 Child      Black       Male     3400   3401. 11   
+ 8 Adult      White       Male     9401   9400. 11   
+ 9 Child      Black       Female   3326   3326. 11   
+10 Child      Black       Male     3400   3399. 11   
 # ℹ 38 more rows</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># split by state and use epsilon 10</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>starting <span class="sc">%&gt;%</span></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_split</span>(state) <span class="sc">%&gt;%</span></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">map_dfr</span>(hist_global, <span class="at">epsilon =</span> <span class="dv">10</span>, <span class="at">attribs =</span> attribs)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># split by state and use epsilon 10</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>starting <span class="sc">%&gt;%</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_split</span>(state) <span class="sc">%&gt;%</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">map_dfr</span>(hist_global, <span class="at">epsilon =</span> <span class="dv">10</span>, <span class="at">attribs =</span> attribs)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 48 × 6
    age_bucket race_simple sex_val     n n_noisy state
@@ -2694,7 +2677,7 @@ vertical-align: -.125em;
  7 Adult      White       Female   9401   9401. 11   
  8 Adult      White       Male     9401   9401. 11   
  9 Child      Black       Female   3326   3326. 11   
-10 Child      Black       Male     3400   3400. 11   
+10 Child      Black       Male     3400   3399. 11   
 # ℹ 38 more rows</code></pre>
 </div>
 </div>

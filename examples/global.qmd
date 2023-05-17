@@ -18,26 +18,7 @@ library(tidyverse)
 library(here)
 
 source(here("R", "hist-global.R"))
-```
-
-Putting lap_mech function here for now.
-
-```{r}
-lap_mech <- function(n, eps, gs) {
-
-  # Calculating the scale
-  scale <- gs / eps
-
-  r <- stats::runif(n)
-
-  x <- ifelse(
-    test = r > 0.5,
-    yes = 0 - sign(r - 0.5) * scale * log(2 * (1 - r)),
-    no = 0 - sign(r - 0.5) * scale * log(2 * r)
-  )
-
-  return(x)
-}
+source(here("R", "lap-mech.R"))
 ```
 
 Begin with starting data 001. Create a vector of attributes included in the histogram (open to considering other ways to handle this).
