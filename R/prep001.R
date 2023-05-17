@@ -15,7 +15,7 @@ prep001 <- function() {
   df_comb <- map_dfr(state_list, process_pums)
 
   keepvars <- c("serialno")
-  geovars <- c("state", "puma")
+  geovars <- c("state")
   attribs <- c("age_bucket", "sex_val", "race_simple")
   
   starting <- df_comb |>

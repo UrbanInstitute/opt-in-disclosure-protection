@@ -19,8 +19,8 @@ library(here)
 
 source(here("R", "process-pums.R"))
 source(here("R", "prep001.R"))
-source(here("R", "add-opt-out-prob.R"))
-source(here("R", "add-opt-out-decision.R"))
+source(here("R", "add-prob-opt-in.R"))
+source(here("R", "add-opt-in.R"))
 ```
 
 ### DC only - for exploratory
@@ -36,7 +36,7 @@ saveRDS(df_dc, file = paste(here("data", "pums"), "pums-dc.rds", sep = "/"))
 
 DC and IA only
 attributes: age bucket, sex, race simple
-geo: state, puma
+geo: state
 
 ```{r, message = FALSE}
 starting001 <- prep001()
