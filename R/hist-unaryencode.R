@@ -23,11 +23,12 @@ hist_unaryencode <- function(data, epsilon, type = "SUE", attribs) {
 
   # all ids should be in lookup table
   histogram <- data %>%
-    dplyr::group_by(dplyr::across(c(attribs, D_i))) %>%
-    dplyr::count()
+    dplyr::group_by(dplyr::across(c(all_of(attribs), D_i))) %>%
+    dplyr::count() %>%
+    dplyr::ungroup()
 
   D <- data %>%
-    dplyr::select(attribs) %>%
+    dplyr::select(all_of(attribs)) %>%
     create_D()
   
   N <- nrow(data)
