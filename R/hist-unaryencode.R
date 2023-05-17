@@ -3,7 +3,7 @@
 #' @param data A data frame with microdata with attributes and ID variable D_i
 #' @param epsilon A numeric value of epsilon
 #' @param type Symmetric ("SOE") or Optimized ("OUE") string entry
-#' @param A vector of attributes for the histogram
+#' @param attribs A vector of attributes for the histogram
 #'
 #' @return A noisy histogram with n and n_noisy
 #' 
