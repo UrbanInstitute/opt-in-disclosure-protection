@@ -47,7 +47,7 @@ hist_unaryencode <- function(data, epsilon, type = "SUE", attribs) {
   # encode ----------------------------------------------------------------
 
   # create matrix of OHE responses
-  encode_responses <- map(.x = data$D_i, 
+  encode_responses <- map(.x = data$D_i,
                           .f = function(x) as.numeric(x == D))
   response_matrix <- matrix(unlist(encode_responses), 
                             nrow = N, 

@@ -11,17 +11,17 @@ execute:
   message: false
 ---
 
-This document walks through the workflow for applying a global DP approach - Laplace mechanism.
+This document walks through the workflow for applying a global DP approach using Laplace mechanism.
 
 ```{r}
 library(tidyverse)
 library(here)
 
-source(here("R", "hist-global.R"))
-source(here("R", "lap-mech.R"))
+source(here("R", "hist_global.R"))
+source(here("R", "lap_mech.R"))
 ```
 
-Begin with starting data 001. Create a vector of attributes included in the histogram (open to considering other ways to handle this).
+Begin with starting data 001. Create a vector of attributes included in the histogram.
 
 ```{r}
 starting <- readRDS(here("data", "starting", "starting-data-001.rds"))

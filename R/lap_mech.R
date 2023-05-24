@@ -1,7 +1,7 @@
 #' Laplace mechanism
 #'
 #' @param n The number of draws
-#' @param eps epsilon, privacy loss (num)
+#' @param epsilon epsilon, privacy loss (num)
 #' @param gs L1 global sensitivity of the specific query (num)
 #'
 #' @return A vector of draws from the lap. dist. that satisfies approx-DP (num)
@@ -9,7 +9,7 @@
 lap_mech <- function(n, epsilon, gs) {
   
   # Calculating the scale
-  scale <- gs / eps
+  scale <- gs / epsilon
   
   r <- stats::runif(n)
   

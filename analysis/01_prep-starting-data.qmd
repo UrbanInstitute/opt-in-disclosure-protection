@@ -17,10 +17,10 @@ execute:
 library(tidyverse)
 library(here)
 
-source(here("R", "process-pums.R"))
+source(here("R", "process_pums.R"))
 source(here("R", "prep001.R"))
-source(here("R", "add-prob-opt-in.R"))
-source(here("R", "add-opt-in.R"))
+source(here("R", "add_prob_opt_in.R"))
+source(here("R", "add_opt_in.R"))
 ```
 
 ### DC only - for exploratory

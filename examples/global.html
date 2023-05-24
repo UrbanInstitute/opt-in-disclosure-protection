@@ -2624,15 +2624,15 @@ vertical-align: -.125em;
 
 </header>
 
-<p>This document walks through the workflow for applying a global DP approach - Laplace mechanism.</p>
+<p>This document walks through the workflow for applying a global DP approach using Laplace mechanism.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(here)</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="fu">here</span>(<span class="st">&quot;R&quot;</span>, <span class="st">&quot;hist-global.R&quot;</span>))</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="fu">here</span>(<span class="st">&quot;R&quot;</span>, <span class="st">&quot;lap-mech.R&quot;</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="fu">here</span>(<span class="st">&quot;R&quot;</span>, <span class="st">&quot;hist_global.R&quot;</span>))</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="fu">here</span>(<span class="st">&quot;R&quot;</span>, <span class="st">&quot;lap_mech.R&quot;</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>Begin with starting data 001. Create a vector of attributes included in the histogram (open to considering other ways to handle this).</p>
+<p>Begin with starting data 001. Create a vector of attributes included in the histogram.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>starting <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="fu">here</span>(<span class="st">&quot;data&quot;</span>, <span class="st">&quot;starting&quot;</span>, <span class="st">&quot;starting-data-001.rds&quot;</span>))</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
@@ -2648,14 +2648,14 @@ vertical-align: -.125em;
 <pre><code># A tibble: 48 × 6
    age_bucket race_simple sex_val     n n_noisy state
    &lt;chr&gt;      &lt;chr&gt;       &lt;chr&gt;   &lt;int&gt;   &lt;dbl&gt; &lt;chr&gt;
- 1 Adult      Black       Female  10633  10630. 11   
+ 1 Adult      Black       Female  10633  10635. 11   
  2 Adult      Black       Male     8913   8913. 11   
- 3 Adult      Hispanic    Female    946    947. 11   
+ 3 Adult      Hispanic    Female    946    946. 11   
  4 Adult      Hispanic    Male     1139   1139. 11   
- 5 Adult      Other       Female   1683   1684. 11   
- 6 Adult      Other       Male     1179   1179. 11   
- 7 Adult      White       Female   9401   9401. 11   
- 8 Adult      White       Male     9401   9400. 11   
+ 5 Adult      Other       Female   1683   1682. 11   
+ 6 Adult      Other       Male     1179   1180. 11   
+ 7 Adult      White       Female   9401   9400. 11   
+ 8 Adult      White       Male     9401   9399. 11   
  9 Child      Black       Female   3326   3326. 11   
 10 Child      Black       Male     3400   3399. 11   
 # ℹ 38 more rows</code></pre>
@@ -2677,7 +2677,7 @@ vertical-align: -.125em;
  7 Adult      White       Female   9401   9401. 11   
  8 Adult      White       Male     9401   9401. 11   
  9 Child      Black       Female   3326   3326. 11   
-10 Child      Black       Male     3400   3399. 11   
+10 Child      Black       Male     3400   3400. 11   
 # ℹ 38 more rows</code></pre>
 </div>
 </div>

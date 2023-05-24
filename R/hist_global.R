@@ -21,9 +21,9 @@ hist_global <- function(data, epsilon, attribs) {
 
   # epsilon divided by 2?
   data_synth <- histogram %>%
-    dplyr::bind_cols(noise = dpbea::lap_mech(n = nrow(histogram), 
-                                      eps = epsilon / 2, 
-                                      gs = 1),) %>%
+    dplyr::bind_cols(noise = lap_mech(n = nrow(histogram),
+                                      eps = epsilon, 
+                                      gs = 1)) %>%
     dplyr::mutate(n_noisy = n + noise) %>%
     dplyr::select(-noise)
   
