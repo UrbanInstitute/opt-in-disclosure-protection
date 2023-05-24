@@ -1,0 +1,45 @@
+---
+title: "Prep PUMS data for analysis"
+format: 
+  html:
+    embed-resources: true
+    toc: true
+editor: source
+execute:
+  echo: true
+  warning: false
+  message: false
+---
+
+## Prep starting data
+
+```{r setup}
+library(tidyverse)
+library(here)
+
+source(here("R", "process_pums.R"))
+source(here("R", "prep001.R"))
+source(here("R", "add_prob_opt_in.R"))
+source(here("R", "add_opt_in.R"))
+```
+
+### DC only - for exploratory
+
+10% sample of total population
+
+```{r, message = FALSE}
+df_dc <- process_pums("DC")
+saveRDS(df_dc, file = paste(here("data", "pums"), "pums-dc.rds", sep = "/"))
+```
+
+### starting-data-001
+
+DC and IA only
+attributes: age bucket, sex, race simple
+geo: state
+
+```{r, message = FALSE}
+starting001 <- prep001()
+saveRDS(starting001, file = paste(here("data", "starting"), "starting-data-001.rds", sep = "/"))
+```
+

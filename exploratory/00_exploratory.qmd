@@ -1,0 +1,480 @@
+---
+title: "Exploring Stateside PUMS Files"
+format: 
+  html:
+    embed-resources: true
+    toc: true
+editor: source
+execute:
+  echo: true
+  warning: false
+  message: false
+---
+
+## Stateside Public Use Microdata Sample Files
+
+[Census Page](https://www.census.gov/data/datasets/2010/dec/stateside-pums.html)
+
+[Technical Documentation](https://www2.census.gov/programs-surveys/decennial/2010/technical-documentation/complete-tech-docs/us-pums/pumsus.pdf)
+
+About PUMS files:
+
+* 10% samples of occupied and vacant housing units in the US (and the people in the occupied units) and 10% sample of group quarters (noninstitutional and institutional) persons
+* Subsample numbers are included for working with smaller sample sizes
+* Use weights for each person or housing unit to reflect totals (if working with subsample, adjust the weights appropriately)
+
+This document contains processing & exploratory analysis for Washington, DC.
+
+```{r}
+library(tidyverse)
+library(purrr)
+library(readxl)
+library(knitr)
+
+options(scipen = 999)
+```
+
+## Processing
+
+### Prep layout file
+
+The excel layout file provides variables widths, names, dictionary values, etc. Use this layout file to help process the fixed-width state PUMS files.
+
+```{r}
+person_layout <- read_excel(here::here("resources", "2010 PUMS Record Layout.xlsx"), sheet = "Person", skip = 1)
+housing_layout <- read_excel(here::here("resources", "2010 PUMS Record Layout.xlsx"), sheet = "Housing", skip = 1)
+layout <- rbind(person_layout, housing_layout)
+```
+
+### Read and process fixed-width file
+
+Files contain both person and housing records together, but each record type has different variable widths. Process separately with corresponding variable widths and variable names from layout file.
+
+```{r}
+dc_fwf <- "https://www2.census.gov/census_2010/12-Stateside_PUMS/District_of_Columbia/dc.2010.pums.01.txt"
+```
+
+```{r}
+process_fwf <- function(layout, fwf, rec_type){
+  
+  lvars <- layout %>%
+    select(LEN, VARIABLE) %>%
+    distinct() %>%
+    na.omit()
+  
+  file_read <- read_fwf(fwf, fwf_widths(widths = lvars$LEN, col_names = lvars$VARIABLE), show_col_types = FALSE) %>%
+    filter(RECTYPE == rec_type) %>%
+    select(-any_of(c("PADDING", "RECTYPE"))) %>%
+    mutate(across(everything(), as.character))
+  
+  return(file_read)
+}
+```
+
+Read and join housing and person records.
+
+```{r}
+housing_read <- process_fwf(housing_layout, dc_fwf, "H")
+person_read <- process_fwf(person_layout, dc_fwf, "P") 
+
+df_join <- full_join(housing_read, person_read, by = "SERIALNO")
+```
+
+Some housing records have no person record joined - these are vacant units.
+
+```{r}
+df_join %>%
+  filter(UNITTYPE == "0") %>% # housing units, exclude group quarters
+  mutate(no_persons = is.na(PNUM)) %>%
+  select(SERIALNO, HWEIGHT, no_persons) %>%
+  distinct() %>%
+  group_by(no_persons) %>%
+  summarize(records = n(),
+            weighted = sum(as.numeric(HWEIGHT)),
+            .groups = "drop") %>%
+  mutate(across(c(records, weighted),  ~ (.x / sum(.x)) * 100,
+                .names = "{.col}_pct")) %>%
+  kable(digits = 1)
+```
+
+ We'll drop vacant units for our purposes.
+
+```{r}
+df_join_occ <- df_join %>% 
+  filter(!(UNITTYPE == "0" & is.na(PNUM)))
+
+stopifnot(!is.na(df_join_occ$PNUM))
+```
+
+### Add value description fields
+
+Variable values are encoded. This section adds on data dictionary description ("_VAL") fields for easier use.
+
+Process the description values for variables from the layout file and merge to the working dataframe.
+
+```{r}
+dict <- layout %>%
+  filter(is.na(HI) & !is.na(LO) & VARIABLE != "RECTYPE") %>%
+  select(c(VARIABLE, `VALUE DESCRIPTION`, LO)) %>%
+  group_by(VARIABLE) %>%
+  filter(n() > 1) %>%
+  ungroup()
+
+dictlist <- unique(dict$VARIABLE)
+```
+
+```{r}
+dict_process <- function(variable){
+  
+  var_dict <- dict %>%
+    filter(VARIABLE == variable) %>%
+    select(-c(VARIABLE)) %>%
+    rename(!!as.name(variable) := LO,
+           !!paste0(variable, "_VAL") := `VALUE DESCRIPTION`)
+  
+  return(var_dict)
+  
+}
+```
+
+```{r}
+dict_prep <- map(dictlist, dict_process)
+merge_list <- append(dict_prep, list(df_join_occ), after = 0)
+```
+
+```{r}
+df <- Reduce(left_join, merge_list)
+```
+
+```{r}
+write.csv(df, here::here("data", "pums-dc.csv"))
+```
+
+## EDA - Geography
+
+Geographic fields include:
+
+* STATE: FIPS State Code
+* REGION: Region Code
+* DIVISION: Division Code
+* PUMA: Public Use Microdata Area Code
+
+Washington, DC has `r length(unique(df$PUMA))` PUMAs.
+
+```{r}
+df %>%
+  group_by(STATE, STATE_VAL, REGION, REGION_VAL, DIVISION, DIVISION_VAL, PUMA) %>%
+  summarize(records = n(),
+            persons = sum(as.numeric(PWEIGHT)),
+            .groups = "drop") %>%
+  mutate(across(c(records, persons),  ~ (.x / sum(.x)) * 100,
+                .names = "{.col}_pct")) %>%
+  kable(digits = 1)
+```
+
+## EDA - Housing
+
+``` {r}
+# helper functions
+housing_tab_fn <- function(var_val){
+  
+  tab <- df %>%
+    select(SERIALNO, HWEIGHT, {{var_val}}) %>%
+    distinct() %>%
+    group_by({{var_val}}) %>%
+    summarize(units = n(),
+              weighted = sum(as.numeric(HWEIGHT))) %>%
+    mutate(across(c(units, weighted), ~ (.x / sum(.x)) * 100,
+                  .names = "{.col}_pct")) %>%
+    arrange(-weighted_pct) %>%
+    kable(digits = 1)
+  
+  return(tab)
+  
+}
+
+housing_num_fn <- function(var){
+  sumdf <- df %>%
+    select(SERIALNO, HWEIGHT, {{var}}) %>%
+    distinct() %>%
+    mutate(num = as.numeric({{var}}))
+  
+  summ <- summary(sumdf$num)
+  
+  return(summ)
+}
+```
+
+### Unit Type
+
+Housing unit (occupied or vacant, 10% sample of units) or group quarters (noninstitutional and institutional, 10% sample of persons)
+
+```{r}
+housing_tab_fn(UNITTYPE_VAL)
+```
+
+### Vacancy Status
+
+Vacant units were already removed in processing, only occupied and group quarters remain.
+
+```{r}
+housing_tab_fn(VACS_VAL)
+```
+
+### Tenure
+
+Home ownership type
+
+```{r}
+housing_tab_fn(TENURE_VAL)
+```
+
+### Household/family type
+
+```{r}
+housing_tab_fn(HHT_VAL)
+```
+
+### Presence and age of own children under 18 years
+
+```{r}
+housing_tab_fn(PAOC_VAL)
+```
+
+### Presence and age of related children under 18 years
+
+```{r}
+housing_tab_fn(PARC_VAL)
+```
+
+### Presence and type of unmarried partner household
+
+```{r}
+housing_tab_fn(UPART_VAL)
+```
+
+### Multigenerational household
+
+```{r}
+housing_tab_fn(MULTG_VAL)
+```
+
+### Number of persons in housing record
+
+```{r}
+housing_num_fn(PERSONS)
+```
+
+```{r}
+housing_tab_fn(PERSONS)
+```
+
+### Number of persons age 60+ housing record
+
+```{r}
+housing_num_fn(P60)
+```
+
+```{r}
+housing_tab_fn(P60)
+```
+
+### Number of persons age 65+ housing record
+
+```{r}
+housing_num_fn(P65)
+```
+
+```{r}
+housing_tab_fn(P65)
+```
+
+### Number of persons under age 18 in housing record
+
+```{r}
+housing_num_fn(P18)
+```
+
+```{r}
+housing_tab_fn(P18)
+```
+
+### Number of people in family in housing record
+
+```{r}
+housing_num_fn(NPF)
+```
+
+```{r}
+housing_tab_fn(NPF)
+```
+
+### Number of own children under age 18 in housing record
+
+```{r}
+housing_num_fn(NOCH)
+```
+
+```{r}
+housing_tab_fn(NOCH)
+```
+
+### Number of related children under age 18 in housing record
+
+```{r}
+housing_num_fn(NRCH)
+```
+
+```{r}
+housing_tab_fn(NRCH)
+```
+
+## EDA - Persons
+
+``` {r}
+# helper function
+persons_tab_fn <- function(var_val){
+  
+  tab <- df %>%
+    group_by({{var_val}}) %>%
+    summarize(persons = n(),
+              weighted = sum(as.numeric(PWEIGHT))) %>%
+    mutate(across(c(persons, weighted), ~ (.x / sum(.x)) * 100,
+                  .names = "{.col}_pct")) %>%
+    arrange(-weighted_pct) %>%
+    kable(digits = 1)
+  
+  return(tab)
+  
+}
+```
+
+### Coverage
+
+Persons are identified by `SERIALNO` (housing/group quarters unit serial number) and `PNUM` (person sequence number).
+
+There are `r nrow(df_join_occ)` person records. These records reflect `r sum(as.numeric(df_join_occ$PWEIGHT))` total people.
+
+### Relationship
+
+``` {r}
+persons_tab_fn(RELATE_VAL)
+```
+
+### Own child indicator
+
+``` {r}
+persons_tab_fn(OC_VAL)
+```
+
+### Related child indicator
+
+``` {r}
+persons_tab_fn(RC_VAL)
+```
+
+### Sex
+
+``` {r}
+persons_tab_fn(SEX_VAL)
+```
+
+### Same sex spouse flag
+
+Documentation: "includes a flag allowing for the identification of those same-sex couples who originally reported their relationship to householder as “husband or wife” but were changed to “unmarried partner” during the editing process"
+
+``` {r}
+persons_tab_fn(SSPA_VAL)
+```
+
+### Age
+
+Age values above the state topcode (age 90 for Washington, DC) are replaced with the mean of topcoded values (93 for Washington, DC).
+
+``` {r}
+summary(as.numeric(df$AGE))
+```
+
+### Quarter of birth
+
+``` {r}
+persons_tab_fn(QTRBIR_VAL)
+```
+
+### Hispanic or Latino origin
+
+``` {r}
+persons_tab_fn(HISPAN_VAL)
+```
+
+### Number of major race groups marked
+
+``` {r}
+persons_tab_fn(NUMRACE_VAL)
+```
+
+### White recode
+
+``` {r}
+persons_tab_fn(WHITE_VAL)
+```
+
+### Black or African American recode
+
+``` {r}
+persons_tab_fn(BLACK_VAL)
+```
+
+### American Indian and Alaska Native recode
+
+``` {r}
+persons_tab_fn(AIAN_VAL)
+```
+
+### Asian recode
+
+``` {r}
+persons_tab_fn(ASIAN_VAL)
+```
+
+### Native Hawaiian recode
+
+``` {r}
+persons_tab_fn(NHAW_VAL)
+```
+
+### Other Pacific Islander recode
+
+``` {r}
+persons_tab_fn(OPI_VAL)
+```
+
+### Some other race recode
+
+``` {r}
+persons_tab_fn(OTHER_VAL)
+```
+
+### Race short recode
+
+``` {r}
+persons_tab_fn(RACESHORT_VAL)
+```
+
+### Race detailed recode
+
+``` {r}
+persons_tab_fn(RACEDET_VAL)
+```
+
+### Race checkbox recode
+
+``` {r}
+persons_tab_fn(RACECHKBX_VAL)
+```
+
+### Group quarters type
+
+``` {r}
+persons_tab_fn(GQTYP_VAL)
+```

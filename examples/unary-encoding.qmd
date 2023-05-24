@@ -1,0 +1,75 @@
+---
+title: "Unary Encoding Example"
+format: 
+  html:
+    embed-resources: true
+    toc: true
+editor: source
+execute:
+  echo: true
+  warning: false
+  message: false
+---
+
+This document walks through the workflow for applying unary encoding - either symmetric (SUE) or optimized (OUE).
+
+See: 
+
+* https://programming-dp.com/ch13.html#unary-encoding
+
+* Wang, Zhang, Feng, Yang 2020
+
+```{r}
+library(tidyverse)
+library(here)
+
+source(here("R", "add_prob_opt_in.R"))
+source(here("R", "add_opt_in.R"))
+source(here("R", "hist_unaryencode.R"))
+source(here("R", "create_D.R"))
+source(here("R", "add_D_i.R"))
+```
+
+Begin with starting data 001. Create a vector of attributes included in the histogram.
+
+```{r}
+starting <- readRDS(here("data", "starting", "starting-data-001.rds"))
+
+attribs <- c("age_bucket", "race_simple", "sex_val")
+```
+
+Add ids using the `attribs` vector. Add opt in probabilities (uniform random for now) and decisions using threshold of 0.5.
+
+```{r}
+data <- starting %>%
+  add_D_i(attribs) %>%
+  add_prob_opt_in(prob = "uniform") %>%
+  add_opt_in(prob_opt_in = prob_opt_in, threshold = 0.5)
+```
+
+Apply OUE separately by state.
+
+```{r}
+# split by state and do OUE with epsilon 2
+data %>%
+  group_split(state) %>%
+  map_dfr(hist_unaryencode, epsilon = 2, type = "OUE", attribs = attribs)
+
+# split by state and do SUE with epsilon 2
+data %>%
+  group_split(state) %>%
+  map_dfr(hist_unaryencode, epsilon = 2, type = "SUE", attribs = attribs)
+```
+
+```{r}
+# split by state and do OUE with epsilon 10
+data %>%
+  group_split(state) %>%
+  map_dfr(hist_unaryencode, epsilon = 10, type = "OUE", attribs = attribs)
+
+# split by state and do SUE with epsilon 10
+data %>%
+  group_split(state) %>%
+  map_dfr(hist_unaryencode, epsilon = 10, type = "SUE", attribs = attribs)
+```
+
