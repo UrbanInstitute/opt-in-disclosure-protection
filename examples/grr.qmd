@@ -10,7 +10,7 @@ editor_options:
 
 library(tidyverse)
 
-source(here::here("R", "grr.R"))
+source(here::here("R", "hist_grr.R"))
 source(here::here("R", "add_D_i.R"))
 source(here::here("R", "create_D.R"))
 

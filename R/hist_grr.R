@@ -1,6 +1,6 @@
 #' Calculate a noisy histogram using generalized randomized response
 #'
-#' @param data A data frame with micrdodata with attributes and an ID 
+#' @param data A data frame with microdata with attributes and an ID 
 #' variable D_i
 #' @param epsilon A numeric value of epsilon
 #'
@@ -75,7 +75,7 @@ hist_grr <- function(data, epsilon) {
   
   # make correction for randomised response
   data_noisy <- count(data_noisy, D_i, name = "n_v") %>%
-    dplyr::mutate(n_noisy = (n_v - N * q) / p - q) %>%
+    dplyr::mutate(n_noisy = (n_v - N * q) / (p - q)) %>%
     dplyr::select(-n_v)
   
   # join noisy data to data without noise to maintain empty cells and for

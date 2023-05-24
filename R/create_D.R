@@ -1,7 +1,7 @@
 #' Create a vector of IDs with each element corresponding to a cell in the 
 #' histogram
 #' 
-#' This include possible cases
+#' This includes all possible cases
 #'
 #' @param data A data frame
 #'
