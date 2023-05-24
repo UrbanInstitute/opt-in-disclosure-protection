@@ -2,12 +2,12 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.2.335">
+<meta name="generator" content="quarto-1.2.269">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Aaron R. Williams and Jen Andre">
-<meta name="dcterms.date" content="2023-05-11">
+<meta name="dcterms.date" content="2023-05-19">
 
 <title>Simulations</title>
 <style>
@@ -2618,7 +2618,7 @@ vertical-align: -.125em;
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">May 11, 2023</p>
+      <p class="date">May 19, 2023</p>
     </div>
   </div>
   
@@ -2666,7 +2666,7 @@ vertical-align: -.125em;
 <section id="calculate-the-histograms" class="level2">
 <h2 class="anchored" data-anchor-id="calculate-the-histograms">5. Calculate the Histogram(s)</h2>
 <p>We will compare centralized and local methods of differential privacy with different hyperparameters (<span class="math inline">\(\epsilon\)</span>, opt-in rate, etc.). Each method will have a function starting with <code>hist_</code> that takes the microdata and any hyperparameters.</p>
-<p>The result will be a tidy data frame with <span class="math inline">\(d\)</span> rows and <span class="math inline">\(z + 4\)</span> columns. The <span class="math inline">\(z\)</span> columns are the original attributes from the microdata, the additional columns <span class="math inline">\(n\)</span> and <span class="math inline">\(n_noisy\)</span>, and the ID column <code>D_i</code>.</p>
+<p>The result will be a tidy data frame with <span class="math inline">\(d\)</span> rows and <span class="math inline">\(z + 4\)</span> columns. The <span class="math inline">\(z\)</span> columns are the original attributes from the microdata, the additional columns <code>n</code> and <code>n_noisy</code>, and the ID column <code>D_i</code>.</p>
 </section>
 <section id="evaluate" class="level2">
 <h2 class="anchored" data-anchor-id="evaluate">6. Evaluate</h2>
@@ -2707,7 +2707,27 @@ vertical-align: -.125em;
 </section>
 <section id="unary-encoding" class="level2">
 <h2 class="anchored" data-anchor-id="unary-encoding">2. Unary Encoding</h2>
-<p>https://programming-dp.com/ch13.html#unary-encoding</p>
+<p>While generalized random response focuses on a yes/no question to perturb responses, unary encoding works by encoding each response into a vector of bits and perturbing each bit as determined by <span class="math inline">\(\epsilon\)</span>. Unary encoding forms the basic approach for Google’s RAPPOR technology <span class="citation" data-cites="erlingsson2014">(<a href="#ref-erlingsson2014" role="doc-biblioref">Erlingsson, Pihur, and Korolova 2014</a>)</span>. The basic procedure is as follows [<span class="citation" data-cites="wang2020">Teng Wang et al. (<a href="#ref-wang2020" role="doc-biblioref">2020</a>)</span>]<span class="citation" data-cites="wang">(<a href="#ref-wang" role="doc-biblioref">Tianhao Wang et al., n.d.</a>)</span><span class="citation" data-cites="near">(<a href="#ref-near" role="doc-biblioref">Near and Abuah, n.d.</a>)</span>:</p>
+<ol type="1">
+<li><p>Encode each response <span class="math inline">\(v\)</span> into a vector of bits (each noted by <span class="math inline">\(B[i]\)</span>) of length <span class="math inline">\(D\)</span> (one-hot-encoding).</p></li>
+<li><p>For each bit independently, draw a uniform random value between 0 and 1. Perturb the bit according to <span class="math inline">\(p\)</span>, the probability that 1 remains 1 after perturbation, and <span class="math inline">\(q\)</span>, the probability that 0 is perturbed into 1.</p></li>
+</ol>
+<p><span class="math display">\[\text{Pr}[B&#39;[i] = 1] = \begin{cases} p &amp; \text{if } B[i] = 1\\ q &amp; \text{if } B[i] = 0 \end{cases} \text{  where } p &gt; q\]</span></p>
+<ol start="3" type="1">
+<li>Sum the bits for each element of the domain and make a correction for the perturbed responses.</li>
+</ol>
+<p>The values <span class="math inline">\(p\)</span> and <span class="math inline">\(q\)</span> connect to <span class="math inline">\(\epsilon\)</span> as follows:</p>
+<ul>
+<li><p>For Symmetric Unary Encoding (SUE) (basic RAPPOR), <span class="math inline">\(p + q = 1\)</span>.</p>
+<p><span class="math display">\[p = \frac{e^\frac{\epsilon}{2}}{e^\frac{\epsilon}{2} + 1}\]</span></p>
+<p><span class="math display">\[q = \frac{1}{e^\frac{\epsilon}{2} + 1}\]</span></p></li>
+<li><p>For Optimized Unary Encoding (OUE), <span class="math inline">\(p\)</span> and <span class="math inline">\(q\)</span> are optimized to minimize the algorithm variance.</p>
+<p><span class="math display">\[p = \frac{1}{2}\]</span></p>
+<p><span class="math display">\[q = \frac{1}{e^\epsilon + 1}\]</span></p></li>
+</ul>
+<p>To aggregate the counts for each domain category, sum the noisy perturbed bits (<span class="math inline">\(B&#39;[i]\)</span>) for each domain category (<span class="math inline">\(d\)</span>), and apply a correction that takes into account the number of perturbed responses in each element of the domain. The estimate <span class="math inline">\(\hat{n_i}\)</span> comes from the following:</p>
+<p><span class="math display">\[\hat{n_i} = \frac{\sum_{d}B_{d}&#39;[i]-Nq}{p-q}\]</span></p>
+<p>where <span class="math inline">\(\sum_{d}B_{d}&#39;[i]\)</span> is the sum of noisy perturbed bits in each domain category (analogous to <span class="math inline">\(\tilde{n_i}\)</span> in the GRR example, the noisy and biased count of observations in cell <span class="math inline">\(D_i\)</span>) and <span class="math inline">\(N\)</span> is the number of responses (observations).</p>
 </section>
 <section id="binary-local-hash" class="level2">
 <h2 class="anchored" data-anchor-id="binary-local-hash">3. Binary Local Hash</h2>
@@ -2718,6 +2738,18 @@ vertical-align: -.125em;
 </section>
 
 <div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" role="doc-bibliography">
+<div id="ref-erlingsson2014" class="csl-entry" role="doc-biblioentry">
+Erlingsson, Úlfar, Vasyl Pihur, and Aleksandra Korolova. 2014. <span>“CCS’14: 2014 ACM SIGSAC Conference on Computer and Communications Security.”</span> In, 1054–67. Scottsdale Arizona USA: ACM. <a href="https://doi.org/10.1145/2660267.2660348">https://doi.org/10.1145/2660267.2660348</a>.
+</div>
+<div id="ref-near" class="csl-entry" role="doc-biblioentry">
+Near, Joseph P, and Chiké Abuah. n.d. <span>“Programming Differential Privacy.”</span>
+</div>
+<div id="ref-wang2020" class="csl-entry" role="doc-biblioentry">
+Wang, Teng, Xuefeng Zhang, Jingyu Feng, and Xinyu Yang. 2020. <span>“A Comprehensive Survey on Local Differential Privacy Toward Data Statistics and Analysis.”</span> <em>Sensors</em> 20 (24): 7030. <a href="https://doi.org/10.3390/s20247030">https://doi.org/10.3390/s20247030</a>.
+</div>
+<div id="ref-wang" class="csl-entry" role="doc-biblioentry">
+Wang, Tianhao, Jeremiah Blocki, Ninghui Li, and Somesh Jha. n.d. <span>“Optimizing Locally Differentially Private Protocols.”</span>
+</div>
 <div id="ref-warner1965" class="csl-entry" role="doc-biblioentry">
 Warner, Stanley L. 1965. <span>“Randomized Response: A Survey Technique for Eliminating Evasive Answer Bias.”</span> <em>Journal of the American Statistical Association</em> 60 (309): 63–69. <a href="https://doi.org/10.1080/01621459.1965.10480775">https://doi.org/10.1080/01621459.1965.10480775</a>.
 </div>

@@ -95,7 +95,35 @@ $$\hat{n_i} = \tilde{n_i} \cdot p + (N - \tilde{n_i}) \cdot q$$
 
 ## 2. Unary Encoding
 
-https://programming-dp.com/ch13.html#unary-encoding
+While generalized random response focuses on a yes/no question to perturb responses, unary encoding works by encoding each response into a vector of bits and perturbing each bit as determined by $\epsilon$. Unary encoding forms the basic approach for Google's RAPPOR technology [@erlingsson2014]. The basic procedure is as follows [@wang2020][@wang][@near]:
+
+1. Encode each response $v$ into a vector of bits (each noted by $B[i]$) of length $D$ (one-hot-encoding).
+
+2. For each bit independently, draw a uniform random value between 0 and 1. Perturb the bit according to $p$, the probability that 1 remains 1 after perturbation, and $q$, the probability that 0 is perturbed into 1.
+
+$$\text{Pr}[B'[i] = 1] = \begin{cases} p & \text{if } B[i] = 1\\ q & \text{if } B[i] = 0 \end{cases} \text{  where } p > q$$
+
+3. Sum the bits for each element of the domain and make a correction for the perturbed responses.
+
+The values $p$ and $q$ connect to $\epsilon$ as follows:
+
+* For Symmetric Unary Encoding (SUE) (basic RAPPOR), $p + q = 1$.
+
+    $$p = \frac{e^\frac{\epsilon}{2}}{e^\frac{\epsilon}{2} + 1}$$
+
+    $$q = \frac{1}{e^\frac{\epsilon}{2} + 1}$$
+
+* For Optimized Unary Encoding (OUE), $p$ and $q$ are optimized to minimize the algorithm variance.
+
+    $$p = \frac{1}{2}$$
+
+    $$q = \frac{1}{e^\epsilon + 1}$$
+
+To aggregate the counts for each domain category, sum the noisy perturbed bits ($B'[i]$) for each domain category ($d$), and apply a correction that takes into account the number of perturbed responses in each element of the domain. The estimate $\hat{n_i}$ comes from the following:
+
+$$\hat{n_i} = \frac{\sum_{d}B_{d}'[i]-Nq}{p-q}$$
+
+where $\sum_{d}B_{d}'[i]$ is the sum of noisy perturbed bits in each domain category (analogous to $\tilde{n_i}$ in the GRR example, the noisy and biased count of observations in cell $D_i$) and $N$ is the number of responses (observations).
 
 ## 3. Binary Local Hash
 
