@@ -2,25 +2,27 @@
 #'
 #' @param starting_data A dataframe of starting data
 #' @param prob The type of opt-in probability: NULL (default), "uniform"
+#' @param white_multiplier A multiplier for the white probability of opting in
+#' All probabilities are normalized using the data so the mean is prob
 #' 
 #' @return A dataframe of starting data with probability column added
 #'
-add_prob_opt_in <- function(starting_data, prob = NULL) {
+add_prob_opt_in <- function(starting_data, prob, white_multiplier = NULL) {
   
-  households <- starting_data |>
-    dplyr::select(serialno) |>
-    dplyr::distinct()
-  
-  if (is.null(prob)) {
-    households$prob_opt_in <- 1
-  } else if (prob == "uniform") {
-    households$prob_opt_in <- runif(nrow(households))
+  if (is.null(white_multiplier)) {
+    
+    data <- starting_data |>
+      dplyr::mutate(prob_opt_in = prob)
+    
+  } else  {
+    
+    data <- starting_data |>
+      dplyr::mutate(prob_opt_in = white_multiplier * (1 + (race_simple == "White"))) |>
+      dplyr::mutate(prob_opt_in = prob_opt_in * (prob / mean(prob_opt_in)))
+
   }
   
-  new_df <- starting_data |>
-    dplyr::full_join(households, by = "serialno")
-  
-  return(new_df)
+  return(data)
   
 }
   

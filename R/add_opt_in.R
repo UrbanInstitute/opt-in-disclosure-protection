@@ -7,11 +7,12 @@
 #' @return A dataframe of starting data with opt in decision added
 #'
 add_opt_in <- function(starting_data,
-                       prob_opt_in,
-                       threshold) {
+                       prob_opt_in) {
 
   new_df <- starting_data |>
-    dplyr::mutate(opt_in = prob_opt_in >= threshold)
+    dplyr::bind_cols(random_number = runif(n = nrow(starting_data))) %>%
+    dplyr::mutate(opt_in = prob_opt_in < random_number) %>%
+    dplyr::select(-random_number)
   
   return(new_df)
   
