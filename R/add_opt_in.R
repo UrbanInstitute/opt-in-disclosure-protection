@@ -11,7 +11,7 @@ add_opt_in <- function(starting_data,
 
   new_df <- starting_data |>
     dplyr::bind_cols(random_number = runif(n = nrow(starting_data))) %>%
-    dplyr::mutate(opt_in = prob_opt_in < random_number) %>%
+    dplyr::mutate(opt_in = prob_opt_in > random_number) %>%
     dplyr::select(-random_number)
   
   return(new_df)
