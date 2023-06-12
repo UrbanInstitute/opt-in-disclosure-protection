@@ -8,6 +8,6 @@
 #' 
 variance_rappor <- function(epsilon, k, N) {
   
-  return( (exp(epsilon/2)) / (N * (exp(epsilon/2) - 1)^2) ) 
+  (exp(epsilon / 2)) / (N * (exp(epsilon/2) - 1) ^ 2)
   
 }

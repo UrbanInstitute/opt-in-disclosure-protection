@@ -8,6 +8,6 @@
 #' 
 variance_blh <- function(epsilon, k, N) {
   
-  return( ((exp(epsilon) + 1)^2) / (N * (exp(epsilon) - 1)^2) ) 
+  ((exp(epsilon) + 1) ^ 2) / (N * (exp(epsilon) - 1) ^ 2)
   
 }

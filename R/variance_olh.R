@@ -8,6 +8,6 @@
 #' 
 variance_olh <- function(epsilon, k, N) {
   
-  return( (4 * exp(epsilon)) / (N * (exp(epsilon) - 1)^2) ) 
+  (4 * exp(epsilon)) / (N * (exp(epsilon) - 1) ^ 2) 
   
 }

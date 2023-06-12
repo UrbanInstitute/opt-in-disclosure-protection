@@ -1,4 +1,4 @@
-#' Calculate variance for w-SM method
+#' Calculate variance for omega-SM method
 #'
 #' @param epsilon A numeric value of epsilon
 #' @param k Cardinality of total values (number of attribute combinations)
@@ -6,8 +6,8 @@
 #'
 #' @return Variance value
 #' 
-variance_wsm <- function(epsilon, k, N) {
+variance_omega_sm <- function(epsilon, k, N) {
   
-  return( (exp(epsilon) + k - 2) / (N * (exp(epsilon) - 1)^2) )
+  (exp(epsilon) + k - 2) / (N * (exp(epsilon) - 1) ^ 2)
   
 }
