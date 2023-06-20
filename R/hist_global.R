@@ -8,6 +8,8 @@
 #' 
 hist_global <- function(data, epsilon, attribs) {
   
+  source(here("R", "lap_mech.R"))
+  
   # temporary workaround to keep state identifier -------------------------
   if(("state" %in% colnames(data)) & (length(unique(data$state)) == 1)) {
     state_id <- unique(data$state)
