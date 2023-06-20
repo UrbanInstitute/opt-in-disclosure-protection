@@ -1,0 +1,102 @@
+---
+title: "Data 001 Grid"
+format: 
+  html:
+    embed-resources: true
+    toc: true
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r, message = FALSE, warning = FALSE}
+library(tidyverse)
+library(here)
+
+source(here("R", "hist_unaryencode.R"))
+source(here("R", "hist_global.R"))
+source(here("R", "add_D_i.R"))
+source(here("R", "create_D.R"))
+source(here("R", "add_prob_opt_in.R"))
+source(here("R", "add_opt_in.R"))
+source(here("R", "metric_all.R"))
+
+options(dplyr.summarise.inform = FALSE)
+```
+
+## Set Up Starting Data
+
+```{r}
+data <- readRDS(here("data", "starting", "starting-data-001.rds"))
+
+attribs <- c("age_bucket", "race_simple", "sex_val")
+```
+
+## Set Up Grid Specs
+
+```{r}
+specs <- expand_grid(
+  run = 1:100, 
+  epsilon = c(1, 5, 10, 20),
+  opt_in = c(0.1, 0.5, 0.9, 1)
+)
+```
+
+## Functions for Data Prep and Summary
+
+```{r}
+prep_data <- function(data, opt_in) {
+  
+  data |>
+      add_prob_opt_in(prob = opt_in) |>
+      add_opt_in() |>
+      add_D_i(attribs)
+  
+}
+
+summarize_results <- function(data) {
+  
+  data |>
+    group_by(across(any_of(names(specs)))) |>
+    metric_all(n = n, n_noisy = n_noisy, threshold = 0.1, drop_zeros = TRUE) |>
+    ungroup()
+  
+}
+```
+
+## Run Spec Grid
+
+```{r}
+results <- bind_rows(
+  `sue` = pmap_dfr(
+    .l = specs,
+    .f = function(run, epsilon, opt_in) data |>
+      prep_data(opt_in = opt_in) |>
+      group_split(state) |>
+      map_dfr(hist_unaryencode, epsilon = epsilon, type = "SUE", attribs = attribs) |>
+      mutate(run = run, epsilon = epsilon, opt_in = opt_in) |>
+      summarize_results()
+  ),
+  `oue` = pmap_dfr(
+    .l = specs,
+    .f = function(run, epsilon, opt_in) data |>
+      prep_data(opt_in = opt_in) |>      
+      group_split(state) |>
+      map_dfr(hist_unaryencode, epsilon = epsilon, type = "OUE", attribs = attribs) |>
+      mutate(run = run, epsilon = epsilon, opt_in = opt_in) |>
+      summarize_results()
+  ),
+  `global` = pmap_dfr(
+    .l = distinct(select(specs, c(epsilon, run))),
+    .f = function(run, epsilon) data |>
+      group_split(state) |>
+      map_dfr(hist_global, epsilon = epsilon, attribs = attribs) |>
+      mutate(run = run, epsilon = epsilon) |>
+      summarize_results() |>
+      cbind(opt_in = unique(specs$opt_in))
+    ),
+  .id = "method"
+)
+
+saveRDS(results, file = paste(here("data", "results"), "results-001.rds", sep = "/"))
+```
+

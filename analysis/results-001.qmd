@@ -1,0 +1,109 @@
+---
+title: "Data 001 Summarize Results"
+format: 
+  html:
+    embed-resources: true
+    toc: true
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r, message = FALSE, warning = FALSE}
+library(tidyverse)
+library(here)
+library(urbnthemes)
+
+set_urbn_defaults(style = "print")
+options(dplyr.summarise.inform = FALSE)
+```
+
+## Load Results
+
+```{r}
+results <- readRDS(here("data", "results", "results-001.rds"))
+```
+
+## Plotting Functions
+
+```{r}
+summary_boxplot <- function(results, metric, eps) {
+  
+  results %>%
+    filter(epsilon == eps) %>%
+    ggplot(aes(fill = method, 
+               y = {{metric}}, 
+               x = as.factor(opt_in))) +
+      geom_boxplot() +
+      labs(x = "Opt-In Rate")
+  
+}
+
+summary_boxplot_facet <- function(results, metric) {
+  
+  results %>%
+    ggplot(aes(fill = method, 
+               y = {{metric}}, 
+               x = as.factor(opt_in))) +
+      geom_boxplot() +
+      facet_grid(epsilon ~ ., scales = "free_y") +
+      labs(x = "Opt-In Rate")
+  
+}
+```
+
+## Results
+
+### Bias
+
+```{r}
+summary_boxplot(results, metric = mean_error, eps = 1)
+summary_boxplot_facet(results, metric = mean_error)
+```
+
+```{r}
+summary_boxplot(results, metric = median_error, eps = 1)
+summary_boxplot_facet(results, metric = median_error)
+```
+
+```{r}
+summary_boxplot(results, metric = mean_pct_error, eps = 1)
+summary_boxplot_facet(results, metric = mean_pct_error)
+```
+
+```{r}
+summary_boxplot(results, metric = median_pct_error, eps = 1)
+summary_boxplot_facet(results, metric = median_pct_error)
+```
+
+### Accuracy
+
+```{r}
+summary_boxplot(results, metric = mean_abs_error, eps = 1)
+summary_boxplot_facet(results, metric = mean_abs_error)
+```
+
+```{r}
+summary_boxplot(results, metric = median_abs_error, eps = 1)
+summary_boxplot_facet(results, metric = median_abs_error)
+```
+
+```{r}
+summary_boxplot(results, metric = mean_abs_pct_error, eps = 1)
+summary_boxplot_facet(results, metric = mean_abs_pct_error)
+```
+
+```{r}
+summary_boxplot(results, metric = median_abs_pct_error, eps = 1)
+summary_boxplot_facet(results, metric = median_abs_pct_error)
+```
+
+```{r}
+summary_boxplot(results, metric = rmse, eps = 1)
+summary_boxplot_facet(results, metric = rmse)
+```
+
+```{r}
+summary_boxplot(results, metric = cv, eps = 1)
+summary_boxplot_facet(results, metric = cv)
+```
+
