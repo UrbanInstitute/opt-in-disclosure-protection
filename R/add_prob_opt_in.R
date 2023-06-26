@@ -1,7 +1,7 @@
 #' Add probability of opt in (household level) to starting data
 #'
 #' @param starting_data A dataframe of starting data
-#' @param prob The type of opt-in probability: NULL (default), "uniform"
+#' @param prob A number in \[0, 1\] for the probability of opting in
 #' @param white_multiplier A multiplier for the white probability of opting in
 #' All probabilities are normalized using the data so the mean is prob
 #' 
