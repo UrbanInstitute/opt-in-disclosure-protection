@@ -18,7 +18,6 @@ source(here("R", "add_D_i.R"))
 source(here("R", "create_D.R"))
 source(here("R", "add_prob_opt_in.R"))
 source(here("R", "add_opt_in.R"))
-source(here("R", "metric_all.R"))
 
 options(dplyr.summarise.inform = FALSE)
 ```
@@ -37,7 +36,7 @@ attribs <- c("age_bucket", "race_simple", "sex_val")
 specs <- expand_grid(
   run = 1:100, 
   epsilon = c(1, 5, 10, 20),
-  opt_in = c(0.1, 0.5, 0.9, 1)
+  opt_in = c(0.01, 0.1, 0.5, 0.9, 1)
 )
 ```
 
@@ -52,15 +51,6 @@ prep_data <- function(data, opt_in) {
       add_D_i(attribs)
   
 }
-
-summarize_results <- function(data) {
-  
-  data |>
-    group_by(across(any_of(names(specs)))) |>
-    metric_all(n = n, n_noisy = n_noisy, threshold = 0.1, drop_zeros = TRUE) |>
-    ungroup()
-  
-}
 ```
 
 ## Run Spec Grid
@@ -73,8 +63,7 @@ results <- bind_rows(
       prep_data(opt_in = opt_in) |>
       group_split(state) |>
       map_dfr(hist_unaryencode, epsilon = epsilon, type = "SUE", attribs = attribs) |>
-      mutate(run = run, epsilon = epsilon, opt_in = opt_in) |>
-      summarize_results()
+      mutate(run = run, epsilon = epsilon, opt_in = opt_in)
   ),
   `oue` = pmap_dfr(
     .l = specs,
@@ -82,21 +71,19 @@ results <- bind_rows(
       prep_data(opt_in = opt_in) |>      
       group_split(state) |>
       map_dfr(hist_unaryencode, epsilon = epsilon, type = "OUE", attribs = attribs) |>
-      mutate(run = run, epsilon = epsilon, opt_in = opt_in) |>
-      summarize_results()
+      mutate(run = run, epsilon = epsilon, opt_in = opt_in)
   ),
   `global` = pmap_dfr(
     .l = distinct(select(specs, c(epsilon, run))),
     .f = function(run, epsilon) data |>
       group_split(state) |>
       map_dfr(hist_global, epsilon = epsilon, attribs = attribs) |>
-      mutate(run = run, epsilon = epsilon) |>
-      summarize_results() |>
-      cbind(opt_in = unique(specs$opt_in))
+      mutate(run = run, epsilon = epsilon) %>%
+      uncount(weights = length(unique(specs$opt_in))) %>% 
+      mutate(opt_in = rep(unique(specs$opt_in), length.out = n()))
     ),
   .id = "method"
 )
 
-saveRDS(results, file = paste(here("data", "results"), "results-001.rds", sep = "/"))
+saveRDS(results, file = here("data", "results", "results-001.rds"))
 ```
-
