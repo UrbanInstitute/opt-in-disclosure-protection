@@ -9,13 +9,13 @@
 hist_grr <- function(data, epsilon) {
 
   # check inputs ----------------------------------------------------------
-  stop_if_not(!is.null(data$D_i))
+  stopifnot(!is.null(data$D_i))
 
   # create histogram ------------------------------------------------------
 
   # all ids should be in lookup table
   histogram <- data %>%
-    dplyr::group_by(dplyr::across(dplyr::everything())) %>%
+    dplyr::group_by(dplyr::across(c(all_of(attribs), D_i))) %>%
     dplyr::count()
 
   D <- data %>%
