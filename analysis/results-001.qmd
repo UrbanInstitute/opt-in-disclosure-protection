@@ -13,6 +13,9 @@ library(tidyverse)
 library(here)
 library(urbnthemes)
 
+source(here("R", "metrics_config.R"))
+source(here("R", "metric_all.R"))
+
 set_urbn_defaults(style = "print")
 options(dplyr.summarise.inform = FALSE)
 ```
@@ -21,31 +24,46 @@ options(dplyr.summarise.inform = FALSE)
 
 ```{r}
 results <- readRDS(here("data", "results", "results-001.rds"))
+
+attribs <- c("age_bucket", "race_simple", "sex_val")
+```
+
+## Summarize Metrics
+
+```{r}
+summarize_results <- function(data) {
+  
+  data |>
+    metric_all(n = n, n_noisy = n_noisy, threshold = 0.1, drop_zeros = TRUE) |>
+    ungroup()
+  
+}
+```
+
+## Identify Summary Level
+
+```{r}
+methods_summary_level <- c("method", "run", "epsilon", "opt_in")
+methods_summary <- results %>%
+  group_by(across(all_of(methods_summary_level))) %>%
+  summarize_results()
+
+race_state_summary_level <- c("race_simple", "state", "method", "run", "epsilon", "opt_in")
+race_state_summary <- results %>%
+  group_by(across(all_of(race_state_summary_level))) %>%
+  summarize_results()
 ```
 
 ## Plotting Functions
 
 ```{r}
-summary_boxplot <- function(results, metric, eps) {
+boxplot_helper <- function(data, metric) {
   
-  results %>%
-    filter(epsilon == eps) %>%
+  data %>%
     ggplot(aes(fill = method, 
                y = {{metric}}, 
                x = as.factor(opt_in))) +
       geom_boxplot() +
-      labs(x = "Opt-In Rate")
-  
-}
-
-summary_boxplot_facet <- function(results, metric) {
-  
-  results %>%
-    ggplot(aes(fill = method, 
-               y = {{metric}}, 
-               x = as.factor(opt_in))) +
-      geom_boxplot() +
-      facet_grid(epsilon ~ ., scales = "free_y") +
       labs(x = "Opt-In Rate")
   
 }
@@ -53,57 +71,59 @@ summary_boxplot_facet <- function(results, metric) {
 
 ## Results
 
-### Bias
+### Methods Overall
+
+#### Bias
 
 ```{r}
-summary_boxplot(results, metric = mean_error, eps = 1)
-summary_boxplot_facet(results, metric = mean_error)
+methods_summary %>%
+  boxplot_helper(metric = mean_pct_error) +
+  facet_grid(epsilon ~ ., scales = "free_y")
+```
+
+#### Accuracy
+
+```{r}
+methods_summary %>%
+  boxplot_helper(metric = mean_abs_pct_error) +
+  facet_grid(epsilon ~ ., scales = "free_y")
+```
+
+### Methods by Race & State
+
+#### Bias
+
+```{r}
+race_state_summary %>%
+  filter(epsilon == 1 & state == 19) %>%
+  boxplot_helper(metric = mean_pct_error) +
+  facet_grid(race_simple ~ .) +
+  ggtitle("State = IA | Epsilon = 1")
 ```
 
 ```{r}
-summary_boxplot(results, metric = median_error, eps = 1)
-summary_boxplot_facet(results, metric = median_error)
+race_state_summary %>%
+  filter(epsilon == 1 & state == 11) %>%
+  boxplot_helper(metric = mean_pct_error) +
+  facet_grid(race_simple ~ .) +
+  ggtitle("State = DC | Epsilon = 1")
+```
+
+#### Accuracy
+
+```{r}
+race_state_summary %>%
+  filter(epsilon == 1 & state == 19) %>%
+  boxplot_helper(metric = mean_abs_pct_error) +
+  facet_grid(race_simple ~ .) +
+  ggtitle("State = IA | Epsilon = 1")
 ```
 
 ```{r}
-summary_boxplot(results, metric = mean_pct_error, eps = 1)
-summary_boxplot_facet(results, metric = mean_pct_error)
-```
-
-```{r}
-summary_boxplot(results, metric = median_pct_error, eps = 1)
-summary_boxplot_facet(results, metric = median_pct_error)
-```
-
-### Accuracy
-
-```{r}
-summary_boxplot(results, metric = mean_abs_error, eps = 1)
-summary_boxplot_facet(results, metric = mean_abs_error)
-```
-
-```{r}
-summary_boxplot(results, metric = median_abs_error, eps = 1)
-summary_boxplot_facet(results, metric = median_abs_error)
-```
-
-```{r}
-summary_boxplot(results, metric = mean_abs_pct_error, eps = 1)
-summary_boxplot_facet(results, metric = mean_abs_pct_error)
-```
-
-```{r}
-summary_boxplot(results, metric = median_abs_pct_error, eps = 1)
-summary_boxplot_facet(results, metric = median_abs_pct_error)
-```
-
-```{r}
-summary_boxplot(results, metric = rmse, eps = 1)
-summary_boxplot_facet(results, metric = rmse)
-```
-
-```{r}
-summary_boxplot(results, metric = cv, eps = 1)
-summary_boxplot_facet(results, metric = cv)
+race_state_summary %>%
+  filter(epsilon == 1 & state == 11) %>%
+  boxplot_helper(metric = mean_abs_pct_error) +
+  facet_grid(race_simple ~ .) +
+  ggtitle("State = DC | Epsilon = 1")
 ```
 
