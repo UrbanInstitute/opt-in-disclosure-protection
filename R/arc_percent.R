@@ -7,7 +7,7 @@
 #' 
 arc_percent <- function(x, y) {
   
-  arc_percent <- ifelse(
+  arc_percent <- dplyr::if_else(
     x == y,
     0,
     (x - y) / (0.5 * (x + y))
