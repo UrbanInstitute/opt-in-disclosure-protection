@@ -11,7 +11,7 @@
 metric_all <- function(data, n, n_noisy, threshold, drop_zeros = FALSE) {
   
   data |>
-    summarize(mean_error = metric_mean_error(n, n_noisy),
+    dplyr::summarize(mean_error = metric_mean_error(n, n_noisy),
               mean_abs_error = metric_mean_abs_error(n, n_noisy),
               mean_pct_error = metric_mean_pct_error(n, n_noisy, drop_zeros),
               mean_abs_pct_error = metric_mean_abs_pct_error(n, n_noisy, drop_zeros),
