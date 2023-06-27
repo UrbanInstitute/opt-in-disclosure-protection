@@ -12,6 +12,7 @@ editor_options:
 library(tidyverse)
 library(here)
 library(urbnthemes)
+library(tigris)
 
 source(here("R", "metrics_config.R"))
 source(here("R", "metric_all.R"))
@@ -57,7 +58,7 @@ race_state_summary <- results %>%
 ## Plotting Functions
 
 ```{r}
-boxplot_helper <- function(data, metric) {
+boxplot_simple <- function(data, metric) {
   
   data %>%
     ggplot(aes(fill = method, 
@@ -65,6 +66,18 @@ boxplot_helper <- function(data, metric) {
                x = as.factor(opt_in))) +
       geom_boxplot() +
       labs(x = "Opt-In Rate")
+  
+}
+
+boxplot_race_state <- function(data, metric, state, epsilon) {
+  
+  state_fips <- parse_number(lookup_code(state))
+  
+  data %>%
+    filter(epsilon == {{epsilon}} & state == state_fips) %>%
+    boxplot_simple(metric = {{metric}}) +
+    facet_grid(race_simple ~ .) +
+    ggtitle(paste0("State = ", {{state}}, " | Epsilon = ", {{epsilon}}))
   
 }
 ```
@@ -77,7 +90,7 @@ boxplot_helper <- function(data, metric) {
 
 ```{r}
 methods_summary %>%
-  boxplot_helper(metric = mean_pct_error) +
+  boxplot_simple(metric = mean_pct_error) +
   facet_grid(epsilon ~ ., scales = "free_y")
 ```
 
@@ -85,7 +98,7 @@ methods_summary %>%
 
 ```{r}
 methods_summary %>%
-  boxplot_helper(metric = mean_abs_pct_error) +
+  boxplot_simple(metric = mean_abs_pct_error) +
   facet_grid(epsilon ~ ., scales = "free_y")
 ```
 
@@ -94,36 +107,59 @@ methods_summary %>%
 #### Bias
 
 ```{r}
-race_state_summary %>%
-  filter(epsilon == 1 & state == 19) %>%
-  boxplot_helper(metric = mean_pct_error) +
-  facet_grid(race_simple ~ .) +
-  ggtitle("State = IA | Epsilon = 1")
+boxplot_race_state(data = race_state_summary, 
+                   metric = mean_pct_error, 
+                   state = "IA", 
+                   epsilon = 10)
 ```
 
 ```{r}
-race_state_summary %>%
-  filter(epsilon == 1 & state == 11) %>%
-  boxplot_helper(metric = mean_pct_error) +
-  facet_grid(race_simple ~ .) +
-  ggtitle("State = DC | Epsilon = 1")
+boxplot_race_state(data = race_state_summary, 
+                   metric = mean_pct_error, 
+                   state = "DC", 
+                   epsilon = 10)
+```
+
+```{r}
+boxplot_race_state(data = race_state_summary, 
+                   metric = mean_pct_error, 
+                   state = "IA", 
+                   epsilon = 10)
+```
+
+```{r}
+boxplot_race_state(data = race_state_summary, 
+                   metric = mean_pct_error, 
+                   state = "DC", 
+                   epsilon = 10)
 ```
 
 #### Accuracy
 
 ```{r}
-race_state_summary %>%
-  filter(epsilon == 1 & state == 19) %>%
-  boxplot_helper(metric = mean_abs_pct_error) +
-  facet_grid(race_simple ~ .) +
-  ggtitle("State = IA | Epsilon = 1")
+boxplot_race_state(data = race_state_summary, 
+                   metric = mean_abs_pct_error, 
+                   state = "IA", 
+                   epsilon = 1)
 ```
 
 ```{r}
-race_state_summary %>%
-  filter(epsilon == 1 & state == 11) %>%
-  boxplot_helper(metric = mean_abs_pct_error) +
-  facet_grid(race_simple ~ .) +
-  ggtitle("State = DC | Epsilon = 1")
+boxplot_race_state(data = race_state_summary, 
+                   metric = mean_abs_pct_error, 
+                   state = "DC", 
+                   epsilon = 1)
 ```
 
+```{r}
+boxplot_race_state(data = race_state_summary, 
+                   metric = mean_abs_pct_error, 
+                   state = "IA", 
+                   epsilon = 10)
+```
+
+```{r}
+boxplot_race_state(data = race_state_summary, 
+                   metric = mean_abs_pct_error, 
+                   state = "DC", 
+                   epsilon = 10)
+```

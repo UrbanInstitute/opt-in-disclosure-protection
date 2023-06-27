@@ -12,6 +12,7 @@ editor_options:
 library(tidyverse)
 library(here)
 
+source(here("R", "hist_grr.R"))
 source(here("R", "hist_unaryencode.R"))
 source(here("R", "hist_global.R"))
 source(here("R", "add_D_i.R"))
@@ -57,6 +58,14 @@ prep_data <- function(data, opt_in) {
 
 ```{r}
 results <- bind_rows(
+  `grr` = pmap_dfr(
+    .l = specs,
+    .f = function(run, epsilon, opt_in) data |>
+      prep_data(opt_in = opt_in) |>
+      group_split(state) |>
+      map_dfr(hist_grr, epsilon = epsilon, attribs = attribs) |>
+      mutate(run = run, epsilon = epsilon, opt_in = opt_in)
+  ),
   `sue` = pmap_dfr(
     .l = specs,
     .f = function(run, epsilon, opt_in) data |>
