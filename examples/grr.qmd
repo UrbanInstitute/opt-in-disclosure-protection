@@ -12,6 +12,7 @@ library(tidyverse)
 
 source(here::here("R", "hist_grr.R"))
 source(here::here("R", "add_D_i.R"))
+source(here::here("R", "add_opt_in.R"))
 source(here::here("R", "create_D.R"))
 
 ```
@@ -22,14 +23,17 @@ Let's create a simple example with two variables from the diamonds data set. The
 data <- diamonds %>%
   select(cut, color) %>%
   mutate(across(everything(), as.character)) %>%
-  filter(!(cut == "Fair" & color == "D"))
+  filter(!(cut == "Fair" & color == "D")) %>%
+  mutate(state = "Fake state")
+
+attribs <- c("cut", "color", "state")
 
 ```
 
 `add_D_i()` and `create_D()` are important functions for ensuring the missing combinations are included. 
 
 ```{r}
-add_D_i(data)
+add_D_i(data, attribs = attribs)
 create_D(data)
 
 
@@ -39,11 +43,13 @@ Demonstrate the method with $\epsilon = 1$ and $\epsilon = 10$.
 
 ```{r}
 data %>%
-  add_D_i() %>%
-  grr(epsilon = 1)
+  add_D_i(attribs = attribs) %>%
+  add_opt_in(prob_opt_in = 1) %>%
+  hist_grr(epsilon = 1, attribs = attribs)
 
 data %>%
-  add_D_i() %>%
-  grr(epsilon = 10)
+  add_D_i(attribs = attribs) %>%
+  add_opt_in(prob_opt_in = 1) %>%
+  hist_grr(epsilon = 10, attribs = attribs)
 
 ```

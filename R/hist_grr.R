@@ -3,26 +3,35 @@
 #' @param data A data frame with microdata with attributes and an ID 
 #' variable D_i
 #' @param epsilon A numeric value of epsilon
-#'
+#' @param attribs A vector of attributes for the histogram
+
 #' @return A noisy histogram with n and n_noisy
 #' 
-hist_grr <- function(data, epsilon) {
+hist_grr <- function(data, epsilon, attribs) {
 
   # check inputs ----------------------------------------------------------
   stopifnot(!is.null(data$D_i))
-
+  stopifnot(!is.null(data$opt_in))
+  
+  # temporary workaround to keep state identifier -------------------------
+  if(("state" %in% colnames(data)) & (length(unique(data$state)) == 1)) {
+    state_id <- unique(data$state)
+  }
+  
   # create histogram ------------------------------------------------------
 
   # all ids should be in lookup table
-  histogram <- data %>%
-    dplyr::group_by(dplyr::across(c(all_of(attribs), D_i))) %>%
-    dplyr::count()
+  histogram <- data |>
+    dplyr::group_by(dplyr::across(c(dplyr::all_of(attribs), D_i))) |>
+    dplyr::count() |>
+    dplyr::ungroup()
 
-  D <- data %>%
-    dplyr::select(-D_i) %>%
+  D <- data |>
+    dplyr::select(dplyr::all_of(attribs)) |>
     create_D()
   
   N <- nrow(data)
+  N_optin <- sum(data$opt_in)
   d <- length(D)
   
   # calculate the probability of telling the truth
@@ -34,27 +43,25 @@ hist_grr <- function(data, epsilon) {
   
   # encode ----------------------------------------------------------------
 
-  # decide whether to tell the truth or lie
+  # split for "optin" and "truth" groups
+  optin <- data[data$opt_in == TRUE, ]
+  truth <- data[data$opt_in == FALSE, ]
+  
+  # for opt-ins, decide whether to tell the truth or lie
   flips <- sample(
     x = c("truth", "lie"), 
-    size = nrow(data), 
+    size = nrow(optin), 
     replace = TRUE,
     prob = c(p, q * (d - 1))
-  ) 
+  )
   
-  # keep truth
-  # if everything is truth, then return the original data
-  data_keep <- data[flips == "truth", ]
+  # for opt-ins, keep truth flip untouched
+  optin_truth <- optin[flips == "truth", ]
   
-  if (nrow(data) == nrow(data_keep)) {
-    
-    return(data)
-    
-  }
-  
-  # if lie, the pick from another id
-  D_i_replace <- data$D_i[flips == "lie"]
+  # for opt-ins, if lie flip, the pick from another id
+  optin_lie <- optin[flips == "lie", ]
 
+  # sample function
   sample_other_id <- function(D_i, D) {
     
     D_minus_i <- D[D != D_i]
@@ -66,24 +73,42 @@ hist_grr <- function(data, epsilon) {
   }
   
   # randomize responses for liars
-  D_i_randomized <- map_chr(.x = D_i_replace, .f = sample_other_id, D = D)
+  optin_lie_perturbed <- optin_lie |>
+    dplyr::mutate(D_i = map_chr(.x = D_i, .f = sample_other_id, D = D))
  
   # combine truths and lies
-  data_noisy <- tibble::tibble(D_i = c(data_keep$D_i, D_i_randomized))
-  
+  optin_noisy <- dplyr::bind_rows(optin_truth, optin_lie_perturbed)
+
   # aggregate -------------------------------------------------------------
   
   # make correction for randomised response
-  data_noisy <- count(data_noisy, D_i, name = "n_v") %>%
-    dplyr::mutate(n_noisy = (n_v - N * q) / (p - q)) %>%
+  optin_corrected <- optin_noisy |>
+    dplyr::count(D_i, name = "n_v") |>
+    dplyr::mutate(n_perturbed = (n_v - N_optin * q) / (p - q)) |>
     dplyr::select(-n_v)
+  
+  # summarize truth observations
+  truth_sum <- dplyr::count(truth, D_i, name = "n_truth")
+
+  # join optin and truth
+  combine <- optin_corrected |>
+    dplyr::left_join(truth_sum, by = "D_i") |>
+    tidyr::replace_na(list(n_perterbed = 0, n_truth = 0)) |>
+    dplyr::mutate(n_noisy = n_perturbed + n_truth) |>
+    dplyr::select(-n_perturbed, -n_truth)
   
   # join noisy data to data without noise to maintain empty cells and for
   # comparisons
-  data_synth <- data_noisy %>% 
-    left_join(histogram, by = "D_i") %>%
+  data_out <- combine |> 
+    dplyr::left_join(histogram, by = "D_i") |>
+    tidyr::replace_na(list(n = 0)) |>
     dplyr::relocate(D_i, n, n_noisy)
-
-  return(data_synth)
+  
+  # temporary workaround to keep state identifier
+  if(("state" %in% colnames(data)) & (length(unique(data$state)) == 1)) {
+    data_out$state <- state_id
+  }
+  
+  return(data_out)
 
 }
