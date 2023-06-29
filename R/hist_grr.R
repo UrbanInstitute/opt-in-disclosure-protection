@@ -21,13 +21,13 @@ hist_grr <- function(data, epsilon, attribs) {
   # create histogram ------------------------------------------------------
 
   # all ids should be in lookup table
-  histogram <- data %>%
-    dplyr::group_by(dplyr::across(c(all_of(attribs), D_i))) %>%
-    dplyr::count() %>%
+  histogram <- data |>
+    dplyr::group_by(dplyr::across(c(dplyr::all_of(attribs), D_i))) |>
+    dplyr::count() |>
     dplyr::ungroup()
 
-  D <- data %>%
-    dplyr::select(all_of(attribs)) %>%
+  D <- data |>
+    dplyr::select(dplyr::all_of(attribs)) |>
     create_D()
   
   N <- nrow(data)
@@ -44,8 +44,8 @@ hist_grr <- function(data, epsilon, attribs) {
   # encode ----------------------------------------------------------------
 
   # split for "optin" and "truth" groups
-  optin <- data[data$opt_in == TRUE,]
-  truth <- data[data$opt_in == FALSE,]
+  optin <- data[data$opt_in == TRUE, ]
+  truth <- data[data$opt_in == FALSE, ]
   
   # for opt-ins, decide whether to tell the truth or lie
   flips <- sample(
@@ -59,7 +59,7 @@ hist_grr <- function(data, epsilon, attribs) {
   optin_truth <- optin[flips == "truth", ]
   
   # for opt-ins, if lie flip, the pick from another id
-  optin_lie <- optin[flips == "lie",]
+  optin_lie <- optin[flips == "lie", ]
 
   # sample function
   sample_other_id <- function(D_i, D) {
@@ -73,32 +73,35 @@ hist_grr <- function(data, epsilon, attribs) {
   }
   
   # randomize responses for liars
-  optin_lie_perturbed <- optin_lie %>%
-    mutate(D_i = map_chr(.x = D_i, .f = sample_other_id, D = D))
+  optin_lie_perturbed <- optin_lie |>
+    dplyr::mutate(D_i = map_chr(.x = D_i, .f = sample_other_id, D = D))
  
   # combine truths and lies
-  optin_noisy <- rbind(optin_truth, optin_lie_perturbed)
+  optin_noisy <- dplyr::bind_rows(optin_truth, optin_lie_perturbed)
 
   # aggregate -------------------------------------------------------------
   
   # make correction for randomised response
-  optin_corrected <- count(optin_noisy, D_i, name = "n_v") %>%
-    dplyr::mutate(n_perturbed = (n_v - N_optin * q) / (p - q)) %>%
+  optin_corrected <- optin_noisy |>
+    dplyr::count(D_i, name = "n_v") |>
+    dplyr::mutate(n_perturbed = (n_v - N_optin * q) / (p - q)) |>
     dplyr::select(-n_v)
   
   # summarize truth observations
-  truth_sum <- count(truth, D_i, name = "n_truth")
+  truth_sum <- dplyr::count(truth, D_i, name = "n_truth")
 
   # join optin and truth
-  combine <- optin_corrected %>%
-    left_join(truth_sum, by = "D_i") %>%
-    mutate(n_noisy = rowSums(select(., "n_perturbed", "n_truth"), na.rm = TRUE)) %>%
-    select(-c(n_perturbed, n_truth))
+  combine <- optin_corrected |>
+    dplyr::left_join(truth_sum, by = "D_i") |>
+    tidyr::replace_na(list(n_perterbed = 0, n_truth = 0)) |>
+    dplyr::mutate(n_noisy = n_perturbed + n_truth) |>
+    dplyr::select(-n_perturbed, -n_truth)
   
   # join noisy data to data without noise to maintain empty cells and for
   # comparisons
-  data_out <- combine %>% 
-    left_join(histogram, by = "D_i") %>%
+  data_out <- combine |> 
+    dplyr::left_join(histogram, by = "D_i") |>
+    tidyr::replace_na(list(n = 0)) |>
     dplyr::relocate(D_i, n, n_noisy)
   
   # temporary workaround to keep state identifier
