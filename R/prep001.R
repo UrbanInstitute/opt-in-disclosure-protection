@@ -4,7 +4,7 @@
 #' Attributes: age bucket, sex, race simple
 #'
 #'
-#' @return A list containing starting data 001 and accompanying lookup table
+#' @return Dataframe starting data 001
 #'
 prep001 <- function() {
   
@@ -12,7 +12,7 @@ prep001 <- function() {
   
   state_list <- c("DC", "IA")
 
-  df_comb <- map_dfr(state_list, process_pums)
+  df_comb <- purrr::map_dfr(state_list, process_pums)
 
   keepvars <- c("serialno")
   geovars <- c("state")
