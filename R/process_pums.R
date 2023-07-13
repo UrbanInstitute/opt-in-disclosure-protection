@@ -16,7 +16,11 @@ process_pums <- function(state_abb,
   stopifnot((toupper(state_abb) %in% state.abb.adj))
   
   fwf <- paste0("https://www2.census.gov/census_2010/12-Stateside_PUMS/",
-                 str_replace_all(state.name.adj[str_detect(state.abb.adj, toupper(state_abb))], " ", "_"), 
+                 stringr::str_replace_all(
+                   state.name.adj[stringr::str_detect(state.abb.adj, 
+                                                      toupper(state_abb))], 
+                   " ", 
+                   "_"), 
                  "/",
                  tolower(state_abb),
                  ".2010.pums.01.txt")
@@ -70,7 +74,7 @@ process_pums <- function(state_abb,
   # add dictionary values
   layout_list <- readRDS(here::here("data", "layout", "fwf-layout-list.rds"))
   merge_list <- append(layout_list, list(df), after = 0)
-  df_full <- Reduce(left_join, merge_list) |>
+  df_full <- Reduce(dplyr::left_join, merge_list) |>
     dplyr::rename_with(tolower, everything())
   
   return(df_full)
