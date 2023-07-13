@@ -19,6 +19,7 @@ library(here)
 
 source(here("R", "process_pums.R"))
 source(here("R", "prep001.R"))
+source(here("R", "prep002.R"))
 source(here("R", "add_prob_opt_in.R"))
 source(here("R", "add_opt_in.R"))
 ```
@@ -41,5 +42,16 @@ geo: state
 ```{r, message = FALSE}
 starting001 <- prep001()
 saveRDS(starting001, file = paste(here("data", "starting"), "starting-data-001.rds", sep = "/"))
+```
+
+### starting-data-002
+
+DC and IA only
+attributes: hispanic simple
+geo: state
+
+```{r, message = FALSE}
+starting002 <- prep002()
+saveRDS(starting002, file = paste(here("data", "starting"), "starting-data-002.rds", sep = "/"))
 ```
 
