@@ -37,18 +37,17 @@ attribs <- c("hisp_simple")
 specs <- expand_grid(
   run = 1:100, 
   epsilon = c(1, 5, 10, 20),
-  opt_in = c(0.01, 0.1, 0.5, 0.9, 1),
-  white_multiplier = c(0.5, 1, 2)
+  opt_in = c(0.01, 0.1, 0.5, 0.9, 1)
 )
 ```
 
 ## Functions for Data Prep and Summary
 
 ```{r}
-prep_data <- function(data, opt_in, white_multiplier = white_multiplier) {
+prep_data <- function(data, opt_in) {
   
   data |>
-      add_prob_opt_in(prob = opt_in, white_multiplier = white_multiplier) |>
+      add_prob_opt_in(prob = opt_in) |>
       add_opt_in() |>
       add_D_i(attribs)
   
@@ -61,27 +60,27 @@ prep_data <- function(data, opt_in, white_multiplier = white_multiplier) {
 results <- bind_rows(
   `grr` = pmap_dfr(
     .l = specs,
-    .f = function(run, epsilon, opt_in, white_multiplier) data |>
-      prep_data(opt_in = opt_in, white_multiplier = white_multiplier) |>
+    .f = function(run, epsilon, opt_in) data |>
+      prep_data(opt_in = opt_in) |>
       group_split(state) |>
       map_dfr(hist_grr, epsilon = epsilon, attribs = attribs) |>
-      mutate(run = run, epsilon = epsilon, opt_in = opt_in, white_multiplier = white_multiplier)
+      mutate(run = run, epsilon = epsilon, opt_in = opt_in)
   ),
   `sue` = pmap_dfr(
     .l = specs,
     .f = function(run, epsilon, opt_in) data |>
-      prep_data(opt_in = opt_in, white_multiplier = white_multiplier) |>
+      prep_data(opt_in = opt_in) |>
       group_split(state) |>
       map_dfr(hist_unaryencode, epsilon = epsilon, type = "SUE", attribs = attribs) |>
-      mutate(run = run, epsilon = epsilon, opt_in = opt_in, white_multiplier = white_multiplier)
+      mutate(run = run, epsilon = epsilon, opt_in = opt_in)
   ),
   `oue` = pmap_dfr(
     .l = specs,
     .f = function(run, epsilon, opt_in) data |>
-      prep_data(opt_in = opt_in, white_multiplier = white_multiplier) |>      
+      prep_data(opt_in = opt_in) |>      
       group_split(state) |>
       map_dfr(hist_unaryencode, epsilon = epsilon, type = "OUE", attribs = attribs) |>
-      mutate(run = run, epsilon = epsilon, opt_in = opt_in, white_multiplier = white_multiplier)
+      mutate(run = run, epsilon = epsilon, opt_in = opt_in)
   ),
   `global` = pmap_dfr(
     .l = distinct(select(specs, c(epsilon, run))),
