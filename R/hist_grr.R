@@ -99,8 +99,8 @@ hist_grr <- function(data, epsilon, attribs) {
   
   # join noisy data to data without noise to maintain empty cells and for
   # comparisons
-  data_out <- combine |> 
-    dplyr::left_join(histogram, by = "D_i") |>
+  data_out <- histogram |> 
+    dplyr::left_join(combine, by = "D_i") |>
     tidyr::replace_na(list(n = 0)) |>
     dplyr::relocate(D_i, n, n_noisy)
   
