@@ -62,6 +62,6 @@ prediction_test <- function(postsynth, data, formula, model = NULL, recipe = NUL
   
   # calculate the RMSE
   yardstick::rmse(data = data, 
-                  truth = eval(rlang::f_lhs(formula)), estimate = .pred)$.estimate
+                  truth = rlang::f_lhs(formula), estimate = .pred)$.estimate
   
 }
