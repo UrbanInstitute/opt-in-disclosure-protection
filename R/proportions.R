@@ -1,4 +1,4 @@
-#' Calculate frquency tables for categorical variables
+#' Calculate frequency tables for categorical variables
 #'
 #' @param postsynth A postsynth object or tibble with synthetic data
 #' @param data A data frame with the original data
@@ -21,10 +21,10 @@ proportions <- function(postsynth, data, group_var = NULL) {
   }
   
   synthetic_data <- synthetic_data |>
-    dplyr::select(where(is.factor), where(is.character))
+    dplyr::select(dplyr::where(is.factor), where(is.character))
   
   data <- data |>
-    dplyr::select(where(is.factor), where(is.character))
+    dplyr::select(dplyr::where(is.factor), where(is.character))
   
   combined_data <- 
     dplyr::bind_rows(
@@ -34,7 +34,11 @@ proportions <- function(postsynth, data, group_var = NULL) {
     )
   
   combined_data <- combined_data |>
-    tidyr::pivot_longer(cols = -c(source, {{ group_var }}), names_to = "variable", values_to = "class") 
+    tidyr::pivot_longer(
+      cols = -c(source, {{ group_var }}), 
+      names_to = "variable", 
+      values_to = "class"
+    ) 
   
   combined_data <- combined_data |>
     dplyr::count({{ group_var }}, source, variable, class) |>

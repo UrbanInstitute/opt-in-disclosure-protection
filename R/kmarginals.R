@@ -47,7 +47,7 @@ kmarginals <- function(postsynth, data, k) {
   madd <- function(synthetic_data, data, vars) {
     
     prop_synth <- synthetic_data |>
-      dplyr::select(vars) |>
+      dplyr::select(dplyr::all_of(vars)) |>
       dplyr::group_by_all() |>
       dplyr::count() |>
       dplyr::ungroup() |>
@@ -55,7 +55,7 @@ kmarginals <- function(postsynth, data, k) {
       dplyr::select(-n)
     
     prop_data <- data |>
-      dplyr::select(vars) |>
+      dplyr::select(dplyr::all_of(vars)) |>
       dplyr::group_by_all() |>
       dplyr::count() |>
       dplyr::ungroup() |>
@@ -82,7 +82,7 @@ kmarginals <- function(postsynth, data, k) {
     .x = 1:nrow(kmarginals_vars), 
     .f = ~ madd(synthetic_data, data, kmarginals_vars[.x, ]))
   
-  # calculate the mean of the MabsDDs and then turn into and ascedning measure
+  # calculate the mean of the MabsDDs and then turn into and ascending measure
   # on [0, 1000]
   (1 - mean(madds)) * 1000
   
