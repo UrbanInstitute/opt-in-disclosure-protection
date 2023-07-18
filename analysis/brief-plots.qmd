@@ -1,0 +1,145 @@
+---
+title: "Brief Plots"
+format: 
+  html:
+    embed-resources: true
+    toc: true
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r, message = FALSE, warning = FALSE}
+library(tidyverse)
+library(here)
+library(urbnthemes)
+library(tigris)
+
+source(here("R", "metrics_config.R"))
+source(here("R", "metric_all.R"))
+
+set_urbn_defaults(style = "print")
+options(dplyr.summarise.inform = FALSE)
+```
+
+## Load Results
+
+For scenarios 1 and 2.
+
+```{r}
+results001 <- readRDS(here("data", "results", "results-001.rds"))
+attribs001 <- c("age_bucket", "race_simple", "sex_val")
+
+results002 <- readRDS(here("data", "results", "results-002.rds"))
+attribs002 <- c("hisp_simple")
+```
+
+## Summarize Metrics
+
+Wrapper function for applying all bias and accuracy metrics.
+
+```{r}
+summarize_results <- function(data) {
+  
+  data |>
+    metric_all(n = n, n_noisy = n_noisy, threshold = 0.1, drop_zeros = TRUE) |>
+    ungroup()
+  
+}
+```
+
+## Summarize for Methods Comparison
+
+Compare bias and accuracy for the central and GRR methods - regardless of state, race, etc.
+
+```{r}
+# summarize by method, run, epsilon, and opt in
+methods_summary_level <- c("method", "run", "epsilon", "opt_in")
+
+# filter to global and grr only and create metrics
+methods_summary <- results002 %>%
+  filter(method %in% c("global", "grr")) %>%
+  group_by(across(all_of(methods_summary_level))) %>%
+  summarize_results()
+```
+
+```{r}
+# boxplot function
+boxplot_methods <- function(data, metric, ylab) {
+  
+  data %>%
+    ggplot(aes(fill = method, 
+               y = {{metric}}, 
+               x = as.factor(opt_in))) +
+      geom_boxplot() +
+      labs(x = "Opt-in rate",
+           y = ylab) +
+      scale_fill_discrete(labels = c("global" = "Central", 
+                                     "grr" = "Local")) +
+      facet_grid(epsilon ~ ., scales = "free_y", 
+                 labeller = label_bquote(epsilon == .(epsilon)))
+  
+}
+```
+
+```{r}
+# bias
+methods_summary %>%
+  boxplot_methods(mean_pct_error, "Mean percent error")
+```
+
+```{r}
+# accuracy
+methods_summary %>%
+  boxplot_methods(mean_abs_pct_error, "Mean absolute percent error")
+```
+
+## Summarize for Race/Ethnicity Comparison
+
+For GRR only, look at accuracy results by race and state for each epsilon and opt in.
+
+```{r}
+# summarize by state, race, run, epsilon, and opt in
+race_summary_level <- c("race_simple", "state", "run", "opt_in", "epsilon")
+
+# filter to grr only and create metrics
+race_summary <- results001 %>%
+  filter(method == "grr") %>%
+  group_by(across(all_of(race_summary_level))) %>%
+  summarize_results()
+```
+
+```{r}
+# boxplot function
+boxplot_race_same <- function(data, state, metric, ylab, eps) {
+  
+  state_fips <- parse_number(lookup_code(state))
+  
+  data %>%
+    filter(state == state_fips & epsilon == eps) %>%
+    ggplot(aes(y = {{metric}}, 
+               x = as.factor(opt_in))) +
+      geom_boxplot() +
+      labs(x = "Opt-in rate",
+           y = ylab) +
+      facet_grid(race_simple ~ .)
+  
+}
+```
+
+```{r}
+# DC
+race_summary %>%
+  boxplot_race_same(state = "DC",
+                    metric = mean_abs_pct_error,
+                    ylab = "Mean absolute percent error",
+                    eps = 1)
+```
+
+```{r}
+# Iowa
+race_summary %>%
+  boxplot_race_same(state = "IA",
+                    metric = mean_abs_pct_error,
+                    ylab = "Mean absolute percent error",
+                    eps = 1)
+```
