@@ -1,0 +1,98 @@
+---
+format:
+  urbn-report-pdf:
+    keep-tex: true  
+bibliography: bibliography.bib  
+---
+
+\pagenumbering{roman}
+
+\begin{titlepage}
+    % Add Policy Center/Intaitive/Toxonmy Term Bar
+    % note the textbox exceeds width of document to avoid white space on sides
+    \begin{textblock*}{9in}(-0.25in, 0.15in)
+        \begin{tcolorbox}[valign = center]
+            \begin{center}
+                \policycenter{Research Methods and Data Analytics}
+            \end{center}
+        \end{tcolorbox}
+    \end{textblock*}
+
+    % Adding the cover image - code forces the image to be width of full paper (ignoring margins)
+    \vspace*{-1.7cm}
+    \noindent
+    \makebox[\textwidth]{\includegraphics{images/cover.jpg}}
+    
+    \vspace{0.35in}
+    \noindent\textcolor{urban-blue}{\MakeUppercase{\textbf{Research Report}}}
+    
+    \titlereport{Opt-In Statistical Disclosure Protections}
+    
+    \vspace{-0.25in}
+    
+    \reportsubtitle{Empowering Survey Respondents to Improve Data Quality}
+    % Multiple column author names - change the "4" to the number of desired columns
+    \begin{multicols}{4}
+        \authorfont{Aaron R. Williams}
+        
+        \authorfont{Jen Andre}
+      
+    \end{multicols}
+    
+    \vspace{-0.75cm}
+    
+    \datefont{August 2023}
+
+    % Add logo
+    \begin{textblock*}{4.5in}[1, 1](5.5in, 10.5in)
+        \noindent\includegraphics[width=4.5in]{images/cover-footer.jpg}
+    \end{textblock*}
+\end{titlepage}
+
+\include{frontmatter/about}
+
+\cleardoublepage
+
+\setcounter{page}{3}
+\begin{singlespace}
+    \tableofcontents
+\end{singlespace}
+
+\thispagestyle{empty} 
+
+
+\include{frontmatter/acknowledgements}
+
+\include{frontmatter/executive}
+
+
+\part{Opt-In Statistical Disclosure Protections}
+
+\section{Introduction}
+
+\section{Methods}
+
+\subsection{Local Differential Privacy}
+
+\subsection{Modeling Opt-In Decisions}
+
+\section{Results}
+
+\section{Conclusion}
+
+\include{backmatter/appendix}
+
+\include{backmatter/notes}
+
+\include{backmatter/references}
+
+\include{backmatter/author}
+
+\include{backmatter/independence}
+
+\newpage
+\thispagestyle{empty}
+
+\begin{textblock*}{8.5in}[1, 1](8.5in, 11in)
+    \noindent\includegraphics[width=\paperwidth,height=\paperheight]{images/back.pdf}
+\end{textblock*}
