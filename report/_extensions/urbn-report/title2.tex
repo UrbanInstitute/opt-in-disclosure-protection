@@ -1,0 +1,49 @@
+\begin{titlepage}
+    % Add Policy Center/Intaitive/Toxonmy Term Bar
+    % note the textbox exceeds width of document to avoid white space on sides
+    \begin{textblock*}{9in}(-0.25in, 0.15in)
+        \begin{tcolorbox}[valign = center]
+            \begin{center}
+                \policycenter{Policy Center, Initiative, or Taxonomy Terms Here}
+            \end{center}
+        \end{tcolorbox}
+    \end{textblock*}
+
+    % Adding the cover image - code forces the image to be width of full paper (ignoring margins)
+    \vspace*{-1.7cm}
+    \noindent
+    \makebox[\textwidth]{\includegraphics{images/cover.jpg}}
+    
+    \vspace{0.35in}
+    \noindent\textcolor{urban-blue}{\MakeUppercase{\textbf{Research Report}}}
+    
+    \titlereport{Title Here in Title Case}
+    
+    \vspace{-0.25in}
+    
+    \reportsubtitle{Subtitle Here in Title Case}
+    % Multiple column author names - change the "4" to the number of desired columns
+    \begin{multicols}{4}
+        \authorfont{Author 1 Name}\\
+        Author's Affiliation
+        
+        \authorfont{Author 2 Name}\\
+        Author's Affiliation
+        
+        \authorfont{Author 3 Name}\\
+        Author's Affiliation
+        
+        \authorfont{Author 4 Name}\\
+        Author's Affiliation
+    \end{multicols}
+    
+    \vspace{-0.75cm}
+    \authorfont{with Author Name and Author Name}
+    
+    \datefont{Month and Year}
+
+    % Add logo
+    \begin{textblock*}{4.5in}[1, 1](5.5in, 10.5in)
+        \noindent\includegraphics[width=4.5in]{images/cover-footer.jpg}
+    \end{textblock*}
+\end{titlepage}
