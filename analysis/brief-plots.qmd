@@ -85,12 +85,14 @@ boxplot_methods <- function(data, metric, ylab) {
 # bias
 methods_summary %>%
   boxplot_methods(mean_pct_error, "Mean percent error")
+ggsave(here("figures", "methods_bias.png"))
 ```
 
 ```{r}
 # accuracy
 methods_summary %>%
   boxplot_methods(mean_abs_pct_error, "Mean absolute percent error")
+ggsave(here("figures", "methods_accuracy.png"))
 ```
 
 ## Summarize for Race/Ethnicity Comparison
@@ -133,6 +135,7 @@ race_summary %>%
                     metric = mean_abs_pct_error,
                     ylab = "Mean absolute percent error",
                     eps = 1)
+ggsave(here("figures", "groups_dc.png"))
 ```
 
 ```{r}
@@ -142,4 +145,5 @@ race_summary %>%
                     metric = mean_abs_pct_error,
                     ylab = "Mean absolute percent error",
                     eps = 1)
+ggsave(here("figures", "groups_ia.png"))
 ```
