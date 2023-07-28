@@ -1,0 +1,54 @@
+---
+title: "Synthesize the ACS"
+format: 
+  html:
+    embed-resources: true
+    toc: true
+editor: source
+execute:
+  echo: true
+  warning: false
+  message: false
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r}
+#| label: load-packages-and-function
+
+library(tidyverse)
+library(furrr)
+library(here)
+library(tidysynthesis)
+library(syntheval)
+library(tictoc)
+
+source(here("R", "prediction_test.R"))
+source(here("R", "kmarginals.R"))
+source(here("R", "proportions.R"))
+
+source(here("R", "summarize_results.R"))
+source(here("R", "add_prob_opt_in.R"))
+source(here("R", "add_opt_in.R"))
+
+source(here("R", "synthesize_acs.R"))
+
+```
+
+## Load ACS
+
+```{r}
+#| label: load-data
+
+gsds <- readRDS(here("data", "starting", "acs-gsds.rds")) |>
+  select(-serial)
+
+```
+
+## Univariate Utility
+
+## Bivariate Utility
+
+## Multivariate Utility
+
+## Disclosure Metrics
