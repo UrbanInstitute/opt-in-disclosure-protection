@@ -1,0 +1,146 @@
+---
+title: "Prep ACS data for analysis"
+format: 
+  html:
+    embed-resources: true
+    toc: true
+editor: source
+execute:
+  echo: true
+  warning: false
+  message: false
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup}
+library(tidyverse)
+library(here)
+library(tidysynthesis)
+library(syntheval)
+
+source(here("R", "prediction_test.R"))
+source(here("R", "summarize_results.R"))
+
+```
+
+## Load ACS
+
+```{r}
+gsds <- readRDS(here("data", "starting", "acs-gsds.rds")) |>
+  select(-serial)
+
+```
+
+```{r}
+set.seed(20220218)
+
+# create "starting data"
+starting_data <- gsds |> 
+  select(race)
+
+synthesis_order <- c(
+  "hispan", 
+  "statefip",
+  "marst",
+  "sex",
+  "hcovany",
+  "empstat",
+  "labforce",
+  "age",
+  "educd",
+  "ftotinc",
+  "inctot",
+  "incwage",
+  "incwelfr",
+  "incresid"
+)
+
+# visit_sequence
+visit_sequence <- visit_sequence(
+  conf_data = synthesis_order,
+  start_data = starting_data,
+  type = "manual"
+)
+
+# roadmap
+roadmap <- roadmap(
+  conf_data = gsds,
+  start_data = starting_data,
+  visit_sequence = visit_sequence
+)
+
+# synth_spec
+rpart_mod_cat <- parsnip::decision_tree() %>% 
+  parsnip::set_mode("classification") %>%
+  parsnip::set_engine("rpart")
+
+rpart_mod_num <- parsnip::decision_tree() %>%
+  parsnip::set_mode("regression") %>%
+  parsnip::set_engine("rpart")
+
+algorithms <- construct_algos(
+  roadmap = roadmap,
+  default_algo = rpart_mod_cat,
+  custom_algos = list(
+    list(
+      vars = c("age", "educd", "ftotinc", "inctot", "incwage", "incwelfr", "incresid"),
+      algorithm = rpart_mod_num
+    )
+  )
+)
+
+synth_spec <- synth_spec(
+  roadmap = roadmap,
+  synth_algorithms = algorithms,
+  recipes = construct_recipes(roadmap = roadmap),
+  predict_methods = sample_rpart
+)
+
+# noise
+# don't add noise to predictions
+noise <- noise(
+  roadmap = roadmap,
+  add_noise = FALSE,
+  exclusions = 0
+)
+
+# constraints
+# don't impose constraints
+constraints <- constraints(
+  roadmap = roadmap,
+  constraints = NULL,
+  max_z = 0
+)
+
+# replicates
+replicates <- replicates(
+  replicates = 1,
+  workers = 1,
+  summary_function = NULL
+)
+
+presynth <- presynth(
+  roadmap = roadmap,
+  synth_spec = synth_spec,
+  noise = noise, 
+  constraints = constraints,
+  replicates = replicates
+)
+
+synth1 <- synthesize(presynth)
+
+synth1$synthetic_data
+
+```
+
+Does inctot exceed ftotinc?
+
+```{r}
+results <- summarize_results(postsynth = synth1, data = gsds)
+
+synthesize_acs(data = gsds |> mutate(opt_in = TRUE), id = "test")
+
+
+```
+
