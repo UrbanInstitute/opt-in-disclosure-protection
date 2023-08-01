@@ -42,7 +42,7 @@ proportions <- function(postsynth, data, group_var = NULL) {
   
   combined_data <- combined_data |>
     dplyr::count({{ group_var }}, source, variable, class) |>
-    dplyr::group_by(source, variable) |>
+    dplyr::group_by({{ group_var }}, source, variable) |>
     dplyr::mutate(prop = n / sum(n)) |>
     dplyr::ungroup()
   

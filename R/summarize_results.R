@@ -5,9 +5,35 @@ summarize_results <- function(postsynth, data) {
   
   proportions_race <- proportions(postsynth = postsynth, data = gsds, group_var = race)
   
+  combine_race <- function(data) {
+    
+    data |>
+      mutate(
+        race_eth = case_when(
+          hispan != "Not Hispanic" ~ "Hispanic",
+          race == "Black/African American" ~ "Black",
+          race == "White" ~ "White",
+          TRUE ~ "Other Races and Ethnicities"
+        )
+      )
+    
+  }
+  
+  proportions_race_eth <- proportions(
+    postsynth = combine_race(postsynth$synthetic_data), 
+    data = combine_race(data = gsds), 
+    group_var = race_eth
+  )
+  
   moments <- moments(postsynth =  postsynth, data = data)
   
   moments_race <- moments(postsynth =  postsynth, data = data, group_var = race)
+  
+  moments_race_eth <- moments(
+    postsynth = combine_race(postsynth$synthetic_data), 
+    data = combine_race(data = gsds), 
+    group_var = race_eth
+  )
   
   percentiles <- percentiles(
     postsynth = dplyr::select(postsynth$synthetic_data, -prob_opt_in),
@@ -23,13 +49,59 @@ summarize_results <- function(postsynth, data) {
   k2_marginals <- kmarginals(postsynth = postsynth, data = data, k = 2)
   k3_marginals <- kmarginals(postsynth = postsynth, data = data, k = 3) 
   
+  discriminator <- discriminator_auc(postsynth = postsynth, data = data)
   
+  # specific utility
+  prep_model_data <- function(data) {
+    
+    lm_data <- data |>
+      dplyr::mutate(
+        years_of_educ = dplyr::case_match(
+          educd,
+          3 ~ 0,
+          2 ~ 0,
+          5 ~ 1,
+          6 ~ 1,
+          8 ~ 2,
+          9 ~ 3,
+          10 ~ 4,
+          11 ~ 5,
+          14 ~ 6,
+          15 ~ 7,
+          17 ~ 8, # grade 5
+          18 ~ 9,
+          19 ~ 10,
+          20 ~ 11,
+          21 ~ 12,
+          23 ~ 13,
+          25 ~ 13,
+          26 ~ 13,
+          27 ~ 13,
+          29 ~ 14,
+          31 ~ 15,
+          36 ~ 17,
+          41 ~ 19,
+          42 ~ 19,
+          43 ~ 21
+        )
+      ) |>
+      dplyr::mutate(
+        white = race == "White",
+        potential_experience = pmax(age - years_of_educ - 6, 0),
+        potential_experience_sq = potential_experience ^ 2
+      ) |>
+      dplyr::filter(incwage > 0)
+    
+  }
   
-  # descriminator_auc <- descriminator_auc(
-  #   postsynth = postsynth, 
-  #   data = data
-  # )
-  
+  # regression metrics
+  regression_ci_overlap <- regression_ci_overlap(
+    postsynth = prep_model_data(postsynth$synthetic_data) |>
+      mutate(sex = factor(sex, levels = c("Male", "Female"))), 
+    data = prep_model_data(data), 
+    formula = log(incwage) ~ years_of_educ + potential_experience + potential_experience_sq + white + sex
+  )
+
   # disclosure metrics
   ldiveristy <- postsynth$ldiversity |>
     dplyr::select(dplyr::where(is.numeric)) |>
@@ -45,6 +117,7 @@ summarize_results <- function(postsynth, data) {
   list(
     proportions = proportions,
     proportions_race = proportions_race,
+    proportions_race_eth = proportions_race_eth,
     moments = moments,
     moments_race = moments_race,
     percentiles = percentiles,
@@ -52,7 +125,9 @@ summarize_results <- function(postsynth, data) {
     k1_marginals = k1_marginals,
     k2_marginals = k2_marginals,
     k3_marginals = k3_marginals,
-    # descriminator_auc = descriminator_auc
+    discriminator_auc = discriminator$auc,
+    discriminator_vip = discriminator$var_importance,
+    regression_ci_overlap = regression_ci_overlap,
     ldiveristy = ldiveristy,
     incwelfr_rmse = incwelfr_rmse
   )
