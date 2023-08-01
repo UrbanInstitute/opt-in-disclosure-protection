@@ -17,12 +17,11 @@ add_prob_opt_in <- function(starting_data, prob, white_multiplier = NULL) {
   } else  {
     
     data <- starting_data |>
-      dplyr::mutate(prob_opt_in = white_multiplier * (1 + (race_simple == "White"))) |>
+      dplyr::mutate(prob_opt_in = dplyr::if_else(race_simple == "White", white_multiplier, 1)) |>
       dplyr::mutate(prob_opt_in = prob_opt_in * (prob / mean(prob_opt_in)))
-
+    
   }
   
   return(data)
   
 }
-  
