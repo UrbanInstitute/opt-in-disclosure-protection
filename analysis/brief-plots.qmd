@@ -1,5 +1,6 @@
 ---
 title: "Brief Plots"
+date: today
 format: 
   html:
     embed-resources: true
@@ -19,6 +20,7 @@ source(here("R", "metric_all.R"))
 
 set_urbn_defaults(style = "print")
 options(dplyr.summarise.inform = FALSE)
+options(scipen = 999)
 ```
 
 ## Load Results
