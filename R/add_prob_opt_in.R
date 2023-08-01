@@ -9,7 +9,7 @@
 #'
 add_prob_opt_in <- function(starting_data, prob, white_multiplier = NULL) {
   
-  if (is.null(white_multiplier)) {
+  if (is.null(white_multiplier) | prob == 1) {
     
     data <- starting_data |>
       dplyr::mutate(prob_opt_in = prob)
@@ -18,7 +18,8 @@ add_prob_opt_in <- function(starting_data, prob, white_multiplier = NULL) {
     
     data <- starting_data |>
       dplyr::mutate(prob_opt_in = dplyr::if_else(race_simple == "White", white_multiplier, 1)) |>
-      dplyr::mutate(prob_opt_in = prob_opt_in * (prob / mean(prob_opt_in)))
+      dplyr::mutate(prob_opt_in = prob_opt_in * (prob / mean(prob_opt_in))) |>
+      dplyr::mutate(prob_opt_in = pmin(prob_opt_in, 1))
 
   }
   
