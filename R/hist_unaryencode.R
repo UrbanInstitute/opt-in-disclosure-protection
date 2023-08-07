@@ -27,9 +27,7 @@ hist_unaryencode <- function(data, epsilon, type = "SUE", attribs) {
     dplyr::count() %>%
     dplyr::ungroup()
 
-  D <- data %>%
-    dplyr::select(all_of(attribs)) %>%
-    create_D()
+  D <- histogram$D_i
   
   N <- nrow(data)
   N_optin <- sum(data$opt_in)
