@@ -70,49 +70,61 @@ bibliography: bibliography.bib
 
 \section{Introduction}
 
-People generate and share data about themselves every day when they browse the web, purchase goods and services, and respond to surveys, and they should be empowered to make decisions about how these data are accessed and used. Currently, disclosure protection policies at the US Census Bureau do not allow for such empowerment -- respondents to surveys like the decennial census and the American Community Survey are all subjected to disclosure protections. Data for all respondents are, by default, masked with some form of statistical disclosure control, and those who may wish to see themselves accurately reflected in the data are unable to do so. These data quality distortions may have greater impact for certain groups, such as smaller race and ethnicity groups, relative to others.
+People generate and share data about themselves every day when they browse the web, interact with government services, and respond to surveys, and they should be empowered to make decisions about how these data are accessed and used. Currently, disclosure protection policies at the US Census Bureau do not allow for such empowerment -- respondents to surveys like the decennial census and the American Community Survey are all subjected to disclosure protections. Data for all respondents are, by default, masked with some form of statistical disclosure control, and those who may wish to see themselves accurately reflected in the data are unable to do so. These data quality distortions may have greater impact for certain groups, such as smaller race and ethnicity groups, relative to others.
 
-In this brief, we explore a new framework for disclosure protections that would require respondents to actively opt in to disclosure protections. Responses for those who opt in would be treated with disclosure protections, while responses for those who forego protections would remain unchanged in statistical product outputs. We present two demonstration studies, the first using an opt-in local differential privacy approach for the decennial census, and the second using an opt-in synthetic data approach for the American Community Survey. In both cases, we seek to explore the impact of varying the rate of opting in to disclosure protections on data quality, along with the associated privacy consequences. We especially examine the impact for small racial/ethnic groups, including the impact on quality and privacy if some groups opt in at higher rates than others.
+In this brief, we explore a new framework for disclosure protections that would require respondents to actively opt in to disclosure protections. Responses for those who opt in would be treated with disclosure protections, while responses for those who forego protections would remain unchanged in statistical product outputs. We present two demonstration studies, the first using an opt-in local differential privacy approach for the decennial census, and the second using an opt-in synthetic data approach for the American Community Survey. In both cases, we seek to explore the impact of varying the rate of opting in to disclosure protections on data quality and the associated privacy consequences. We especially examine the impact for small racial/ethnic groups, including the impact on quality and privacy if some groups opt in at higher rates than others.
 
 We aim to test the feasibility of this potential solution path, contributing to ongoing public discussions and debate about disclosure protections and public data quality involving researchers, public data users, and other stakeholders. This solution would have wide-ranging implications, including operational changes, new outreach strategies, and many complex legal questions about Title 13 and other regulations. The findings we present here provide early evidence on the impact of turning privacy disclosure choices over to participants.
 
 \section{Background}
 
-\subsection{Data Privacy}
+The primary goal of this report is to present the opt in privacy framework and early evidence on the impact of such a framework on census data quality under two disclosure avoidance methods. The data privacy literature is extensive, and we assume a baseline knowledge of certain key concepts. In this section, we provide a brief overview of a few key concepts, as well as a review of disclosure avoidance at the US Census Bureau.
 
-Utility & privacy tradeoff
+\subsection{Data Privacy Key Terms}
 
-Formal privacy/DP
+*Statistical Disclosure Control Methods*
 
-Privacy loss budget
+Statistical Disclosure Control (SDC) methods are used to release sensitive or confidential data products while preserving the confidentiality of the data. Traditional SDC methods include suppression, rounding, top- and bottom-coding, synthetic data generation, and more.
 
-Traditional SDC
+*Differential Privacy*
 
-Synthetic data
+Differential Privacy (DP) is a formal definition of privacy, meaning that DP methods meet certain mathematical properties and guarantees. With DP, it is possible to quantify the amount of privacy loss that occurs with a data release with the "privacy-loss budget", denoted by $\epsilon$. The probability of privacy loss is denoted by $\delta$.
+
+*Utility-Privacy Trade-off*
+
+When applying disclosure avoidance methods to confidential data, there exists a central tension between the usefulness or quality of the resulting "noisy" data and the amount of privacy risk. Before any noise infusion, confidential data have the highest possible utility, but also have high privacy risks. Efforts to improve disclosure protections via SDC methods can reduce these privacy risks, but also may worsen overall data quality and usefulness for intended analyses or other applications. With DP methods, it is possible to "tune" the balance between utility and privacy by changing the value of $\epsilon$, with lower values of $\epsilon$ corresponding to greater noise infusion, implying lower data quality and higher disclosure protection.
 
 \subsection{The US Census Bureau and Disclosure Avoidance}
 
 The US Census Bureau is tasked with providing high quality data about the US and its people. These data are of enormous consequence for the public, serving as the basis for political representation, community funding and planning, and key research. Given these use cases, the accuracy and quality of Census Bureau products is crucial.
 
-Decennial census statistical products are used for congressional apportionment, redistricting, federal funding allocations, planning and decision-making for government and business organizations, and informing many other surveys [@mather2019a]. The American Community Survey (ACS) is used to inform federal agencies for policymaking and program delivery, state and local agencies for services like roads and schools, and nongovernmental organizations for research and analysis [@unitedstatescensusbureau2017]. In fiscal year 2015, 132 federal programs used Census Bureau data to allocate more than \$675 billion in funds to state and local communities [@hotchkiss2017a]. Decennial census and ACS data are also foundational to racial equity analytics, enabling researchers to answer important research and policy questions [@axelrod2022].
+Decennial census statistical products are used for congressional apportionment, redistricting, federal funding allocations, planning and decision-making for government and business organizations, and informing many other surveys [@mather2019a]. The American Community Survey (ACS) is used to inform federal policymaking and program delivery, state and local service provision (e.g., roads and schools), and research and analysis by nongovernmental organizations [@unitedstatescensusbureau2017]. In fiscal year 2015, 132 federal programs used Census Bureau data to allocate more than \$675 billion in funds to state and local communities [@hotchkiss2017a]. Decennial census and ACS data are also foundational to racial equity analytics, enabling researchers to answer important research and policy questions [@axelrod2022].
 
-In addition to conducting surveys and releasing high quality public data, the Census Bureau is also obligated to protect the confidentiality of individual respondents reflected in these data products. The Census Bureau's approach to safeguarding the identities of respondents in publicly released data is informed by its interpretation of Section 9 of Title 13 of the U.S. Code, enacted in 1954. This approach has evolved over the years, especially in response to advances in computing technologies and attack methods [@hotz2022a]. In 2018, the Census Bureau announced its intention to "modernize how we protect respondent confidentiality," including the adoption of Differential Privacy (DP) [@abowd2018]. This move was motivated by certain benefits of DP over traditional disclosure limitation, including more robust protections and greater transparency [@abowd2022a].
+In addition to conducting surveys and releasing high quality public data, the Census Bureau is also obligated to protect the confidentiality of individual respondents reflected in these data products. The Census Bureau's approach to safeguarding the identities of respondents in publicly released data is informed by its interpretation of Section 9 of Title 13 of the US Code, enacted in 1954. This approach has evolved over the years, especially in response to advances in computing technologies and attack methods [@hotz2022a]. In 2018, the Census Bureau announced its intention to "modernize how we protect respondent confidentiality," including the adoption of Differential Privacy (DP) [@abowd2018]. This move was motivated by certain benefits of DP over traditional disclosure limitation, including more robust protections and greater transparency [@abowd2022a].
 
-For the 2020 Decennial Census, the Census Bureau updated their Disclosure Avoidance System (DAS) from traditional swapping algorithms to the differentially private TopDown Algorithm (TDA) [@bowen2022]. As a formally private method, the privacy protections can be quantified. In contrast, the Census Bureau has conceded that the "science does not yet exist to comprehensively implement a formally private solution for the ACS" [@daily2022a]. Instead, they are currently exploring the feasibility of a fully synthetic public-use microdata file and accompanying validation server. In both cases, all respondents are subjected to disclosure protections, even those who might otherwise prefer to see their data accurately reflected.
+For the 2020 Decennial Census, the Census Bureau updated their Disclosure Avoidance System (DAS) from traditional swapping algorithms to the TopDown Algorithm (TDA), which refers to a system of DP mechanisms for privacy loss accounting, along with optimization algorithms and post-processing. The TDA satisfies zero-concentrated DP ($\rho$-zCDP), a relaxation of pure DP. As a formally private method, the privacy protections can be quantified, and the Census Bureau does translate the $\rho$-zCDP privacy parameter $\rho$ to the corresponding values of $\epsilon$ and $\delta$ [@bowen2022][@abowd2022a].
+
+In contrast, the Census Bureau has conceded that the "science does not yet exist to comprehensively implement a formally private solution for the ACS" [@daily2022a]. Instead, they are currently exploring the feasibility of a fully synthetic public-use microdata file and accompanying validation server. In both cases, all respondents are subjected to disclosure protections, even those who might otherwise prefer to see their data accurately reflected.
 
 \section{Opt-In Privacy Framework and Implications}
 
-In our demonstrations, we imagine a framework for disclosure protection in which respondents would be asked to actively opt in to statistical disclosure control methods. Those who do not opt-in would simply contribute their true data to statistical products. We make various simplifying assumptions and decisions, described in detail later in this report. 
+In our demonstrations, we imagine a framework for disclosure protection in which respondents would be asked to actively opt in to statistical disclosure control methods. Those who do not opt-in would simply contribute their true data to statistical products. The choices we make to build this framework may have significant ethical and legal implications, discussed in this section.
 
-Such a change in framework would have significant legal ramifications such as X, Y, Z. 
+\subsection{Opt In Framework Ethical Implications}
 
-There are also various ethical considerations. For one, an opt-in framework would require significant outreach efforts and plain-language explanations to ensure that respondents understand what they are or are not opting into. Further, careful attention must be paid to the impact of one respondent choosing to forego protections on the privacy risks of respondents who do opt in. 
+The adoption of a framework requiring respondents to opt in to disclosure protections has various ethical considerations. First, a major challenge upon implementation of such a framework would be a significant knowledge gap for respondents. The Census Bureau or any other organization would need to carry out extensive outreach efforts and design plain-language explanations to ensure that respondents understand what they are or are not opting into. It is crucial for respondents to understand the implications of their opt-in choice not only for the privacy of their personal information, but also for the resulting data quality and the downstream impact on their community.
+
+Second, there are ethical considerations in the framing of the opt-in decision and the administration of the question in a survey. For this project, we intentionally chose language of "opting in" to disclosure avoidance protections, treating the decision to forego protections as the default and requiring an additional step for those desiring additional protections. This is in contrast to language of "opting out", which would treat disclosure avoidance protections as the default position. Additionally, we made the simplifying assumption that the primary survey respondent, or householder, makes the opt in decision for all members of the household. This choice may be appropriate if the householder is the parent or legal guardian of a minor in the household, but may not be appropriate for other adults in the household who may disagree with the respondent's opt in decision.
+
+Finally, any application of an opt in framework to disclosure avoidance methods must consider the impact of one respondent choosing to forego protections of the privacy risks of respondents who do opt in. The mathematical guarantees of differential privacy allow for individuals to forego protections without decreasing other respondents' protection, but this is not guaranteed in non-formally private methods like synthetic data generation.
+
+\subsection{Opt In Framework Legal Implications}
+
+In addition to ethical considerations, the implementation of an opt in disclosure avoidance framework would also have significant legal implications. Most notably, the implementation of this type of framework would most likely require a change to Title 13 of the US Code, which could trigger complex legal arguments and potential politicization.
 
 \section{Demonstration 1: Local Differential Privacy for the Decennial Census}
 
-The Census Bureau deployment of DP for the 2020 Decennial Census uses a global privacy approach in which tabulated cells of confidential responses in a series of data tables are infused with noise by a central curator (the Census Bureau). All census respondents are automatically subjected to the DAS, even those who might otherwise wish to see their data reflected accurately, without any noise. Further, the noise that is injected into tabulated data cells is independent of the size of the population in the cell. In effect, there is more relative error added for small groups than for larger ones. This could lead to worse data quality for small groups such as some racial/ethnic groups and, as a result of inaccurate representation in the data, these groups could receive inadequate funding and incorrect research findings. 
-
-A primary benefit of a formal privacy approach like the DAS is that the overall privacy loss budget can be transparently quantified with the metric $\epsilon$. Further, the mathematical properties of DP allow for some individuals to forego privacy protections without decreasing other respondents' protections. 
+The Census Bureau deployment of DP for the 2020 Decennial Census uses a global approach in which tabulated cells of confidential responses in a series of data tables are infused with noise by a central curator (the Census Bureau). All census respondents are automatically subjected to the DAS, even those who might otherwise wish to see their data reflected accurately, without any noise. Further, the noise that is injected into tabulated data cells is independent of the size of the population in the cell. In effect, there is more relative error added for small groups than for larger ones. This could lead to worse data quality for small groups such as some racial/ethnic groups and, as a result of inaccurate representation in the data, these groups could receive inadequate funding and incorrect research findings.
 
 \subsection{Local Differential Privacy}
 
@@ -128,9 +140,7 @@ For this demonstration, we use person-level records from the 2010 Decennial Cens
 
 \subsection{Simulations}
 
-For our simulation approach, we run iterations of a disclosure mechanism to generate noisy histograms of counts for a set of defined attributes. We focus on two disclosure mechanisms to compare a standard global approach to a local opt-in approach. The first is a Laplace sanitizer, a global method in which cells are infused with noise from a Laplace distribution. The Laplace distribution is centered at zero and the variability is the ratio of the privacy loss budget, $\epsilon$, over the $l_1$-global sensitivity of the statistic [@dwork2006c][@williams2023a]. The second is the previously described GRR method, a local method in which individuals who opt in to disclosure protections report a true response with probability $p = \frac{e^\epsilon}{e^\epsilon + d - 1}$. Otherwise, the record is randomly replaced with another combination of fields. 
-
-We then evaluate these results using bias and accuracy metrics, comparing the noisy histograms to the true values. We use mean percent error to evaluate bias, or the tendency for noisy estimates to systematically move in one direction relative to the true values. We use absolute mean percent error to evaluate accuracy, or the closeness of noisy estimates to the true values. 
+For our simulation approach, we run iterations of a disclosure mechanism to generate noisy histograms of counts for a set of defined attributes. We focus on two disclosure mechanisms to compare a standard global approach to a local opt-in approach. The first is a Laplace sanitizer, a global method in which cells are infused with noise from a Laplace distribution. The Laplace distribution is centered at zero and the variability is the ratio of the privacy loss budget, $\epsilon$, over the $l_1$-global sensitivity of the statistic [@dwork2006c][@williams2023a]. The second is the previously described GRR method, a local method in which individuals who opt in to disclosure protections report a true response with probability \$p = \\frac{e\^\\epsilon}{e\^\\epsilon + d - 1}\$, where $d$ is the overall cardinality of possible response values. Otherwise, the record is randomly replaced with another combination of fields. Though the TDA deployed by the Census Bureau is a more complicated series of algorithms and processing steps than the simple Laplace mechanism presented here, this simplification allows us to compare more easily with a simple local approach and focus specifically on the impact of the opt in framework on data quality.
 
 The specifications for our simulations are as follows. For each combination of specifications, we run 100 iterations of each disclosure mechanism.
 
@@ -158,6 +168,10 @@ The specifications for our simulations are as follows. For each combination of s
     -   0.9
 
     -   1
+
+\subsection{Evaluation}
+
+We evaluate the results of these simulations using bias and accuracy metrics, comparing the noisy histograms generated under each privacy approach to each other and to the true values. We use mean percent error to evaluate bias, or the tendency for noisy estimates to systematically move in one direction relative to the true values. We use absolute mean percent error to evaluate accuracy, or the closeness of noisy estimates to the true values.
 
 \subsection{Results and Discussion}
 
@@ -226,6 +240,8 @@ All in all, existing local DP methods generate protected data of overall lower a
 \subsection{Data}
 
 \subsection{Simulations}
+
+\subsection{Evaluation}
 
 \subsection{Results and Discussion}
 
