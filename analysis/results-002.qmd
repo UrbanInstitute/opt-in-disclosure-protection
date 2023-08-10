@@ -1,0 +1,165 @@
+---
+title: "Data 002 Summarize Results"
+format: 
+  html:
+    embed-resources: true
+    toc: true
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r, message = FALSE, warning = FALSE}
+library(tidyverse)
+library(here)
+library(urbnthemes)
+library(tigris)
+
+source(here("R", "metrics_config.R"))
+source(here("R", "metric_all.R"))
+
+set_urbn_defaults(style = "print")
+options(dplyr.summarise.inform = FALSE)
+```
+
+## Load Results
+
+```{r}
+results <- readRDS(here("data", "results", "results-002.rds"))
+
+attribs <- c("hisp_simple")
+```
+
+## Summarize Metrics
+
+```{r}
+summarize_results <- function(data) {
+  
+  data |>
+    metric_all(n = n, n_noisy = n_noisy, threshold = 0.1, drop_zeros = TRUE) |>
+    ungroup()
+  
+}
+```
+
+## Identify Summary Level
+
+```{r}
+methods_summary_level <- c("method", "run", "epsilon", "opt_in")
+methods_summary <- results %>%
+  group_by(across(all_of(methods_summary_level))) %>%
+  summarize_results()
+
+hisp_state_summary_level <- c("hisp_simple", "state", "method", "run", "epsilon", "opt_in")
+hisp_state_summary <- results %>%
+  group_by(across(all_of(hisp_state_summary_level))) %>%
+  summarize_results()
+```
+
+## Plotting Functions
+
+```{r}
+boxplot_simple <- function(data, metric) {
+  
+  data %>%
+    ggplot(aes(fill = method, 
+               y = {{metric}}, 
+               x = as.factor(opt_in))) +
+      geom_boxplot() +
+      labs(x = "Opt-In Rate")
+  
+}
+
+boxplot_hisp_state <- function(data, metric, state, epsilon) {
+  
+  state_fips <- parse_number(lookup_code(state))
+  
+  data %>%
+    filter(epsilon == {{epsilon}} & state == state_fips) %>%
+    boxplot_simple(metric = {{metric}}) +
+    facet_grid(hisp_simple ~ .) +
+    ggtitle(paste0("State = ", {{state}}, " | Epsilon = ", {{epsilon}}))
+  
+}
+```
+
+## Results
+
+### Methods Overall
+
+#### Bias
+
+```{r}
+methods_summary %>%
+  boxplot_simple(metric = mean_pct_error) +
+  facet_grid(epsilon ~ ., scales = "free_y")
+```
+
+#### Accuracy
+
+```{r}
+methods_summary %>%
+  boxplot_simple(metric = mean_abs_pct_error) +
+  facet_grid(epsilon ~ ., scales = "free_y")
+```
+
+### Methods by Hisp & State
+
+#### Bias
+
+```{r}
+boxplot_hisp_state(data = hisp_state_summary, 
+                   metric = mean_pct_error, 
+                   state = "IA", 
+                   epsilon = 10)
+```
+
+```{r}
+boxplot_hisp_state(data = hisp_state_summary, 
+                   metric = mean_pct_error, 
+                   state = "DC", 
+                   epsilon = 10)
+```
+
+```{r}
+boxplot_hisp_state(data = hisp_state_summary, 
+                   metric = mean_pct_error, 
+                   state = "IA", 
+                   epsilon = 10)
+```
+
+```{r}
+boxplot_hisp_state(data = hisp_state_summary, 
+                   metric = mean_pct_error, 
+                   state = "DC", 
+                   epsilon = 10)
+```
+
+#### Accuracy
+
+```{r}
+boxplot_hisp_state(data = hisp_state_summary, 
+                   metric = mean_abs_pct_error, 
+                   state = "IA", 
+                   epsilon = 1)
+```
+
+```{r}
+boxplot_hisp_state(data = hisp_state_summary, 
+                   metric = mean_abs_pct_error, 
+                   state = "DC", 
+                   epsilon = 1)
+```
+
+```{r}
+boxplot_hisp_state(data = hisp_state_summary, 
+                   metric = mean_abs_pct_error, 
+                   state = "IA", 
+                   epsilon = 10)
+```
+
+```{r}
+boxplot_hisp_state(data = hisp_state_summary, 
+                   metric = mean_abs_pct_error, 
+                   state = "DC", 
+                   epsilon = 10)
+```

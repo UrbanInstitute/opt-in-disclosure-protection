@@ -1,0 +1,100 @@
+---
+title: "Data 001b Grid"
+format: 
+  html:
+    embed-resources: true
+    toc: true
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r, message = FALSE, warning = FALSE}
+library(tidyverse)
+library(here)
+
+source(here("R", "hist_grr.R"))
+source(here("R", "hist_unaryencode.R"))
+source(here("R", "hist_global.R"))
+source(here("R", "add_D_i.R"))
+source(here("R", "create_D.R"))
+source(here("R", "add_prob_opt_in.R"))
+source(here("R", "add_opt_in.R"))
+
+options(dplyr.summarise.inform = FALSE)
+```
+
+## Set Up Starting Data
+
+```{r}
+data <- readRDS(here("data", "starting", "starting-data-001.rds"))
+
+attribs <- c("age_bucket", "race_simple", "sex_val")
+```
+
+## Set Up Grid Specs
+
+```{r}
+specs <- expand_grid(
+  run = 1:100, 
+  epsilon = c(1, 5, 10, 20),
+  opt_in = c(0.01, 0.1, 0.5, 0.9, 1),
+  white_multiplier = c(0.5, 1, 2)
+)
+```
+
+## Functions for Data Prep and Summary
+
+```{r}
+prep_data <- function(data, opt_in, white_multiplier = white_multiplier) {
+  
+  data |>
+      add_prob_opt_in(prob = opt_in, white_multiplier = white_multiplier) |>
+      add_opt_in() |>
+      add_D_i(attribs)
+  
+}
+```
+
+## Run Spec Grid
+
+```{r}
+results <- bind_rows(
+  `grr` = pmap_dfr(
+    .l = specs,
+    .f = function(run, epsilon, opt_in, white_multiplier) data |>
+      prep_data(opt_in = opt_in, white_multiplier = white_multiplier) |>
+      group_split(state) |>
+      map_dfr(hist_grr, epsilon = epsilon, attribs = attribs) |>
+      mutate(run = run, epsilon = epsilon, opt_in = opt_in, white_multiplier = white_multiplier)
+  ),
+  `sue` = pmap_dfr(
+    .l = specs,
+    .f = function(run, epsilon, opt_in, white_multiplier) data |>
+      prep_data(opt_in = opt_in, white_multiplier = white_multiplier) |>
+      group_split(state) |>
+      map_dfr(hist_unaryencode, epsilon = epsilon, type = "SUE", attribs = attribs) |>
+      mutate(run = run, epsilon = epsilon, opt_in = opt_in, white_multiplier = white_multiplier)
+  ),
+  `oue` = pmap_dfr(
+    .l = specs,
+    .f = function(run, epsilon, opt_in, white_multiplier) data |>
+      prep_data(opt_in = opt_in, white_multiplier = white_multiplier) |>      
+      group_split(state) |>
+      map_dfr(hist_unaryencode, epsilon = epsilon, type = "OUE", attribs = attribs) |>
+      mutate(run = run, epsilon = epsilon, opt_in = opt_in, white_multiplier = white_multiplier)
+  ),
+  `global` = pmap_dfr(
+    .l = distinct(select(specs, c(epsilon, run))),
+    .f = function(run, epsilon) data |>
+      group_split(state) |>
+      map_dfr(hist_global, epsilon = epsilon, attribs = attribs) |>
+      mutate(run = run, epsilon = epsilon) %>%
+      uncount(weights = nrow(unique(select(specs, c(opt_in, white_multiplier))))) %>% 
+      mutate(opt_in = rep(unique(specs$opt_in), length.out = n()),
+             white_multiplier = rep(unique(specs$white_multiplier), length.out = n()))
+    ),
+  .id = "method"
+)
+
+saveRDS(results, file = here("data", "results", "results-001b.rds"))
+```

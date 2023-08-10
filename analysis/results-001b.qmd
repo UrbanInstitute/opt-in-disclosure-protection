@@ -1,0 +1,93 @@
+---
+title: "Data 001b Summarize Results"
+format: 
+  html:
+    embed-resources: true
+    toc: true
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r, message = FALSE, warning = FALSE}
+library(tidyverse)
+library(here)
+library(urbnthemes)
+library(tigris)
+
+source(here("R", "metrics_config.R"))
+source(here("R", "metric_all.R"))
+
+set_urbn_defaults(style = "print")
+options(dplyr.summarise.inform = FALSE)
+```
+
+## Load Results
+
+```{r}
+results <- readRDS(here("data", "results", "results-001b.rds"))
+
+attribs <- c("age_bucket", "race_simple", "sex_val")
+```
+
+## Summarize Metrics
+
+```{r}
+summarize_results <- function(data) {
+  
+  data |>
+    metric_all(n = n, n_noisy = n_noisy, threshold = 0.1, drop_zeros = TRUE) |>
+    ungroup()
+  
+}
+```
+
+## Identify Summary Level
+
+```{r}
+mult_race_state_summary_level <- c("white_multiplier", "race_simple", "state", "method", "run", "epsilon", "opt_in")
+mult_race_state_summary <- results %>%
+  group_by(across(all_of(mult_race_state_summary_level))) %>%
+  summarize_results()
+```
+
+## Plotting Functions
+
+```{r}
+boxplot_mult_race_state <- function(data, method, metric, state, epsilon, opt_in) {
+  
+  state_fips <- parse_number(lookup_code(state))
+  
+  data %>%
+    filter(method == {{method}} & 
+             epsilon == {{epsilon}} & 
+             state == state_fips & 
+             opt_in == {{opt_in}}) %>%
+    ggplot(aes(fill = race_simple, 
+               y = {{metric}}, 
+               x = as.factor(white_multiplier))) +
+      geom_boxplot() +
+      labs(x = "White Multiplier") +
+      ggtitle(paste0("State = ", {{state}}, " | Epsilon = ", {{epsilon}}))
+  
+}
+```
+
+## Results
+
+```{r}
+boxplot_mult_race_state(data = mult_race_state_summary,
+                        method = "grr",
+                        metric = mean_abs_pct_error,
+                        state = "IA",
+                        epsilon = 1,
+                        opt_in = 0.5)
+```
+
+```{r}
+boxplot_mult_race_state(data = mult_race_state_summary,
+                        method = "grr",
+                        metric = mean_abs_pct_error,
+                        state = "DC",
+                        epsilon = 1,
+                        opt_in = 0.5)
+```
