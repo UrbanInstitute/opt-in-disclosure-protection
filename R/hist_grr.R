@@ -26,9 +26,7 @@ hist_grr <- function(data, epsilon, attribs) {
     dplyr::count() |>
     dplyr::ungroup()
 
-  D <- data |>
-    dplyr::select(dplyr::all_of(attribs)) |>
-    create_D()
+  D <- histogram$D_i
   
   N <- nrow(data)
   N_optin <- sum(data$opt_in)
