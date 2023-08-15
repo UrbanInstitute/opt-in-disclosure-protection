@@ -24,3 +24,28 @@ expert
 for
 assistance.
 \@endanenote 
+\@doanenote {2}
+macro:->https://www.ipums.org/changes-to-census-bureau-data-products
+\@endanenote 
+\@doanenote {3}
+macro:->https://www.census.gov/newsroom/blogs/random-samplings/2022/12/disclosure-avoidance-protections-acs.html
+\@endanenote 
+\@doanenote {4}
+macro:->https://acsdatacommunity.prb.org/discussion-forum/m/2021-acs-conference-files/147/download
+\@endanenote 
+\@doanenote {5}
+macro:->``The
+tidysynthesis
+R
+package.''
+Presentation
+given
+at
+rstudio::conf(2022),
+Washington,
+DC,
+July
+25
+--
+28.
+\@endanenote 

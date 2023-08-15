@@ -128,7 +128,7 @@ The Census Bureau deployment of DP for the 2020 Decennial Census uses a global a
 
 \subsection{Local Differential Privacy}
 
-To allow for individual-level opt-in, we move from a central DP approach, in which the Census Bureau as a data curator would add noise to all respondents, to a local DP approach, allowing for some respondents to opt in and others to forego disclosure protections. Typically, a local model assumes that a central curator cannot be trusted, and so a respondent adds noise to their data before sending it to the curator. For this use case, we can imagine a slight variation on this approach in which the trusted Census Bureau still receives all data in its confidential form, and then infuses noise only for respondents who opt in. 
+To allow for individual-level opt-in, we move from a central DP approach, in which the Census Bureau as a data curator would add noise to all respondents, to a local DP approach, allowing for some respondents to opt in and others to forego disclosure protections. Typically, a local model assumes that a central curator cannot be trusted, and so a respondent adds noise to their data before sending it to the curator. For this use case, we can imagine a slight variation on this approach in which the trusted Census Bureau still receives all data in its confidential form, and then infuses noise only for respondents who opt in.
 
 Many local DP mechanisms are based on the concept of Randomized Response, first proposed by S. L. Warner in 1965 [@warner1965a]. The central idea is that a survey respondent flips a coin, and the result of the coin flips determines if they answer a yes/no question with the true answer or not. The randomization of the coin flip infuses the noise that grants disclosure protections [@near2022].
 
@@ -140,7 +140,7 @@ For this demonstration, we use person-level records from the 2010 Decennial Cens
 
 \subsection{Simulations}
 
-For our simulation approach, we run iterations of a disclosure mechanism to generate noisy histograms of counts for a set of defined attributes. We focus on two disclosure mechanisms to compare a standard global approach to a local opt-in approach. The first is a Laplace sanitizer, a global method in which cells are infused with noise from a Laplace distribution. The Laplace distribution is centered at zero and the variability is the ratio of the privacy loss budget, $\epsilon$, over the $l_1$-global sensitivity of the statistic [@dwork2006c][@williams2023a]. The second is the previously described GRR method, a local method in which individuals who opt in to disclosure protections report a true response with probability \$p = \\frac{e\^\\epsilon}{e\^\\epsilon + d - 1}\$, where $d$ is the overall cardinality of possible response values. Otherwise, the record is randomly replaced with another combination of fields. Though the TDA deployed by the Census Bureau is a more complicated series of algorithms and processing steps than the simple Laplace mechanism presented here, this simplification allows us to compare more easily with a simple local approach and focus specifically on the impact of the opt in framework on data quality.
+For our simulation approach, we run iterations of a disclosure mechanism to generate noisy histograms of counts for a set of defined attributes. We focus on two disclosure mechanisms to compare a standard global approach to a local opt-in approach. The first is a Laplace sanitizer, a global method in which cells are infused with noise from a Laplace distribution. The Laplace distribution is centered at zero and the variability is the ratio of the privacy loss budget, $\epsilon$, over the $l_1$-global sensitivity of the statistic [@dwork2006c][@williams2023a]. The second is the previously described GRR method, a local method in which individuals who opt in to disclosure protections report a true response with probability $p = \frac{e^\epsilon}{e^\epsilon + d - 1}$, where $d$ is the overall cardinality of possible response values. Otherwise, the record is randomly replaced with another combination of fields. Though the TDA deployed by the Census Bureau is a more complicated series of algorithms and processing steps than the simple Laplace mechanism presented here, this simplification allows us to compare more easily with a simple local approach and focus specifically on the impact of the opt in framework on data quality.
 
 The specifications for our simulations are as follows. For each combination of specifications, we run 100 iterations of each disclosure mechanism.
 
@@ -177,9 +177,9 @@ We evaluate the results of these simulations using bias and accuracy metrics, co
 
 **Local DP Methods Result in Overall Lower Accuracy than Global Methods**
 
-For Scenario 1, we focus primarily on results allowing us to compare the performance of the local GRR method to the central Laplace method. With a cardinality of just 2 (Hispanic or Latino, Not Hispanic or Latino), this scenario allows for the most similar comparison with the global method (in which epsilon is allocated to just one statistic). 
+For Scenario 1, we focus primarily on results allowing us to compare the performance of the local GRR method to the central Laplace method. With a cardinality of just 2 (Hispanic or Latino, Not Hispanic or Latino), this scenario allows for the most similar comparison with the global method (in which epsilon is allocated to just one statistic).
 
-Figure \ref{fig:methods-bias} shows the distribution of bias metrics from our simulations at the defined levels of $\epsilon$ and opt in rate. Both the local and central methods are unbiased, with the distribution of mean percent error values centered around zero. 
+Figure \ref{fig:methods-bias} shows the distribution of bias metrics from our simulations at the defined levels of $\epsilon$ and opt in rate. Both the local and central methods are unbiased, with the distribution of mean percent error values centered around zero.
 
 ```{=tex}
 \begin{figure}[!htb]
@@ -189,7 +189,7 @@ Figure \ref{fig:methods-bias} shows the distribution of bias metrics from our si
     \label{fig:methods-bias}
 \end{figure}
 ```
-Figure \ref{fig:methods-accuracy} shows the distribution of accuracy metrics from our simulations at the defined levels of epsilon and opt in rate. 
+Figure \ref{fig:methods-accuracy} shows the distribution of accuracy metrics from our simulations at the defined levels of epsilon and opt in rate.
 
 ```{=tex}
 \begin{figure}[!htb]
@@ -199,13 +199,13 @@ Figure \ref{fig:methods-accuracy} shows the distribution of accuracy metrics fro
     \label{fig:methods-accuracy}
 \end{figure}
 ```
-Figure \ref{fig:methods-accuracy} demonstrates two key takeaways about the accuracy of these methods. First, the opt-in framework approach does improve the overall accuracy of the local GRR method. As we decrease the level of opt in, the width of the mean percent error distribution shrinks and moves closer to zero. However, the second key takeaway is that the central method significantly outperforms the local method in terms of accuracy at nearly every tested level of $\epsilon$ and opt in rate, even with very small opt in rates. The local method only outperforms the central method with a very high privacy loss budget of $\epsilon$ = 20, and the errors for both methods are very small for that level of privacy loss anyway. 
+Figure \ref{fig:methods-accuracy} demonstrates two key takeaways about the accuracy of these methods. First, the opt-in framework approach does improve the overall accuracy of the local GRR method. As we decrease the level of opt in, the width of the mean percent error distribution shrinks and moves closer to zero. However, the second key takeaway is that the central method significantly outperforms the local method in terms of accuracy at nearly every tested level of $\epsilon$ and opt in rate, even with very small opt in rates. The local method only outperforms the central method with a very high privacy loss budget of $\epsilon$ = 20, and the errors for both methods are very small for that level of privacy loss anyway.
 
-While the opt-in local approach does improve the accuracy of estimates with lower levels of opt in, this improvement alone is unfortunately not enough to justify a switch from a central model to a local model. Existing local DP methods cannot offer the same level of accuracy as central methods, especially for datasets with even higher cardinality. However, the potential to improve data quality results with a local method and opt-in framework motivates greater focus on developing local DP methods in the future. 
+While the opt-in local approach does improve the accuracy of estimates with lower levels of opt in, this improvement alone is unfortunately not enough to justify a switch from a central model to a local model. Existing local DP methods cannot offer the same level of accuracy as central methods, especially for datasets with even higher cardinality. However, the potential to improve data quality results with a local method and opt-in framework motivates greater focus on developing local DP methods in the future.
 
 **Opt-in Privacy Offers the Potential to Improve Data Quality for Small Groups**
 
-Although existing local DP methods may be disappointing for overall accuracy, an opt-in local DP framework still offers the potential to improve data quality for small groups. Data quality may be especially improved for groups that opt-in at relatively lower rates than others. For Scenario 2, we focus on results allowing us to compare differences in data quality by racial/ethnic group. 
+Although existing local DP methods may be disappointing for overall accuracy, an opt-in local DP framework still offers the potential to improve data quality for small groups. Data quality may be especially improved for groups that opt-in at relatively lower rates than others. For Scenario 2, we focus on results allowing us to compare differences in data quality by racial/ethnic group.
 
 Figures \ref{fig:groups_dc} and \ref{fig:groups_ia} show the distribution of accuracy results for the specified opt in rates for each racial/ethnic group (using $\epsilon$ = 1), separately by state.
 
@@ -229,21 +229,96 @@ According to the 2010 Census Redistricting Data (Public Law 94-171) Summary File
 
 The opt-in framework offers a solution path to improve data accuracy for these smaller racial/ethnic groups. For example, the median absolute percent error for the Hispanic group is roughly 3.5% in Washington, DC and 6% in Iowa when there is 100% opt in, or when all respondents are subjected to disclosure protections. These error values shrink to about 1.5% and 2%, respectively, with a group opt-in rate of 10%. Given the properties of formal privacy, the privacy protections afforded to those who opt-in are unaffected by those who choose to forego protections.
 
-With an opt-in disclosure framework, the US Census Bureau and community groups could engage in outreach efforts, especially to smaller groups, to help respondents understand the implications of foregoing disclosure protections, both for their privacy but also for the wide-ranging impacts of improving their data quality. This type of outreach could result in better data quality for these groups, with positive downstream impacts on representation and funding allocations to communities. 
+With an opt-in disclosure framework, the US Census Bureau and community groups could engage in outreach efforts, especially to smaller groups, to help respondents understand the implications of foregoing disclosure protections, both for their privacy but also for the wide-ranging impacts of improving their data quality. This type of outreach could result in better data quality for these groups, with positive downstream impacts on representation and funding allocations to communities.
 
-All in all, existing local DP methods generate protected data of overall lower accuracy than data generated by central models. However, this demonstration shows the potential of local DP to improve data accuracy for small groups, while still protecting privacy, with an opt-in DP framework. This use case motivates further development of local DP methods and opt in experimentation to improve accuracy results. 
+All in all, existing local DP methods generate protected data of overall lower accuracy than data generated by central models. However, this demonstration shows the potential of local DP to improve data accuracy for small groups, while still protecting privacy, with an opt-in DP framework. This use case motivates further development of local DP methods and opt in experimentation to improve accuracy results.
 
 \section{Demonstration 2: Synthetic Data for the American Community Survey}
 
+The Census Bureau is investigating the creation of a fully synthetic American Community Survey paired with a validation server[^1]. The Census Bureau intended to create formally private data by 2025 but later conceded that the science does not exist yet to comprehensively implement a formally private solution for the ACS[^2]. Next, the Census Bureau intended to release a non-formally private ACS in 2024 but their timeline has been delayed because of legitimate concerns about the impact of synthetic data.[^3]
+
+[^1]: https://www.ipums.org/changes-to-census-bureau-data-products
+
+[^2]: https://www.census.gov/newsroom/blogs/random-samplings/2022/12/disclosure-avoidance-protections-acs.html
+
+[^3]: https://acsdatacommunity.prb.org/discussion-forum/m/2021-acs-conference-files/147/download
+
+Synthetic data could potentially harm the usefulness of the American Community Survey. Groups with fewer observations, include smaller racial and ethnic groups, could see the biggest losses in data quality. An opt-in disclosure protection methodology paired with synthetic data could mitigate the harms of data synthesis and give outreach organizations a tool to improve data quality.
+
 \subsection{Synthetic Data}
+
+Demonstration 1 focused on summary statistics calculated on microdata. We now pivot to a demonstration where the goal is to produce high-quality microdata that can be used for a range of valid analyses. We will pursue this goal with synthetic data generation.
+
+Synthetic data generation is a statistical disclosure control method that replaces confidential microdata with pseudo microdata that can maintain the statistical properties of the confidential data while limiting disclosure risks. @syntheti2022 and @hu2023 offer thorough introductions to synthetic data. We will briefly introduce topics central to this demonstration.
+
+There are two main flavors of synthetic data. With partially synthetic data, some but not all variables are synthesized [@little1993]. With fully synthetic data, all variables are synthesized [@rubin1993]. Fully synthetic data provides stronger disclosure protection.
+
+Partially synthetic data maintains a one-to-one mapping between observations in the synthetic data and observations in the GSDS. This creates identity disclosure risks and increases attribute disclosure risks. It also means it is possible to calculate disclosure metrics based on re-identification [@reiter2009].
+
+Fully synthetic data don't have a one-to-one mapping because every record is fully generated. This minimizes identity disclosure risks attribute disclosure risks, but dramatically reduces approaches for evaluating disclosure risks. We create a fully synthetic version of the ACS for this demonstration.
+
+It is possible to create formally private synthetic data in idealized situations [@bowen2021]. Model-based approaches generally require discretizing categorical variables. Promising approaches generate 1-, 2-, and 3-way marginals and then use graphical models to generate synthetic data [@mckenna2019]. Other approaches use GANs but generally don't work well outside of idealized situations with modest privacy budgets [@tao2021]. Like the Census Bureau, we abandon formal privacy for this demonstration because it is currently infeasible for the ACS. This means we no longer have a provable bound on the worst-case privacy loss.
+
+We use a fully conditional specification (FCS) to generate synthetic data. FCS uses a sequential approach to model the joint distribution of the ACS as a sequence of univariate conditional distributions. We use non-parametric decision trees and regression trees because they are easy to fit and model relatively complex distributions with ease [@reiter2005]. We modify the decision trees and regression trees so that predictions are samples from the final nodes instead of using the means and modes of the nodes. This increases the sample variances in the synthetic data.
+
+We use the tidysynthesis[^4] and syntheval R packages to synthesize data and evaluate synthetic data.
+
+[^4]: "The tidysynthesis R package." Presentation given at rstudio::conf(2022), Washington, DC, July 25 -- 28.
 
 \subsection{Data}
 
+For this demonstration, we use person-level records from the 2021 1-Year American Community Survey (ACS). The ACS is a roughly 1-in-100 sample of households in the US and is the premier source of information for small area estimation. The 2021 ACS Public Use Microdata Sample (PUMS) contains about 3.25 million individuals and 1.44 million households. We implement an opt-in disclosure protection demonstration using synthetic data and the 2021 1-Year American Community Survey. We access all ACS data through IPUMS [@ruggles].
+
+We restrict the data in five important ways to minimize computation and simplify comparisons. First, we restrict our data to observations from Florida, Michigan, and Pennsylvania. We chose these states because they are large states with different types of racial and ethnic diversity. Second, we restrict our data to heads of households ages 18 or older who are not in group quarters. This limits structurally missing values. Furthermore, synthesizing relationships within households is a major technical challenge [@benedetto2020]. Third, we only synthesize a subset of variables.
+
+-   State (categorical)
+-   Sex (binary)
+-   Age (numeric)
+-   Marital status (categorical)
+-   Race (categorical)
+-   Hispanicity (categorical)
+-   Any health insurance coverage (binary)
+-   Educational attainment (categorical)
+-   Employment status (categorical)
+-   Labor force participation (binary)
+-   Total family income (numeric)
+-   Total personal income (numeric)
+-   Wage and salary income (numeric)
+-   Welfare income (numeric)
+-   Income residual (numeric)
+
+The income residual is personal income minus wages and salary and welfare income. The income residual captures all other sources of income including business income; Social Security income; SSI income; interest, dividend, and rental income; retirement income; and other income.
+
+Fourth, we ignore weights during synthesis and when calculating metrics. Synthesis with weights is an open area of research. Fifth and finally, we randomly partition the data into two halves. The half we synthesize is the gold standard data set (GSDS). The other half is a holdout data set (HDS) for calculating disclosure metrics.
+
+PUMS include statistical disclosure limitation to protect the confidentiality of responses. For example, high incomes are topcoded. When synthesizing data, the Census Bureau has more observations and unaltered variables that could improve the quality of the synthesis but also worsen utility metrics because out metrics do not reflect current SDC techniques.
+
 \subsection{Simulations}
+
+To evaluate the benefits and costs of opt-in disclosure protection we implement a simulation study. We vary two key parameters for each specification. First, we vary the opt-in rate with the values 0.1, 0.5, 0.9, and 1. For example, 90% of observations are unaltered and 10% of observations are synthesized when the opt-in rate is set to 0.1. All observations are synthesized when the opt-in rate is 1. The opt-in decision for each observation is stochastic. We use a function to set the probability of opt-in and then randomly select the opt-in decision based on that probability. Second, we vary the nature of the opt-in. Under the default settings, all observations have the same opt-in probability within a specification.
+
+It's plausible that different racial and ethnic groups would opt into disclosure protections at different rates. We vary individual opt-in propensities based on race. In addition to equal opt-in probabilities, we implement a white multiplier such that white individuals opt in at half the rate of other individuals (0.5) and twice the rate of other individuals (2). The white multiplier is approximate because the opt-in decisions are stochastic and because the multiplier is imprecise at high levels of opt in.
+
+We need to pick an order to synthesize the variables since we adopt a sequential approach. Typically, more information is preserved for a synthetic variable by moving it from later in the synthesis order to earlier in the synthesis order. We prioritize race and ethnicity. Next, we synthesize the remaining categorical variables. Next, we synthesize age and educational attainment. We treat both as numeric variables. Finally, we synthesize all of the income variables.
+
+We implement a simple synthesis without much customization. We use the rpart implementation of decision trees and regression trees [@therneau2022] using their default values (minsplit = 20, minbucket = 8, and cp = 0.01). These parameters keep the trees from going too deep and overfitting the data.
+
+We run each specification five times to evaluate the simulation-to-simulation variation in metrics.
 
 \subsection{Evaluation}
 
 \subsection{Results and Discussion}
+
+
+\subsection{Metrics Appendix}
+
+*This is a placeholder section*
+
+
+
+
+
+
 
 \section{Conclusion}
 
