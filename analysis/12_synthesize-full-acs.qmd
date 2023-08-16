@@ -1,5 +1,6 @@
 ---
-title: "Prep ACS data for analysis"
+title: "Synthesize Full ACS"
+date: today
 format: 
   html:
     embed-resources: true
@@ -21,6 +22,10 @@ library(syntheval)
 
 source(here("R", "prediction_test.R"))
 source(here("R", "summarize_results.R"))
+
+source(here("R", "proportions.R"))
+source(here("R", "kmarginals.R"))
+source(here("R", "discriminator_auc.R"))
 
 ```
 
@@ -132,15 +137,107 @@ synth1 <- synthesize(presynth)
 
 synth1$synthetic_data
 
+synth1$synthetic_data <- synth1$synthetic_data |>
+  mutate(prob_opt_in = 1, opt_in = TRUE)
+
 ```
+
+## Results
 
 Does inctot exceed ftotinc?
 
 ```{r}
 results <- summarize_results(postsynth = synth1, data = gsds)
 
-synthesize_acs(data = gsds |> mutate(opt_in = TRUE), id = "test")
+```
 
+## Univariate Utility
+
+```{r}
+results$proportions |>
+  pivot_wider(id_cols = c(variable, class), names_from = source, values_from = prop) |>
+  ggplot(aes(original, synthetic)) +
+  geom_abline(intercept = 0, slope = 1) +
+  geom_point(alpha = 0.4) +
+  coord_equal()
+
+results$proportions_race |>
+  pivot_wider(id_cols = c(race, variable, class), names_from = source, values_from = prop) |>
+  ggplot(aes(original, synthetic, color = race)) +
+  geom_abline(intercept = 0, slope = 1) +
+  geom_point(alpha = 0.4) +
+  coord_equal() +
+  facet_wrap(~race)
+
+results$moments |>
+  filter(statistic == "have") |>
+  ggplot(aes(original, synthetic)) +
+  geom_abline(intercept = 0, slope = 1) +
+  geom_point(alpha = 0.4) +
+  coord_equal()
+
+results$moments_race |>
+  filter(statistic == "have") |>
+  ggplot(aes(original, synthetic, color = race)) +
+  geom_point() +
+  geom_abline(intercept = 0, slope = 1) +
+  geom_point(alpha = 0.4) +
+  coord_equal() +
+  facet_wrap(~race)
+
+results$moments |>
+  filter(statistic == "mean") |>
+  ggplot(aes(original, synthetic)) +
+  geom_abline(intercept = 0, slope = 1) +
+  geom_point(alpha = 0.4) +
+  coord_equal()
+
+results$moments_race |>
+  filter(statistic == "mean") |>
+  ggplot(aes(original, synthetic, color = race)) +
+  geom_abline(intercept = 0, slope = 1) +
+  geom_point(alpha = 0.4) +
+  coord_equal() +
+  facet_wrap(~race)
+
+results$percentiles |>
+  ggplot(aes(original, synthetic)) +
+  geom_abline(intercept = 0, slope = 1) +
+  geom_point(alpha = 0.4) +
+  facet_wrap(~p, scales = "free")
 
 ```
 
+
+## Bivariate Utility
+
+```{r}
+results$cor_fit$correlation_difference
+
+results$cor_fit$correlation_difference_mae
+
+```
+
+## Multivariate Utility
+
+```{r}
+results$k1_marginals
+  
+results$k2_marginals
+  
+results$k3_marginals
+
+results$discriminator_auc
+
+results$discriminator_vip
+
+```
+
+## Disclosure Metrics
+
+```{r}
+glimpse(results$ldiveristy)
+
+results$incwelfr_rmse
+
+```

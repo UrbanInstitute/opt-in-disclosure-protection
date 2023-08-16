@@ -51,8 +51,8 @@ gsds <- readRDS(here("data", "starting", "acs-gsds.rds")) |>
 #| label: testing-grid
 
 specs <- expand_grid(
-  implicate = 1:2, 
-  opt_in = c(0.1), #0.5, 0.9, 1)
+  implicate = 1:5, 
+  opt_in = c(0.1, 0.5, 0.9, 1),
   white_multiplier = c(0.5, 1, 2)
 ) |>
   mutate(run = row_number()) |>
@@ -80,7 +80,7 @@ prep_data <- function(data, opt_in, white_multiplier) {
   
 }
 
-plan(multisession, workers = 4)
+plan(multisession, workers = 8)
 
 set.seed(20230718)
 

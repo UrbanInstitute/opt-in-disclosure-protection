@@ -6,6 +6,8 @@ synthesize_acs <- function(data, id, description) {
   data_opt_out <- data |>
     dplyr::filter(!opt_in) 
   
+  opt_out_index <- which(!data$opt_in)
+  
   # create "starting data"
   starting_data <- data_opt_in |> 
     dplyr::select(opt_in, prob_opt_in, race)
@@ -104,6 +106,8 @@ synthesize_acs <- function(data, id, description) {
   synth$synthetic_data <- dplyr::bind_rows(synth$synthetic_data, data_opt_out)
   
   synth$description <- description
+  
+  synth$opt_out_index <- opt_out_index
   
   saveRDS(synth, here("data", "results", "acs", paste0("synth-acs_", id, ".rds")))
 

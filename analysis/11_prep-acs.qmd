@@ -1,5 +1,6 @@
 ---
 title: "Prep ACS data for analysis"
+date: today
 format: 
   html:
     embed-resources: true
@@ -64,7 +65,7 @@ if (!file.exists(here("data", "pums", "acs2021.rds"))) {
   acs_extract <- submit_extract(acs_extract_definition)
   
   # wait for the extract to process
-  acs_extract <- wait_for_extract("usa:19")
+  acs_extract <- wait_for_extract(acs_extract)
   
   # define the data set to load
   ddi_path <- download_extract(
@@ -85,6 +86,16 @@ if (!file.exists(here("data", "pums", "acs2021.rds"))) {
 
 ```{r}
 acs2021 <- readRDS(here("data", "pums", "acs2021.rds"))
+
+```
+
+```{r}
+acs2021 |>
+  nrow()
+
+acs2021 |>
+  count(SERIAL) |>
+  nrow()
 
 ```
 
@@ -142,7 +153,7 @@ acs2021 <- acs2021 |>
     sex = as_factor(sex),
     marst = as_factor(marst),
     race = as_factor(race),
-    educd = as_factor(educd),
+    educd = zap_ipums_attributes(educd),
     hispan = as_factor(hispan),
     hcovany = as_factor(hcovany),
     empstat = as_factor(empstat),
@@ -219,6 +230,8 @@ acs2021 |>
 ```
 
 ```{r}
+set.seed(20230728)
+
 sample_index <- sample(1:nrow(acs2021), size = round(nrow(acs2021) / 2))
 
 acs2021 |>

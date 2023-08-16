@@ -1,4 +1,4 @@
-summarize_results <- function(postsynth, data) {
+summarize_results <- function(postsynth, data, holdout) {
   
   # univariate utility
   proportions <- proportions(postsynth = postsynth, data = data)
@@ -114,6 +114,27 @@ summarize_results <- function(postsynth, data) {
     formula = incwelfr ~ .
   )
   
+  synth_factors <- postsynth$synthetic_data |>
+    filter(opt_in) |> 
+    select(-opt_in, -prob_opt_in) |>
+    mutate(
+      sex = factor(sex, c("Male", "Female")),
+      hispan = factor(hispan, levels = c("Not Hispanic", "Mexican", "Puerto Rican", "Cuban", "Other")),
+      marst = factor(marst, levels = c("Married, spouse present", "Married, spouse absent", "Separated", "Divorced", "Widowed", "Never married/single" )),
+      statefip = factor(statefip, levels = c("Florida", "Michigan", "Pennsylvania")),
+      empstat = factor(empstat, levels = c("Employed", "Unemployed", "Not in labor force"))
+    ) |>
+    mutate(across(where(is.character), factor))
+  
+  synth_memberhip_sample <- data[-postsynth$opt_out_index, ] |>
+    dplyr::slice_sample(n = nrow(holdout))
+  
+  membership_inference_test <- membership_inference_test(
+    postsynth = synth_factors, 
+    data = synth_memberhip_sample, 
+    holdout_data = holdout
+  )
+
   list(
     proportions = proportions,
     proportions_race = proportions_race,
@@ -129,7 +150,8 @@ summarize_results <- function(postsynth, data) {
     discriminator_vip = discriminator$var_importance,
     regression_ci_overlap = regression_ci_overlap,
     ldiveristy = ldiveristy,
-    incwelfr_rmse = incwelfr_rmse
+    incwelfr_rmse = incwelfr_rmse,
+    membership_inference_test = membership_inference_test
   )
   
 }
