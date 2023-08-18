@@ -45,22 +45,36 @@ gsds <- readRDS(here("data", "starting", "acs-gsds.rds")) |>
   select(-serial)
 
 holdout <- readRDS(here("data", "starting", "acs-holdout.rds")) |>
-  select(-serial) |>
+  select(-serial)
+
+holdout_frac <- holdout  |>
   slice_sample(prop = 0.1)
 
-syntheses <- list.files(here::here("data", "results", "acs"), full.names = TRUE)[-1]
+syntheses <- list.files(here::here("data", "results", "acs"), full.names = TRUE)[c(-1, -2)]
 
-plan(multisession, workers = 12)
+syntheses <- syntheses |>
+  map(readRDS)
 
+# syntheses <- syntheses[1:2]
+
+# plan(multisession, workers = 4)
+# message("Number of parallel workers: ", nbrOfWorkers())
+
+set.seed(20230818)
 tic()
-results <- syntheses |>
-  future_map(
-    .f = ~readRDS(.x) |> 
-      summarize_results(data = gsds, holdout = holdout), 
-    progress = TRUE)
+results <-
+  map(
+    .x = syntheses,
+    .f = ~summarize_results(postsynth = .x, data = gsds, holdout = holdout_frac)
+  )
+# results <-
+#   future_map(
+#     .x = syntheses,
+#     .f = ~summarize_results(postsynth = .x, data = gsds, holdout = holdout_frac)
+#   )
 toc()
 
-saveRDS(results, here("data", "results", "acs", "acs-metrics.rds"))
+#saveRDS(results, here("data", "results", "acs", "acs-metrics.rds"))
 
 specs <- read_csv(here::here("data", "results", "acs", "specs.csv")) |>
   mutate(
@@ -71,6 +85,8 @@ specs <- read_csv(here::here("data", "results", "acs", "specs.csv")) |>
 ```
 
 ## Univariate Utility
+
+### Proportions
 
 ```{r}
 bind_cols(
@@ -117,6 +133,36 @@ bind_cols(
   scatter_grid()
 
 bind_cols(
+  specs |> 
+    slice(rep(1:n(), each = 97)),
+  results |>
+    map("proportions_race_eth") |>
+    map_dfr(.f = ~.x |> 
+              pivot_wider(id_cols = c(variable, class, race_eth), names_from = source, values_from = prop)
+    ) |>
+    mutate(abs_error = abs(original - synthetic))
+) |>
+  filter(white_multiplier == 1) |>
+  filter(!variable %in% c("hispan", "race")) |>
+  ggplot(aes(opt_in, abs_error, color = race_eth)) +
+  geom_point(alpha = 0.4) +
+  facet_wrap(~variable) +
+  labs(
+    title = "Low Opt-In Modestly Improves Univariate Proportion Estimates",
+    subtitle = "Equal Opt-In Probabilities for All Races",
+    x = "Proportion Opt In",
+    y = "Absolute Error In Proportion"
+  ) +
+  scatter_grid()
+
+
+```
+
+### Count with Wages
+
+```{r}
+
+bind_cols(
   specs,
   results |>
     map("moments") |>
@@ -145,6 +191,11 @@ bind_cols(
   ) +
   scatter_grid()
 
+```
+
+### Mean Income
+
+```{r}
 
 bind_cols(
   specs,
@@ -178,13 +229,87 @@ bind_cols(
   ) +
   scatter_grid()
   
-  
-
 ```
 
 Increasing opt in for small groups can increase their utility. 
 
+### Percentiles
 
+```{r}
+bind_cols(
+  specs |>
+    slice(rep(1:n(), each = 11)),
+  results |>
+    map("percentiles") |>
+    map_dfr(.f = ~ .x |> filter(variable == "incwage"))
+) |>
+  mutate(proportion_difference = if_else(is.nan(proportion_difference), 0, proportion_difference)) |>
+  ggplot(aes(p, proportion_difference, group = id)) +
+  geom_line(alpha = 0.5) +
+  facet_wrap(~opt_in) +
+  labs(
+    title = "Low Opt-In Dramatically Improves the Distribution of Wage and Salary Income",
+    x = "Percentile",
+    y = "Proportion Error"
+  ) +
+  scatter_grid()
+
+
+bind_cols(
+  specs |>
+    slice(rep(1:n(), each = 11)),
+  results |>
+    map("percentiles") |>
+    map_dfr(.f = ~ .x |> filter(variable == "ftotinc"))
+) |>
+  mutate(proportion_difference = if_else(is.nan(proportion_difference), 0, proportion_difference)) |>
+  ggplot(aes(p, proportion_difference, group = id)) +
+  geom_line(alpha = 0.5) +
+  facet_wrap(~opt_in) +
+  labs(
+    title = "Low Opt-In Dramatically Improves the Distribution of Total Family Income",
+    x = "Percentile",
+    y = "Proportion Error"
+  ) +
+  scatter_grid()
+
+bind_cols(
+  specs |>
+    slice(rep(1:n(), each = 11)),
+  results |>
+    map("percentiles") |>
+    map_dfr(.f = ~ .x |> filter(variable == "inctot"))
+) |>
+  mutate(proportion_difference = if_else(is.nan(proportion_difference), 0, proportion_difference)) |>
+  ggplot(aes(p, proportion_difference, group = id)) +
+  geom_line(alpha = 0.5) +
+  facet_wrap(~opt_in) +
+  labs(
+    title = "Low Opt-In Dramatically Improves the Distribution of Total Income",
+    x = "Percentile",
+    y = "Proportion Error"
+  ) +
+  scatter_grid()
+
+bind_cols(
+  specs |>
+    slice(rep(1:n(), each = 11)),
+  results |>
+    map("percentiles") |>
+    map_dfr(.f = ~ .x |> filter(variable == "incresid"))
+) |>
+  mutate(proportion_difference = if_else(is.nan(proportion_difference), 0, proportion_difference)) |>
+  ggplot(aes(p, proportion_difference, group = id)) +
+  geom_line(alpha = 0.5) +
+  facet_wrap(~opt_in) +
+  labs(
+    title = "Low Opt-In Dramatically Improves the Distribution of Income Residual",
+    x = "Percentile",
+    y = "Proportion Error"
+  ) +
+  scatter_grid()
+
+```
 
 ## Bivariate Utility
 
@@ -203,16 +328,23 @@ bind_cols(
   ) +
   scatter_grid()
 
-```
-
-```{r}
 bind_cols(
   specs,
-  results |>
-    map("percentiles")
-)
-
-
+  correlation_difference_mae = results |>
+    map_dbl(.f = ~ .x$cor_fit$correlation_difference_mae)
+) |>
+  group_by(opt_in, white_multiplier) |>
+  summarize(correlation_difference_mae = median(correlation_difference_mae)) |>
+  ungroup() |>
+  ggplot(aes(opt_in, correlation_difference_mae, color = white_multiplier, group = white_multiplier)) +
+  geom_line() +
+  geom_point() +
+  labs(
+    title = "Low Opt-In Improves Synthetic Correlations",
+    x = "Proportion Opt In",
+    y = "Median Mean Absolute Error in Pairwise Correlation Coefficient"
+  ) +
+  scatter_grid()
 
 ```
 
@@ -257,7 +389,8 @@ bind_cols(
     map_dbl("discriminator_auc")
 ) |>
   ggplot(aes(opt_in, discriminator_auc, color = white_multiplier)) +
-  geom_point(alpha = 0.3)
+  geom_point(alpha = 0.3) +
+  scatter_grid()
 
 ```
 
@@ -342,8 +475,7 @@ bind_cols(
   geom_point(alpha = 0.3)
 
 incwelfr_rmse <- prediction_test(
-  postsynth = readRDS(here("data", "starting", "acs-holdout.rds")) |>
-  select(-serial), 
+  postsynth = holdout_frac, 
   data = gsds, 
   formula = incwelfr ~ .
 )
@@ -371,6 +503,13 @@ bind_cols(
     y = "Membership Inference Test AUC"
   ) +
   scatter_grid()
+
+results |>
+    map("membership_inference_test") |>
+    map("conf_mat")
+
+
+
 
 ```
 

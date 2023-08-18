@@ -47,7 +47,7 @@ summarize_results <- function(postsynth, data, holdout) {
   # multivariate utility
   k1_marginals <- kmarginals(postsynth = postsynth, data = data, k = 1)
   k2_marginals <- kmarginals(postsynth = postsynth, data = data, k = 2)
-  k3_marginals <- kmarginals(postsynth = postsynth, data = data, k = 3) 
+  #k3_marginals <- kmarginals(postsynth = postsynth, data = data, k = 3) 
   
   discriminator <- discriminator_auc(postsynth = postsynth, data = data)
   
@@ -114,6 +114,7 @@ summarize_results <- function(postsynth, data, holdout) {
     formula = incwelfr ~ .
   )
   
+  # membership inference test
   synth_factors <- postsynth$synthetic_data |>
     filter(opt_in) |> 
     select(-opt_in, -prob_opt_in) |>
@@ -124,17 +125,20 @@ summarize_results <- function(postsynth, data, holdout) {
       statefip = factor(statefip, levels = c("Florida", "Michigan", "Pennsylvania")),
       empstat = factor(empstat, levels = c("Employed", "Unemployed", "Not in labor force"))
     ) |>
-    mutate(across(where(is.character), factor))
+    mutate(across(where(is.character), factor)) |>
+    dplyr::slice_sample(n = nrow(holdout))
   
-  synth_memberhip_sample <- data[-postsynth$opt_out_index, ] |>
+  training_data <- data[-postsynth$opt_out_index, ] |>
     dplyr::slice_sample(n = nrow(holdout))
   
   membership_inference_test <- membership_inference_test(
     postsynth = synth_factors, 
-    data = synth_memberhip_sample, 
+    data = training_data, 
     holdout_data = holdout
   )
 
+  cat("PING! \n")
+  
   list(
     proportions = proportions,
     proportions_race = proportions_race,
@@ -145,7 +149,7 @@ summarize_results <- function(postsynth, data, holdout) {
     cor_fit = cor_fit,
     k1_marginals = k1_marginals,
     k2_marginals = k2_marginals,
-    k3_marginals = k3_marginals,
+    #k3_marginals = k3_marginals,
     discriminator_auc = discriminator$auc,
     discriminator_vip = discriminator$var_importance,
     regression_ci_overlap = regression_ci_overlap,
