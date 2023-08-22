@@ -184,7 +184,7 @@
 \date{}
 
 \begin{document}
-\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[frame hidden, enhanced, sharp corners, breakable, boxrule=0pt, borderline west={3pt}{0pt}{shadecolor}, interior hidden]}{\end{tcolorbox}}\fi
+\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[borderline west={3pt}{0pt}{shadecolor}, sharp corners, breakable, enhanced, frame hidden, boxrule=0pt, interior hidden]}{\end{tcolorbox}}\fi
 
 \pagenumbering{roman}
 
@@ -202,7 +202,7 @@
     % Adding the cover image - code forces the image to be width of full paper (ignoring margins)
     \vspace*{-1.7cm}
     \noindent
-    \makebox[\textwidth]{\includegraphics{images/cover.jpg}}
+    \makebox[8.5in][s]{\includegraphics{images/cover.jpg}}
     
     \vspace{0.35in}
     \noindent\textcolor{urban-blue}{\MakeUppercase{\textbf{Research Report}}}
@@ -213,14 +213,12 @@
     
     \reportsubtitle{Empowering Survey Respondents to Improve Data Quality}
     % Multiple column author names - change the "4" to the number of desired columns
-    \begin{multicols}{4}
+    \begin{multicols}{2}
         \authorfont{Aaron R. Williams}
         
         \authorfont{Jennifer Andre}
       
     \end{multicols}
-    
-    \vspace{-0.75cm}
     
     \datefont{August 2023}
 

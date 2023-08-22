@@ -22,7 +22,7 @@ bibliography: bibliography.bib
     % Adding the cover image - code forces the image to be width of full paper (ignoring margins)
     \vspace*{-1.7cm}
     \noindent
-    \makebox[\textwidth]{\includegraphics{images/cover.jpg}}
+    \makebox[8.5in][s]{\includegraphics{images/cover.jpg}}
     
     \vspace{0.35in}
     \noindent\textcolor{urban-blue}{\MakeUppercase{\textbf{Research Report}}}
@@ -33,14 +33,12 @@ bibliography: bibliography.bib
     
     \reportsubtitle{Empowering Survey Respondents to Improve Data Quality}
     % Multiple column author names - change the "4" to the number of desired columns
-    \begin{multicols}{4}
+    \begin{multicols}{2}
         \authorfont{Aaron R. Williams}
         
         \authorfont{Jennifer Andre}
       
     \end{multicols}
-    
-    \vspace{-0.75cm}
     
     \datefont{August 2023}
 
@@ -336,6 +334,60 @@ We calculate the following metrics for all simulations:
 
 \subsection{Results and Discussion}
 
+* One potential issue with opt-in disclosure protection is that the noise added to the opt-in data will diminish the gains of including unaltered observations. For example, as opt-in decreases the number of observations in the training data declines and could lead to terrible models for the synthetic data.
+* We do not witness this phenomena in demonstration 2. 
+* Our results support the idea that opt-in approaches to synthetic data can improve data quality with minimal changes to disclosure risks. 
+* All utility metrics improve with the introduction of an opt-in and improve as the rate of opt-in declines.
+* Most of the utility metrics are surprisingly resilient to differenital opt-in.
+
+MULTIVARIATE UTILITY
+
+* We start with multivariate utility. The discrimnator AUC is very high when opt-in = 1 but quickly declines with lower opt-in rates. 
+* This suggests that a simple predictive model has difficulty distinguishing between the synthetic data and the GSDS.
+* The correlation difference is modest for all opt-in rates and improves with low levels of opt-in. 
+
+UNIVARIATE UTILITY
+
+* We next zoom in on specific variables and subsets of variables. 
+
+* The categorical utility of the synthetic data is very high for all scenarios but improves marginally with low opt-in rates. 
+
+* The synthetic data largely recreat proportions from the GSDS. 
+* The results follow a same pattern when disaggregated by race group. Here, the small groups are very imprecise. Note that low levels for the white multiplier dramatically improve the results for small race groups. 
+
+* TODO: calculate kmarginals with the holdout data
+
+* The synthesis is mediocre overall for the numeric variables. These variables would benefit from some tuning of the general synthesis approach. 
+* Still, we see dramatic improvements for low opt-in rates. 
+
+* The distribution of wage and salary income improves dramatically under the opt-in scenario. Some percentiles ar
+
+DISCLOSURE RISKS
+
+* The synthesizer demonstrates promising $\ell$-diversity for all syntheses. This is unsurprising since we use conservative hyperparameters for the decision trees and regression trees. 
+* SUMMARY SENTENCE
+* The AUC for the membership inference attack is close to 0.5. Given the synthetic data, an attacker would struggle to tell if a confidential record is from the GSDS or holdout data using distance-based matching. 
+VISUALIZATION
+* Finally, the RMSE for the attribute inference test is modest. In fact, it is smaller for the model trained on the holdout data than for the model trained on the synthetic data. Using a simple predictive model, this suggests that the synthetic data are not copying chance features of the GSDS. 
+* SUMMARY SENTENCE
+* These disclosure metrics enable us to infer the disclosive properties of the synthetic but they don't not provide a bound or guarantee on the disclosure risks of the synthetic data. 
+* We believe the results are promising. Allowing individuals to forego disclosure protections increases data utility without increasing disclosure risks for the individuals who still want disclosure protection. 
+* This idea rests on a few assumptions. For example, we do not label observations that forego disclosure protections. Doing so could increase disclosure risks by making differencing attacks easier. 
+* Data stewards need to be careful to not implicitly label the opt-in decision. For example, the GSDS could have precision to the closest integer but synthetic records go to three decimal places. 
+
+\section{Conclusion}
+
+## LDP
+
+
+
+
+## Synthetic Data
+
+* Next work
+    * Ample followup work is needed to explore implementation of opt-in disclosure protection. We do not address questionnaire design and giving respondents clear information sot hey can provide informed consent. These implementation decisions inform the ethics of opt-in disclosure protection and would unambiguously affect the opt-in rate. 
+    * SED
+
 \subsection{Metrics Appendix}
 
 *This is a placeholder section*
@@ -369,8 +421,6 @@ We calculate the following metrics for all simulations:
 -   **Attribute inference test on welfare income:** [@elemam2020] We are concerned that an attacker could train predictive models on the synthetic data and make precise inferences about observations in the confidential data. We train a regression tree to predict welfare income on the synthetic data using all other variables as predictors. We assume that an attacker knows all variables but welfare income for the confidential data. We make predictions and calculate the RMSE. We repeat this process using the holdout data instead of the synthetic data to benchmark against the RMSE of models trained when an attacker has access to another random sample from the population instead of the synthetic data.
 
 -   **Membership inference test:** [@zhang2022] We are concerned that an attacker could determine if a confidential observation is in the training data for the candidate file. We construct a data set that is about 10,000 observations from the GSDS and 10,000 observations from the holdout data. For each observation, we measure Gower's distance [@gower1971] to all synthetic observations. Traditionally, analysts pick different thresholds to predict membership and then calculate precision. We normalize the distances so they are in \[0, 1\] and are like probabilities. We then calculate the ROC AUC to measure the tradeoff between true positives and false positives for different thresholds. ROC AUC closer to 0.5 indicates difficulty assessing membership.
-
-\section{Conclusion}
 
 \include{backmatter/appendix}
 
