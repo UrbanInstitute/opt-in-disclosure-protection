@@ -16,6 +16,7 @@ sudo su - -c "R -e \"install.packages('tidymodels', repos='http://cran.rstudio.c
 sudo su - -c "R -e \"install.packages('ranger', repos='http://cran.rstudio.com/')\""
 sudo su - -c "R -e \"install.packages('rpart.LAD', repos='http://cran.rstudio.com/')\""
 sudo su - -c "R -e \"install.packages('vip', repos='http://cran.rstudio.com/')\""
+sudo su - -c "R -e \"install.packages('patchwork', repos='http://cran.rstudio.com/')\""
 
 # download tidysynthesis from github - will be prompted for credentials
 cd $HOME
