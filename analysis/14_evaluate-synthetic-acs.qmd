@@ -26,6 +26,7 @@ library(here)
 library(tidysynthesis)
 library(syntheval)
 library(tictoc)
+library(patchwork)
 library(urbnthemes)
 
 set_urbn_defaults(style = "print")
@@ -128,22 +129,24 @@ bind_cols(
 
 bind_cols(
   specs |> 
-    slice(rep(1:n(), each = 32)),
+    slice(rep(1:n(), each = 97)),
   results |>
-    map("proportions") |>
+    map("proportions_race_eth") |>
     map_dfr(.f = ~.x |> 
-              pivot_wider(id_cols = c(variable, class), names_from = source, values_from = prop)
+              pivot_wider(id_cols = c(variable, class, race_eth), names_from = source, values_from = prop)
     ) |>
-    mutate(abs_error = abs(original - synthetic))
+    mutate(error = original - synthetic)
 ) |>
-  ggplot(aes(opt_in, abs_error, color = white_multiplier)) +
+  filter(white_multiplier == 1) |>
+  filter(!variable %in% c("hispan", "race")) |>
+  ggplot(aes(opt_in, error, color = race_eth)) +
   geom_point(alpha = 0.4) +
   facet_wrap(~variable) +
   labs(
-    title = "Low Opt-In Modestly Improves Univariate Proportion Estimates",
-    subtitle = "Equal Opt-In Probabilities for All Races",
+    title = "Low Opt-In Modestly Improves Proportion Estimates",
+    subtitle = "Equal Opt-In Probabilities for All Races and Ethnicities",
     x = "Proportion Opt In",
-    y = "Absolute Error In Proportion"
+    y = "Error In Proportion"
   ) +
   scatter_grid()
 
@@ -163,17 +166,28 @@ bind_cols(
   geom_point(alpha = 0.4) +
   facet_wrap(~variable) +
   labs(
-    title = "Low Opt-In Modestly Improves Univariate Proportion Estimates",
-    subtitle = "Equal Opt-In Probabilities for All Races",
+    title = "Low Opt-In Modestly Improves Proportion Estimates",
+    subtitle = "Equal Opt-In Probabilities for All Races and Ethnicities",
     x = "Proportion Opt In",
     y = "Absolute Error In Proportion"
   ) +
   scatter_grid()
 
+bind_cols(
+  specs |> 
+    slice(rep(1:n(), each = 97)),
+  results |>
+    map("proportions_race_eth") |>
+    map_dfr(.f = ~.x |> 
+              pivot_wider(id_cols = c(variable, class, race_eth), names_from = source, values_from = prop)
+    ) |>
+    mutate(error = original - synthetic)
+) |>
+  filter(id == "011", race_eth == "Black", variable == "marst")
 
 ```
 
-### Count with Wages
+### Proportion with Wages
 
 ```{r}
 #| label: proportion-with-wages
@@ -418,7 +432,9 @@ bind_cols(
   scale_y_continuous(limits = c(NA, 1000)) +
   labs(
     title = "All Syntheses Recreate 1-Dimensional Marginal Distributions",
-    subtitle = "Score from Holdout Data in Red"
+    subtitle = "Score from Holdout Data in Red",
+    x = "Opt-In Rate",
+    y = "1-Marginal Score"
   ) +
   scatter_grid()
 
@@ -438,8 +454,10 @@ bind_cols(
   geom_hline(yintercept = k2_benchmark, color = "red") +
   scale_y_continuous(limits = c(NA, 1000)) +  
   labs(
-    title = "Low Opt-In Rates Improve the 2-Dimensional Marginal DIistributions",
-    subtitle = "Score from Holdout Data in Red"
+    title = "Low Opt-In Rates Improve the 2-Dimensional Marginal Distributions",
+    subtitle = "Score from Holdout Data in Red",
+    x = "Opt-In Rate",
+    y = "2-Marginal Score"
   ) +  
   scatter_grid()
 
@@ -460,9 +478,43 @@ bind_cols(
   scale_y_continuous(limits = c(NA, 1000)) +  
   labs(
     title = "Low Opt-In Rates Improve the 3-Dimensional Marginal Distributions",
-    subtitle = "Score from Holdout Data in Red"
+    subtitle = "Score from Holdout Data in Red",
+    x = "Opt-In Rate",
+    y = "3-Marginal Score"
   ) +    
   scatter_grid()
+
+k1 <- bind_cols(
+  specs,
+  k1_marginals = results |>
+    map_dbl("k1_marginals")
+) |>
+  ggplot(aes(opt_in, k1_marginals, color = white_multiplier)) +
+  geom_point(alpha = 0.3) +
+  geom_hline(yintercept = k1_benchmark, color = "red") +
+  scale_y_continuous(limits = c(NA, 1000)) +
+  labs(
+    x = "Opt-In Rate",
+    y = "1-Marginal Score"
+  ) +
+  scatter_grid()
+
+k3 <- bind_cols(
+  specs,
+  k3_marginals = results |>
+    map_dbl("k3_marginals")
+) |>
+  ggplot(aes(opt_in, k3_marginals, color = white_multiplier)) +
+  geom_point(alpha = 0.3) +
+  geom_hline(yintercept = k3_benchmark, color = "red") +  
+  scale_y_continuous(limits = c(NA, 1000)) +  
+  labs(
+    x = "Opt-In Rate",
+    y = "3-Marginal Score"
+  ) +    
+  scatter_grid()
+
+k1 + k3
 
 ```
 
@@ -566,8 +618,7 @@ bind_cols(
     max(ldiveristy_ftotinc),
     max(ldiveristy_inctot),
     max(ldiveristy_incwage)
-  ) |>
-  print(n = 100)
+  )
 
 ```
 
@@ -600,7 +651,7 @@ bind_cols(
 ### Membership Inference Test
 
 ```{r}
-#| label: memebrship-inference
+#| label: membership-inference
 
 bind_cols(
   specs,
@@ -611,7 +662,7 @@ bind_cols(
   ggplot(aes(opt_in, membership_inference_auc, color = white_multiplier)) +
   geom_point(alpha = 0.5) +
   labs(
-    title = "No Synthese=is Demonstrates High Membership Inference Risks",
+    title = "No Synthesis Demonstrates High Membership Inference Risks",
     x = "Opt-In Rate",
     y = "Membership Inference Test AUC",
     color = "White Multiplier"
