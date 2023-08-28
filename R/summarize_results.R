@@ -47,7 +47,7 @@ summarize_results <- function(postsynth, data, holdout) {
   # multivariate utility
   k1_marginals <- kmarginals(postsynth = postsynth, data = data, k = 1)
   k2_marginals <- kmarginals(postsynth = postsynth, data = data, k = 2)
-  #k3_marginals <- kmarginals(postsynth = postsynth, data = data, k = 3) 
+  k3_marginals <- kmarginals(postsynth = postsynth, data = data, k = 3)
   
   discriminator <- discriminator_auc(postsynth = postsynth, data = data)
   
@@ -137,19 +137,18 @@ summarize_results <- function(postsynth, data, holdout) {
     holdout_data = holdout
   )
 
-  cat("PING! \n")
-  
   list(
     proportions = proportions,
     proportions_race = proportions_race,
     proportions_race_eth = proportions_race_eth,
     moments = moments,
     moments_race = moments_race,
+    moments_race_eth = moments_race_eth,
     percentiles = percentiles,
     cor_fit = cor_fit,
     k1_marginals = k1_marginals,
     k2_marginals = k2_marginals,
-    #k3_marginals = k3_marginals,
+    k3_marginals = k3_marginals,
     discriminator_auc = discriminator$auc,
     discriminator_vip = discriminator$var_importance,
     regression_ci_overlap = regression_ci_overlap,

@@ -4,6 +4,7 @@ format:
   html:
     embed-resources: true
     toc: true
+    df-print: paged
 editor: source
 execute:
   echo: true
@@ -11,6 +12,9 @@ execute:
   message: false
 editor_options: 
   chunk_output_type: console
+knitr:
+  opts_chunk:
+    fig.path: figures/
 ---
 
 ```{r}
@@ -47,10 +51,13 @@ gsds <- readRDS(here("data", "starting", "acs-gsds.rds")) |>
 holdout <- readRDS(here("data", "starting", "acs-holdout.rds")) |>
   select(-serial)
 
+set.seed(20230822)
 holdout_frac <- holdout  |>
   slice_sample(prop = 0.1)
 
-syntheses <- list.files(here::here("data", "results", "acs"), full.names = TRUE)[c(-1, -2)]
+syntheses <- list.files(here::here("data", "results", "acs"), full.names = TRUE)
+
+syntheses <- syntheses[str_detect(syntheses, pattern = "synth-acs_")]
 
 syntheses <- syntheses |>
   map(readRDS)
@@ -60,21 +67,27 @@ syntheses <- syntheses |>
 # plan(multisession, workers = 4)
 # message("Number of parallel workers: ", nbrOfWorkers())
 
-set.seed(20230818)
-tic()
-results <-
-  map(
-    .x = syntheses,
-    .f = ~summarize_results(postsynth = .x, data = gsds, holdout = holdout_frac)
-  )
-# results <-
-#   future_map(
-#     .x = syntheses,
-#     .f = ~summarize_results(postsynth = .x, data = gsds, holdout = holdout_frac)
-#   )
-toc()
+if (!file.exists(here("data", "results", "acs", "acs-metrics.rds"))) {
 
-#saveRDS(results, here("data", "results", "acs", "acs-metrics.rds"))
+  set.seed(20230818)
+  tic()
+  results <-
+    map(
+      .x = syntheses,
+      .f = ~summarize_results(postsynth = .x, data = gsds, holdout = holdout_frac),
+      .progress = TRUE
+    )
+  toc()
+  
+  saveRDS(results, here("data", "results", "acs", "acs-metrics.rds"))
+  
+} else {
+  
+  results <- readRDS(here("data", "results", "acs", "acs-metrics.rds"))
+  
+}
+
+
 
 specs <- read_csv(here::here("data", "results", "acs", "specs.csv")) |>
   mutate(
@@ -89,6 +102,8 @@ specs <- read_csv(here::here("data", "results", "acs", "specs.csv")) |>
 ### Proportions
 
 ```{r}
+#| label: proportions
+
 bind_cols(
   specs |> 
     slice(rep(1:n(), each = 32)),
@@ -161,6 +176,7 @@ bind_cols(
 ### Count with Wages
 
 ```{r}
+#| label: proportion-with-wages
 
 bind_cols(
   specs,
@@ -168,10 +184,11 @@ bind_cols(
     map("moments") |>
     map_dfr(.f = ~.x |> filter(variable == "incwage", statistic == "have"))
 ) |>
-  ggplot(aes(opt_in, abs(proportion_difference), color = white_multiplier)) +
+  ggplot(aes(opt_in, proportion_difference, color = white_multiplier)) +
   geom_point(alpha = 0.3) +
   labs(
-    title = "Low Opt-in Improves the Proportion of People with Salaries and Wages"
+    title = "Low Opt-in Improves the Proportion of People with Salaries and Wages",
+    y = "Error in Proportion with Salaries and Wages"
   ) +
   scatter_grid()
 
@@ -182,12 +199,34 @@ bind_cols(
     map("moments_race") |>
     map_dfr(.f = ~.x |> filter(variable == "incwage", statistic == "have"))
 ) |>
-  ggplot(aes(opt_in, abs(proportion_difference), color = white_multiplier)) +
+  ggplot(aes(opt_in, proportion_difference, color = white_multiplier)) +
   geom_point(alpha = 0.3) +
+  geom_hline(yintercept = 0) +
   facet_wrap(~race) +
   labs(
-    title = "Small Groups Have Much Worse Accuracy for the Number of People with Salaries or Wages",
-    subtitle = "Low Opt-in Improves the Proportion of People with Salaries and Wages"
+    title = "Small Groups Have Much Worse Accuracy for the Number of People with\nSalaries or Wages",
+    subtitle = "Low Opt-in Improves the Proportion of People with Salaries and Wages",
+    y = "Error in Proportion with Salaries and Wages",
+    color = "White Multiplier"
+  ) +
+  scatter_grid()
+
+bind_cols(
+  specs |> 
+    slice(rep(1:n(), each = 4)),
+  results |>
+    map("moments_race_eth") |>
+    map_dfr(.f = ~.x |> filter(variable == "incwage", statistic == "have"))
+) |>
+  ggplot(aes(opt_in, proportion_difference, color = white_multiplier)) +
+  geom_point(alpha = 0.3) +
+  geom_hline(yintercept = 0) +
+  facet_wrap(~ race_eth) +
+  labs(
+    title = "Small Groups Have Much Worse Accuracy for the Number of People with\nSalaries or Wages",
+    subtitle = "Low Opt-in Improves the Proportion of People with Salaries and Wages",
+    y = "Error in Proportion with Salaries and Wages",
+    color = "White Multiplier"
   ) +
   scatter_grid()
 
@@ -196,6 +235,7 @@ bind_cols(
 ### Mean Income
 
 ```{r}
+#| label: mean-income
 
 bind_cols(
   specs,
@@ -203,12 +243,12 @@ bind_cols(
     map("moments") |>
     map_dfr(.f = ~.x |> filter(variable == "incwage", statistic == "mean"))
 ) |>
-  ggplot(aes(opt_in, abs(proportion_difference), color = white_multiplier)) +
+  ggplot(aes(opt_in, proportion_difference, color = white_multiplier)) +
   geom_point(alpha = 0.3) +
   labs(
-    title = "Low Opt-In Dramatically Improves Estimates of Mean Wage and Salary Income",
+    title = "Low Opt-In Dramatically Improves Estimates of Mean\nWage and Salary Income",
     x = "Proportion Opt In",
-    y = "Absolute Proportion Error in Mean Wage and Salary Income"
+    y = "Proportion Error in Mean Wage and Salary Income"
   ) +
   scatter_grid()
 
@@ -219,13 +259,15 @@ bind_cols(
     map("moments_race") |>
     map_dfr(.f = ~.x |> filter(variable == "incwage", statistic == "mean"))
 ) |>
-  ggplot(aes(opt_in, abs(proportion_difference), color = white_multiplier)) +
+  ggplot(aes(opt_in, proportion_difference, color = white_multiplier)) +
   geom_point(alpha = 0.3) +
+  geom_hline(yintercept = 0) +
   facet_wrap(~race) +
   labs(
     title = "Low Opt-In Dramatically Improves Estimates of Mean Wage and Salary Income",
     x = "Proportion Opt In",
-    y = "Absolute Proportion Error in Mean Wage and Salary Income"
+    y = "Proportion Error in Mean Wage and Salary Income",
+    color = "White Multiplier"
   ) +
   scatter_grid()
   
@@ -236,6 +278,8 @@ Increasing opt in for small groups can increase their utility.
 ### Percentiles
 
 ```{r}
+#| label: percentiles
+
 bind_cols(
   specs |>
     slice(rep(1:n(), each = 11)),
@@ -248,7 +292,7 @@ bind_cols(
   geom_line(alpha = 0.5) +
   facet_wrap(~opt_in) +
   labs(
-    title = "Low Opt-In Dramatically Improves the Distribution of Wage and Salary Income",
+    title = "Low Opt-In Dramatically Improves the Distribution of\nWage and Salary Income",
     x = "Percentile",
     y = "Proportion Error"
   ) +
@@ -314,6 +358,8 @@ bind_cols(
 ## Bivariate Utility
 
 ```{r}
+#| label: correlation-difference
+
 bind_cols(
   specs,
   correlation_difference_mae = results |>
@@ -321,6 +367,7 @@ bind_cols(
 ) |>
   ggplot(aes(opt_in, correlation_difference_mae, color = white_multiplier)) +
   geom_point(alpha = 0.3) +
+  scale_y_continuous(limits = c(0, NA)) +
   labs(
     title = "Low Opt-In Improves Synthetic Correlations",
     x = "Proportion Opt In",
@@ -351,6 +398,15 @@ bind_cols(
 ## Multivariate Utility
 
 ```{r}
+#| label: kmarginals
+
+
+k1_benchmark <- kmarginals(
+  postsynth = holdout, 
+  data = gsds, 
+  k = 1
+)
+
 bind_cols(
   specs,
   k1_marginals = results |>
@@ -358,7 +414,19 @@ bind_cols(
 ) |>
   ggplot(aes(opt_in, k1_marginals, color = white_multiplier)) +
   geom_point(alpha = 0.3) +
+  geom_hline(yintercept = k1_benchmark, color = "red") +
+  scale_y_continuous(limits = c(NA, 1000)) +
+  labs(
+    title = "All Syntheses Recreate 1-Dimensional Marginal Distributions",
+    subtitle = "Score from Holdout Data in Red"
+  ) +
   scatter_grid()
+
+k2_benchmark <- kmarginals(
+  postsynth = holdout, 
+  data = gsds, 
+  k = 2
+)
 
 bind_cols(
   specs,
@@ -367,7 +435,19 @@ bind_cols(
 ) |>
   ggplot(aes(opt_in, k2_marginals, color = white_multiplier)) +
   geom_point(alpha = 0.3) +
+  geom_hline(yintercept = k2_benchmark, color = "red") +
+  scale_y_continuous(limits = c(NA, 1000)) +  
+  labs(
+    title = "Low Opt-In Rates Improve the 2-Dimensional Marginal DIistributions",
+    subtitle = "Score from Holdout Data in Red"
+  ) +  
   scatter_grid()
+
+k3_benchmark <- kmarginals(
+  postsynth = holdout, 
+  data = gsds, 
+  k = 3
+)
 
 bind_cols(
   specs,
@@ -376,6 +456,12 @@ bind_cols(
 ) |>
   ggplot(aes(opt_in, k3_marginals, color = white_multiplier)) +
   geom_point(alpha = 0.3) +
+  geom_hline(yintercept = k3_benchmark, color = "red") +  
+  scale_y_continuous(limits = c(NA, 1000)) +  
+  labs(
+    title = "Low Opt-In Rates Improve the 3-Dimensional Marginal Distributions",
+    subtitle = "Score from Holdout Data in Red"
+  ) +    
   scatter_grid()
 
 ```
@@ -383,6 +469,8 @@ bind_cols(
 As `k` increases, the opt-in has a much bigger relative impact than the white multiplier. 
 
 ```{r}
+#| label: discriminator-auc
+
 bind_cols(
   specs,
   discriminator_auc = results |>
@@ -390,6 +478,11 @@ bind_cols(
 ) |>
   ggplot(aes(opt_in, discriminator_auc, color = white_multiplier)) +
   geom_point(alpha = 0.3) +
+  labs(
+    title = "Low Opt-In Rates Dramatically Improve Discriminant Metrics",
+    subtitle = "The Discriminator Model is a Decision Tree",
+    y = "AUC for Discrimnator Model"
+  ) +
   scatter_grid()
 
 ```
@@ -397,6 +490,8 @@ bind_cols(
 ## Specific Utility
 
 ```{r}
+#| label: regression-overlap 
+
 regression_ci_overlap <- bind_cols(
   specs,
   discriminator_auc = results |>
@@ -416,7 +511,8 @@ regression_ci_overlap |>
   ggplot(aes(opt_in, abs_std_coef_diff, color = white_multiplier)) +
   geom_point(alpha = 0.3) +
   labs(
-    title = ""
+    title = "Coefficient Estimates are Closer with Low Opt-In Levels",
+    x = "Opt-In Rate"
   ) +
   scatter_grid()
 
@@ -425,7 +521,9 @@ regression_ci_overlap |>
   ggplot(aes(opt_in, ci_overlap, color = white_multiplier)) +
   geom_point(alpha = 0.3) +
   labs(
-    title = ""
+    title = "",
+    x = "Opt-In Rate",
+    y = "Regression Confidence Interval Overlap"
   ) +
   scatter_grid()
 
@@ -434,7 +532,8 @@ regression_ci_overlap |>
   ggplot(aes(opt_in, sign_match, color = white_multiplier)) +
   geom_point(alpha = 0.3) +
   labs(
-    title = ""
+    title = "",
+    x = "Opt-In Rate"
   ) +
   scatter_grid()
 
@@ -443,7 +542,8 @@ regression_ci_overlap |>
   ggplot(aes(opt_in, inference_match, color = white_multiplier)) +
   geom_point(alpha = 0.3) +
   labs(
-    title = ""
+    title = "",
+    x = "Opt-In Rate"
   ) +
   scatter_grid()
 
@@ -458,36 +558,49 @@ bind_cols(
   specs,
   discriminator_auc = results |>
     map_dfr("ldiveristy")
-)
+) |>
+  group_by(opt_in, white_multiplier) |>
+  summarize(
+    max(ldiveristy_age),
+    max(ldiveristy_educd),
+    max(ldiveristy_ftotinc),
+    max(ldiveristy_inctot),
+    max(ldiveristy_incwage)
+  ) |>
+  print(n = 100)
 
 ```
 
 ### Attribute Inference Test
 
 ```{r}
+#| label: attribute-inference
 
-bind_cols(
-  specs,
-  discriminator_auc = results |>
-    map_dbl("incwelfr_rmse")
-) |>
-  ggplot(aes(opt_in, discriminator_auc)) +
-  geom_point(alpha = 0.3)
-
-incwelfr_rmse <- prediction_test(
-  postsynth = holdout_frac, 
+holdout_rmse <- prediction_test(
+  postsynth = holdout, 
   data = gsds, 
   formula = incwelfr ~ .
 )
 
-incwelfr_rmse
+bind_cols(
+  specs,
+  incwelfr_rmse = results |>
+    map_dbl("incwelfr_rmse")
+) |>
+  ggplot(aes(opt_in, incwelfr_rmse)) +
+  geom_point(alpha = 0.3) +
+  geom_hline(yintercept = holdout_rmse, color = "red") +
+  labs(
+    title = "The Holdout Data Have Better Attribute Inferences than the Synthetic Data"
+  ) +
+  scatter_grid()
 
 ```
 
 ### Membership Inference Test
 
 ```{r}
-results[[1]]$membership_inference_test
+#| label: memebrship-inference
 
 bind_cols(
   specs,
@@ -496,11 +609,12 @@ bind_cols(
     map_dbl("auc")
 ) |>
   ggplot(aes(opt_in, membership_inference_auc, color = white_multiplier)) +
-  geom_point() +
+  geom_point(alpha = 0.5) +
   labs(
-    title = "",
+    title = "No Synthese=is Demonstrates High Membership Inference Risks",
     x = "Opt-In Rate",
-    y = "Membership Inference Test AUC"
+    y = "Membership Inference Test AUC",
+    color = "White Multiplier"
   ) +
   scatter_grid()
 
