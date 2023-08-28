@@ -184,7 +184,7 @@
 \date{}
 
 \begin{document}
-\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[borderline west={3pt}{0pt}{shadecolor}, sharp corners, breakable, enhanced, frame hidden, boxrule=0pt, interior hidden]}{\end{tcolorbox}}\fi
+\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[boxrule=0pt, sharp corners, frame hidden, breakable, enhanced, interior hidden, borderline west={3pt}{0pt}{shadecolor}]}{\end{tcolorbox}}\fi
 
 \pagenumbering{roman}
 
@@ -954,6 +954,230 @@ We calculate the following metrics for all simulations:
 
 \subsection{Results and Discussion}
 
+We have two main concerns with opt-in fully synthetic data. First, the
+approach may lead to untenable disclosure risks. Second, the utility
+improvements from including unaltered records in released data may be
+dampened by synthetic data with worse utility because the synthesizer is
+trained on smaller and non-random subsets of the GSDS. Essentially, as
+opt-in decreases the number of observations in the training data
+decreases, which could lead to terrible models for the synthetic data.
+
+Our demonstration suggests that opt-in fully synthetic data do not
+significantly increase disclosure risks. We also observe that all
+utility metrics improve with the introduction of an opt-in and improve
+as the opt-in rate decreases. Most of the utility metrics are
+surprisingly resilient to differential rates of opt-in for white
+vs.~non-white respondents. Our results support the idea that opt-in
+approaches to synthetic data can improve data quality with minimal
+changes to disclosure risks.
+
+\textbf{Multivariate Utility}
+
+\begin{figure}[!htb]
+    \caption{Low Opt-In Rates Dramatically Improve Discriminant Metrics}
+    \centering
+    \includegraphics[width=6.5in]{../analysis/figures/discriminator-auc-1.png}
+    \label{fig:discriminator}
+\end{figure}
+
+We start with multivariate utility. The discriminator AUC, shown in
+figure \ref{fig:discriminator}, is high when all observations opt-in to
+disclosure protections and quickly declines with lower opt-in rates.
+This suggests that a simple predictive model has difficulty
+distinguishing between the synthetic data and the GSDS after the
+introduction of opt-in synthesis.
+
+\begin{figure}[!htb]
+    \caption{Low Opt-In Improves Synthetic Correlations}
+    \centering
+    \includegraphics[width=6.5in]{../analysis/figures/correlation-difference-1.png}
+    \label{fig:correlation-difference}
+\end{figure}
+
+The correlation difference, shown in figure
+\ref{fig:correlation-difference} is modest for all opt-in rates and
+improves with low levels of opt-in.
+
+Finally, regression estimates dramatically improve with low levels of
+opt-in. Figure \ref{fig:regression} shows that the gap between
+confidence intervals, which is about six times the length of the
+confidence interval with full opt-in disclosure protection, fully
+disappears with low levels of opt-in.
+
+\begin{figure}[!htb]
+    \caption{Coefficient Estimates are Closer with Low Opt-In Levels}
+    \centering
+    \includegraphics[width=6.5in]{../analysis/figures/regression-overlap-1.png}
+    \label{fig:regression}
+\end{figure}
+
+\textbf{Univaritate Utility}
+
+We next zoom in on specific variables and subsets of variables. The
+categorical utility of the synthetic data is very high for all scenarios
+but improves marginally with low opt-in rates.
+
+Figure \ref{fig:proportions} shows the error in proportions for all
+categories of all categorical variables. Figure
+\ref{fig:proportions-race-ethnicity} shows the proportions for all
+classes of all categorical variables disaggregated into four
+race/ethnicity groups. Some race/ethnicity groups are poorly represented
+in the synthetic data. For example, the Black proportions for ``Married,
+spouse present'' and ``Never married, spouse not present'' are very
+wrong in the synthetic data because the estimates are attenuated to the
+proportions in the majority group. Some of these differences can be
+refined by using different hyperparameters during the synthesis process.
+
+\begin{figure}[!htb]
+    \caption{Low Opt-In Modestly Improves Univariate Proportion Estimates}
+    \centering
+    \includegraphics[width=6.5in]{../analysis/figures/proportions-1.png}
+    \label{fig:proportions}
+\end{figure}
+
+\begin{figure}[!htb]
+    \caption{Low Opt-In Reduces Major Racial/Ethnic Errors in Estimates}
+    \centering
+    \includegraphics[width=6.5in]{../analysis/figures/proportions-3.png}
+    \label{fig:proportions-race-ethnicity}
+\end{figure}
+
+We see a similar patterns when reviewing the proportion of indiduals
+with Salaries or Wages. Figure \ref{fig:prop-wages} shows that the
+synthetic data generally overestimates the number of white people with
+salaries and wages and underestimates for Hispanic and Other Races and
+Ethnicities.
+
+\begin{figure}[!htb]
+    \caption{Low Opt-In Improves Estimates of the Proportions of People with Salaries and Wages}
+    \centering
+    \includegraphics[width=6.5in]{../analysis/figures/proportion-with-wages-3.png}
+    \label{fig:prop-wages}
+\end{figure}
+
+The 1-marginal score for the synthetic data is always better than the
+1-marginal score for the holdout data. The results flip for the
+2-marginal score and 3-marginal score. In all three cases, low levels of
+opt-in dramatically improve the results. Figure \ref{fig:kmarginals}
+shows the k-marginal score for 1-marginals and 3-marginals.
+
+\begin{figure}[!htb]
+    \caption{Low Opt-In Improves Higher-Dimensional Distributions}
+    \centering
+    \includegraphics[width=6.5in]{../analysis/figures/kmarginals-4.png}
+    \label{fig:kmarginals}
+\end{figure}
+
+The syntheses have mixed results for numeric variables. Figure
+\ref{fig:family-income} shows that all syntheses closely match the
+distribution of total family income. The only major errors are for the
+minimum and maximum values.
+
+\begin{figure}[!htb]
+    \caption{All Syntheses Recreate the Total Family Income Distribution}
+    \centering
+    \includegraphics[width=6.5in]{../analysis/figures/percentiles-2.png}
+    \label{fig:family-income}
+\end{figure}
+
+The syntheses miss the distribution of salary and wage income, shown in
+figure \ref{fig:wage-income} but the results improve dramatically with
+low levels of opt-in.
+
+\begin{figure}[!htb]
+    \caption{Low Opt-In Improves the Distribution of Salary and Wage Income}
+    \centering
+    \includegraphics[width=6.5in]{../analysis/figures/percentiles-1.png}
+    \label{fig:wage-income}
+\end{figure}
+
+\textbf{Disclosure Risks}
+
+The synthesizer demonstrates promising \(\ell\)-diversity for all
+syntheses. This is unsurprising since we use conservative
+hyperparameters for the decision trees and regression trees.
+
+In the worst-case situation, less than 0.5\% of values for one variable
+come from nodes in regression trees with fewer than three unique values.
+
+\ref{fig:membership} the AUC for the membership inference attack is
+close to 0.5. Given the synthetic data, an attacker would struggle to
+tell if a confidential record is from the GSDS or holdout data using
+distance-based matching.
+
+\begin{figure}[!htb]
+    \caption{No SYnthesis Demonstrates High Membership Inference Risks}
+    \centering
+    \includegraphics[width=6.5in]{../analysis/figures/membership-inference-1.png}
+    \label{fig:membership}
+\end{figure}
+
+Finally, the RMSE for the attribute inference test from the synthetic
+data is always lower than the RMSE for a model trained on the holdout
+data. Using a simple predictive model, this suggests that the synthetic
+data are not copying chance features of the GSDS. These disclosure
+metrics enable us to infer the disclosive properties of the synthetic
+but they don't not provide a bound or guarantee on the disclosure risks
+of the synthetic data. This is a major disadvantage of non-formally
+private synthetic data when compared with formally private tabulations
+like in the first demonstration.
+
+Nonetheless, we believe the results are promising. Allowing individuals
+to forego disclosure protections increases data utility without
+increasing disclosure risks for the individuals who still want
+disclosure protection.
+
+The idea of opt-in disclosure protection with synthetic microdata rests
+on one major implementation assumption. We do not label observations
+that forego disclosure protections. Doing so could increase disclosure
+risks by making differencing attacks easier. Data stewards need to be
+careful to not implicitly label the opt-in decision. For example, the
+GSDS could have precision to the closest integer but synthetic records
+go to three decimal places.
+
+\section{Conclusion}
+
+\hypertarget{ldp}{%
+\subsection{LDP}\label{ldp}}
+
+The first demonstration shows the benefits and infeasibility of opt-in
+disclosure protections with a differentially private Decennial Census.
+The errors introduced when switching from a centralized DP approach to a
+local DP approach dramatically outweigh the benefits of embracing opt-in
+disclosure protections. Either major methodological breakthroughs for
+local DP are needed or opt-in disclosure protections will not improve
+the utility-disclosure risk trade off for the Decennial Census.
+
+\hypertarget{synthetic-data}{%
+\subsection{Synthetic Data}\label{synthetic-data}}
+
+The second demonstration shows the benefits and feasibility of opt-in
+disclosure protections with a fully-synthetic American Community Survey.
+In all cases, low levels of opt-in improved the utility of the synthetic
+data without worsening disclosure risk metrics. Our synthesis
+methodology was simple and suffered from some errors including major
+errors for certain race and ethnicity groups. Low levels of opt-in
+mitigated many of these issues.
+
+Ample followup work is needed to explore the implementation of opt-in
+disclosure protection. We do not address questionnaire design and giving
+respondents clear information so they can provide informed consent.
+These implementation decisions inform the ethics of opt-in disclosure
+protection and would unambiguously affect the opt-in rate.
+
+The Census Bureau is wrestling with significant outstanding technical
+challenges for producing a fully synthetic ACS. Furthermore, the ACS is
+protected by Title 13 and would likely need legal changes to allow for
+an opt-in approach to disclosure protection.
+
+The Survey of Earned Doctorates is an ideal candidate for evaluating
+this approach. The survey is a census of persons who recently earned
+doctorate degrees. This population would be easier to inform because of
+their research backgrounds. The census has remarkably high response
+rates and we speculate that the population would opt-in to disclosure
+protections at very low rates. Furthermore, the file avoids many of the
+technical challenges currently facing a synthetic ACS.
+
 \subsection{Metrics Appendix}
 
 \emph{This is a placeholder section}
@@ -1075,8 +1299,6 @@ We calculate the following metrics for all simulations:
   positives and false positives for different thresholds. ROC AUC closer
   to 0.5 indicates difficulty assessing membership.
 \end{itemize}
-
-\section{Conclusion}
 
 \include{backmatter/appendix}
 
