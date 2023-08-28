@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.0.36">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Synthesize the ACS</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+
+<script src="13_synthesize-acs_files/libs/clipboard/clipboard.min.js"></script>
+<script src="13_synthesize-acs_files/libs/quarto-html/quarto.js"></script>
+<script src="13_synthesize-acs_files/libs/quarto-html/popper.min.js"></script>
+<script src="13_synthesize-acs_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="13_synthesize-acs_files/libs/quarto-html/anchor.min.js"></script>
+<link href="13_synthesize-acs_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="13_synthesize-acs_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="13_synthesize-acs_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="13_synthesize-acs_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="13_synthesize-acs_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+
+
+</head>
+
+<body>
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+  <nav id="TOC" role="doc-toc">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#load-acs" id="toc-load-acs" class="nav-link active" data-scroll-target="#load-acs">Load ACS</a></li>
+  <li><a href="#create-testing-grid" id="toc-create-testing-grid" class="nav-link" data-scroll-target="#create-testing-grid">Create Testing Grid</a></li>
+  <li><a href="#synthesize" id="toc-synthesize" class="nav-link" data-scroll-target="#synthesize">Synthesize</a></li>
+  </ul>
+</nav>
+</div>
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Synthesize the ACS</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+    
+  </div>
+  
+
+</header>
+
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(furrr)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(here)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidysynthesis)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(syntheval)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tictoc)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="fu">here</span>(<span class="st">"R"</span>, <span class="st">"prediction_test.R"</span>))</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="fu">here</span>(<span class="st">"R"</span>, <span class="st">"kmarginals.R"</span>))</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="fu">here</span>(<span class="st">"R"</span>, <span class="st">"proportions.R"</span>))</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="fu">here</span>(<span class="st">"R"</span>, <span class="st">"summarize_results.R"</span>))</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="fu">here</span>(<span class="st">"R"</span>, <span class="st">"add_prob_opt_in.R"</span>))</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="fu">here</span>(<span class="st">"R"</span>, <span class="st">"add_opt_in.R"</span>))</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="fu">here</span>(<span class="st">"R"</span>, <span class="st">"synthesize_acs.R"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="load-acs" class="level2">
+<h2 class="anchored" data-anchor-id="load-acs">Load ACS</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>gsds <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="fu">here</span>(<span class="st">"data"</span>, <span class="st">"starting"</span>, <span class="st">"acs-gsds.rds"</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>serial)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="create-testing-grid" class="level2">
+<h2 class="anchored" data-anchor-id="create-testing-grid">Create Testing Grid</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>specs <span class="ot">&lt;-</span> <span class="fu">expand_grid</span>(</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">implicate =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>, </span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">opt_in =</span> <span class="fu">c</span>(<span class="fl">0.1</span>, <span class="fl">0.5</span>, <span class="fl">0.9</span>, <span class="dv">1</span>),</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">white_multiplier =</span> <span class="fu">c</span>(<span class="fl">0.5</span>, <span class="dv">1</span>, <span class="dv">2</span>)</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">run =</span> <span class="fu">row_number</span>()) <span class="sc">|&gt;</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">id =</span> <span class="fu">str_pad</span>(<span class="fu">row_number</span>(), <span class="at">side =</span> <span class="st">"left"</span>, <span class="at">pad =</span> <span class="st">"0"</span>, <span class="at">width =</span> <span class="dv">3</span>),</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">description =</span> <span class="fu">str_glue</span>(<span class="st">"Run: {run}; Implicate: {implicate}; Opt-in: {opt_in}; White Mulitplier: {white_multiplier}"</span>)</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="fu">write_csv</span>(specs, <span class="fu">here</span>(<span class="st">"data"</span>, <span class="st">"results"</span>, <span class="st">"acs"</span>, <span class="st">"specs.csv"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="synthesize" class="level2">
+<h2 class="anchored" data-anchor-id="synthesize">Synthesize</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>prep_data <span class="ot">&lt;-</span> <span class="cf">function</span>(data, opt_in, white_multiplier) {</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  data <span class="sc">|&gt;</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">rename</span>(<span class="at">race_simple =</span> race) <span class="sc">|&gt;</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">add_prob_opt_in</span>(<span class="at">prob =</span> opt_in, <span class="at">white_multiplier =</span> white_multiplier) <span class="sc">|&gt;</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">add_opt_in</span>() <span class="sc">|&gt;</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">rename</span>(<span class="at">race =</span> race_simple)</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="fu">plan</span>(multisession, <span class="at">workers =</span> <span class="dv">8</span>)</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">20230718</span>)</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a><span class="fu">tic</span>()</span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>syntheses <span class="ot">&lt;-</span> </span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">future_pmap</span>(</span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">.l =</span> specs,</span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">.f =</span> <span class="cf">function</span>(implicate, run, opt_in, white_multiplier, description, id) gsds <span class="sc">|&gt;</span></span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>      <span class="fu">prep_data</span>(<span class="at">opt_in =</span> opt_in, <span class="at">white_multiplier =</span> white_multiplier) <span class="sc">|&gt;</span></span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>      <span class="fu">synthesize_acs</span>(<span class="at">id =</span> id, <span class="at">description =</span> description),</span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">.options =</span> <span class="fu">furrr_options</span>(<span class="at">seed =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a><span class="fu">toc</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>46246.772 sec elapsed</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">map</span>(syntheses, <span class="st">"description"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[[1]]
+Run: 1; Implicate: 1; Opt-in: 0.1; White Mulitplier: 0.5
+
+[[2]]
+Run: 2; Implicate: 1; Opt-in: 0.1; White Mulitplier: 1
+
+[[3]]
+Run: 3; Implicate: 1; Opt-in: 0.1; White Mulitplier: 2
+
+[[4]]
+Run: 4; Implicate: 1; Opt-in: 0.5; White Mulitplier: 0.5
+
+[[5]]
+Run: 5; Implicate: 1; Opt-in: 0.5; White Mulitplier: 1
+
+[[6]]
+Run: 6; Implicate: 1; Opt-in: 0.5; White Mulitplier: 2
+
+[[7]]
+Run: 7; Implicate: 1; Opt-in: 0.9; White Mulitplier: 0.5
+
+[[8]]
+Run: 8; Implicate: 1; Opt-in: 0.9; White Mulitplier: 1
+
+[[9]]
+Run: 9; Implicate: 1; Opt-in: 0.9; White Mulitplier: 2
+
+[[10]]
+Run: 10; Implicate: 1; Opt-in: 1; White Mulitplier: 0.5
+
+[[11]]
+Run: 11; Implicate: 1; Opt-in: 1; White Mulitplier: 1
+
+[[12]]
+Run: 12; Implicate: 1; Opt-in: 1; White Mulitplier: 2
+
+[[13]]
+Run: 13; Implicate: 2; Opt-in: 0.1; White Mulitplier: 0.5
+
+[[14]]
+Run: 14; Implicate: 2; Opt-in: 0.1; White Mulitplier: 1
+
+[[15]]
+Run: 15; Implicate: 2; Opt-in: 0.1; White Mulitplier: 2
+
+[[16]]
+Run: 16; Implicate: 2; Opt-in: 0.5; White Mulitplier: 0.5
+
+[[17]]
+Run: 17; Implicate: 2; Opt-in: 0.5; White Mulitplier: 1
+
+[[18]]
+Run: 18; Implicate: 2; Opt-in: 0.5; White Mulitplier: 2
+
+[[19]]
+Run: 19; Implicate: 2; Opt-in: 0.9; White Mulitplier: 0.5
+
+[[20]]
+Run: 20; Implicate: 2; Opt-in: 0.9; White Mulitplier: 1
+
+[[21]]
+Run: 21; Implicate: 2; Opt-in: 0.9; White Mulitplier: 2
+
+[[22]]
+Run: 22; Implicate: 2; Opt-in: 1; White Mulitplier: 0.5
+
+[[23]]
+Run: 23; Implicate: 2; Opt-in: 1; White Mulitplier: 1
+
+[[24]]
+Run: 24; Implicate: 2; Opt-in: 1; White Mulitplier: 2
+
+[[25]]
+Run: 25; Implicate: 3; Opt-in: 0.1; White Mulitplier: 0.5
+
+[[26]]
+Run: 26; Implicate: 3; Opt-in: 0.1; White Mulitplier: 1
+
+[[27]]
+Run: 27; Implicate: 3; Opt-in: 0.1; White Mulitplier: 2
+
+[[28]]
+Run: 28; Implicate: 3; Opt-in: 0.5; White Mulitplier: 0.5
+
+[[29]]
+Run: 29; Implicate: 3; Opt-in: 0.5; White Mulitplier: 1
+
+[[30]]
+Run: 30; Implicate: 3; Opt-in: 0.5; White Mulitplier: 2
+
+[[31]]
+Run: 31; Implicate: 3; Opt-in: 0.9; White Mulitplier: 0.5
+
+[[32]]
+Run: 32; Implicate: 3; Opt-in: 0.9; White Mulitplier: 1
+
+[[33]]
+Run: 33; Implicate: 3; Opt-in: 0.9; White Mulitplier: 2
+
+[[34]]
+Run: 34; Implicate: 3; Opt-in: 1; White Mulitplier: 0.5
+
+[[35]]
+Run: 35; Implicate: 3; Opt-in: 1; White Mulitplier: 1
+
+[[36]]
+Run: 36; Implicate: 3; Opt-in: 1; White Mulitplier: 2
+
+[[37]]
+Run: 37; Implicate: 4; Opt-in: 0.1; White Mulitplier: 0.5
+
+[[38]]
+Run: 38; Implicate: 4; Opt-in: 0.1; White Mulitplier: 1
+
+[[39]]
+Run: 39; Implicate: 4; Opt-in: 0.1; White Mulitplier: 2
+
+[[40]]
+Run: 40; Implicate: 4; Opt-in: 0.5; White Mulitplier: 0.5
+
+[[41]]
+Run: 41; Implicate: 4; Opt-in: 0.5; White Mulitplier: 1
+
+[[42]]
+Run: 42; Implicate: 4; Opt-in: 0.5; White Mulitplier: 2
+
+[[43]]
+Run: 43; Implicate: 4; Opt-in: 0.9; White Mulitplier: 0.5
+
+[[44]]
+Run: 44; Implicate: 4; Opt-in: 0.9; White Mulitplier: 1
+
+[[45]]
+Run: 45; Implicate: 4; Opt-in: 0.9; White Mulitplier: 2
+
+[[46]]
+Run: 46; Implicate: 4; Opt-in: 1; White Mulitplier: 0.5
+
+[[47]]
+Run: 47; Implicate: 4; Opt-in: 1; White Mulitplier: 1
+
+[[48]]
+Run: 48; Implicate: 4; Opt-in: 1; White Mulitplier: 2
+
+[[49]]
+Run: 49; Implicate: 5; Opt-in: 0.1; White Mulitplier: 0.5
+
+[[50]]
+Run: 50; Implicate: 5; Opt-in: 0.1; White Mulitplier: 1
+
+[[51]]
+Run: 51; Implicate: 5; Opt-in: 0.1; White Mulitplier: 2
+
+[[52]]
+Run: 52; Implicate: 5; Opt-in: 0.5; White Mulitplier: 0.5
+
+[[53]]
+Run: 53; Implicate: 5; Opt-in: 0.5; White Mulitplier: 1
+
+[[54]]
+Run: 54; Implicate: 5; Opt-in: 0.5; White Mulitplier: 2
+
+[[55]]
+Run: 55; Implicate: 5; Opt-in: 0.9; White Mulitplier: 0.5
+
+[[56]]
+Run: 56; Implicate: 5; Opt-in: 0.9; White Mulitplier: 1
+
+[[57]]
+Run: 57; Implicate: 5; Opt-in: 0.9; White Mulitplier: 2
+
+[[58]]
+Run: 58; Implicate: 5; Opt-in: 1; White Mulitplier: 0.5
+
+[[59]]
+Run: 59; Implicate: 5; Opt-in: 1; White Mulitplier: 1
+
+[[60]]
+Run: 60; Implicate: 5; Opt-in: 1; White Mulitplier: 2</code></pre>
+</div>
+</div>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    setTimeout(function() {
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      let href = ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const cites = ref.parentNode.getAttribute('data-cites').split(' ');
+    tippyHover(ref, function() {
+      var popup = window.document.createElement('div');
+      cites.forEach(function(cite) {
+        var citeDiv = window.document.createElement('div');
+        citeDiv.classList.add('hanging-indent');
+        citeDiv.classList.add('csl-entry');
+        var biblioDiv = window.document.getElementById('ref-' + cite);
+        if (biblioDiv) {
+          citeDiv.innerHTML = biblioDiv.innerHTML;
+        }
+        popup.appendChild(citeDiv);
+      });
+      return popup.innerHTML;
+    });
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>

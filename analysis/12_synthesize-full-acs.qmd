@@ -1,0 +1,243 @@
+---
+title: "Synthesize Full ACS"
+date: today
+format: 
+  html:
+    embed-resources: true
+    toc: true
+editor: source
+execute:
+  echo: true
+  warning: false
+  message: false
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup}
+library(tidyverse)
+library(here)
+library(tidysynthesis)
+library(syntheval)
+
+source(here("R", "prediction_test.R"))
+source(here("R", "summarize_results.R"))
+
+source(here("R", "proportions.R"))
+source(here("R", "kmarginals.R"))
+source(here("R", "discriminator_auc.R"))
+
+```
+
+## Load ACS
+
+```{r}
+gsds <- readRDS(here("data", "starting", "acs-gsds.rds")) |>
+  select(-serial)
+
+```
+
+```{r}
+set.seed(20220218)
+
+# create "starting data"
+starting_data <- gsds |> 
+  select(race)
+
+synthesis_order <- c(
+  "hispan", 
+  "statefip",
+  "marst",
+  "sex",
+  "hcovany",
+  "empstat",
+  "labforce",
+  "age",
+  "educd",
+  "ftotinc",
+  "inctot",
+  "incwage",
+  "incwelfr",
+  "incresid"
+)
+
+# visit_sequence
+visit_sequence <- visit_sequence(
+  conf_data = synthesis_order,
+  start_data = starting_data,
+  type = "manual"
+)
+
+# roadmap
+roadmap <- roadmap(
+  conf_data = gsds,
+  start_data = starting_data,
+  visit_sequence = visit_sequence
+)
+
+# synth_spec
+rpart_mod_cat <- parsnip::decision_tree() %>% 
+  parsnip::set_mode("classification") %>%
+  parsnip::set_engine("rpart")
+
+rpart_mod_num <- parsnip::decision_tree() %>%
+  parsnip::set_mode("regression") %>%
+  parsnip::set_engine("rpart")
+
+algorithms <- construct_algos(
+  roadmap = roadmap,
+  default_algo = rpart_mod_cat,
+  custom_algos = list(
+    list(
+      vars = c("age", "educd", "ftotinc", "inctot", "incwage", "incwelfr", "incresid"),
+      algorithm = rpart_mod_num
+    )
+  )
+)
+
+synth_spec <- synth_spec(
+  roadmap = roadmap,
+  synth_algorithms = algorithms,
+  recipes = construct_recipes(roadmap = roadmap),
+  predict_methods = sample_rpart
+)
+
+# noise
+# don't add noise to predictions
+noise <- noise(
+  roadmap = roadmap,
+  add_noise = FALSE,
+  exclusions = 0
+)
+
+# constraints
+# don't impose constraints
+constraints <- constraints(
+  roadmap = roadmap,
+  constraints = NULL,
+  max_z = 0
+)
+
+# replicates
+replicates <- replicates(
+  replicates = 1,
+  workers = 1,
+  summary_function = NULL
+)
+
+presynth <- presynth(
+  roadmap = roadmap,
+  synth_spec = synth_spec,
+  noise = noise, 
+  constraints = constraints,
+  replicates = replicates
+)
+
+synth1 <- synthesize(presynth)
+
+synth1$synthetic_data
+
+synth1$synthetic_data <- synth1$synthetic_data |>
+  mutate(prob_opt_in = 1, opt_in = TRUE)
+
+```
+
+## Results
+
+Does inctot exceed ftotinc?
+
+```{r}
+results <- summarize_results(postsynth = synth1, data = gsds)
+
+```
+
+## Univariate Utility
+
+```{r}
+results$proportions |>
+  pivot_wider(id_cols = c(variable, class), names_from = source, values_from = prop) |>
+  ggplot(aes(original, synthetic)) +
+  geom_abline(intercept = 0, slope = 1) +
+  geom_point(alpha = 0.4) +
+  coord_equal()
+
+results$proportions_race |>
+  pivot_wider(id_cols = c(race, variable, class), names_from = source, values_from = prop) |>
+  ggplot(aes(original, synthetic, color = race)) +
+  geom_abline(intercept = 0, slope = 1) +
+  geom_point(alpha = 0.4) +
+  coord_equal() +
+  facet_wrap(~race)
+
+results$moments |>
+  filter(statistic == "have") |>
+  ggplot(aes(original, synthetic)) +
+  geom_abline(intercept = 0, slope = 1) +
+  geom_point(alpha = 0.4) +
+  coord_equal()
+
+results$moments_race |>
+  filter(statistic == "have") |>
+  ggplot(aes(original, synthetic, color = race)) +
+  geom_point() +
+  geom_abline(intercept = 0, slope = 1) +
+  geom_point(alpha = 0.4) +
+  coord_equal() +
+  facet_wrap(~race)
+
+results$moments |>
+  filter(statistic == "mean") |>
+  ggplot(aes(original, synthetic)) +
+  geom_abline(intercept = 0, slope = 1) +
+  geom_point(alpha = 0.4) +
+  coord_equal()
+
+results$moments_race |>
+  filter(statistic == "mean") |>
+  ggplot(aes(original, synthetic, color = race)) +
+  geom_abline(intercept = 0, slope = 1) +
+  geom_point(alpha = 0.4) +
+  coord_equal() +
+  facet_wrap(~race)
+
+results$percentiles |>
+  ggplot(aes(original, synthetic)) +
+  geom_abline(intercept = 0, slope = 1) +
+  geom_point(alpha = 0.4) +
+  facet_wrap(~p, scales = "free")
+
+```
+
+
+## Bivariate Utility
+
+```{r}
+results$cor_fit$correlation_difference
+
+results$cor_fit$correlation_difference_mae
+
+```
+
+## Multivariate Utility
+
+```{r}
+results$k1_marginals
+  
+results$k2_marginals
+  
+results$k3_marginals
+
+results$discriminator_auc
+
+results$discriminator_vip
+
+```
+
+## Disclosure Metrics
+
+```{r}
+glimpse(results$ldiveristy)
+
+results$incwelfr_rmse
+
+```
