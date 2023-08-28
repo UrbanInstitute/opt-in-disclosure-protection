@@ -120,7 +120,6 @@ bind_cols(
   geom_point(alpha = 0.4) +
   facet_wrap(~variable) +
   labs(
-    title = "Low Opt-In Modestly Improves Univariate Proportion Estimates",
     subtitle = "Equal Opt-In Probabilities for All Races",
     x = "Proportion Opt In",
     y = "Absolute Error In Proportion"
@@ -143,7 +142,6 @@ bind_cols(
   geom_point(alpha = 0.4) +
   facet_wrap(~variable) +
   labs(
-    title = "Low Opt-In Modestly Improves Proportion Estimates",
     subtitle = "Equal Opt-In Probabilities for All Races and Ethnicities",
     x = "Proportion Opt In",
     y = "Error In Proportion"
@@ -166,7 +164,6 @@ bind_cols(
   geom_point(alpha = 0.4) +
   facet_wrap(~variable) +
   labs(
-    title = "Low Opt-In Modestly Improves Proportion Estimates",
     subtitle = "Equal Opt-In Probabilities for All Races and Ethnicities",
     x = "Proportion Opt In",
     y = "Absolute Error In Proportion"
@@ -201,7 +198,6 @@ bind_cols(
   ggplot(aes(opt_in, proportion_difference, color = white_multiplier)) +
   geom_point(alpha = 0.3) +
   labs(
-    title = "Low Opt-in Improves the Proportion of People with Salaries and Wages",
     y = "Error in Proportion with Salaries and Wages"
   ) +
   scatter_grid()
@@ -218,7 +214,6 @@ bind_cols(
   geom_hline(yintercept = 0) +
   facet_wrap(~race) +
   labs(
-    title = "Small Groups Have Much Worse Accuracy for the Number of People with\nSalaries or Wages",
     subtitle = "Low Opt-in Improves the Proportion of People with Salaries and Wages",
     y = "Error in Proportion with Salaries and Wages",
     color = "White Multiplier"
@@ -237,7 +232,6 @@ bind_cols(
   geom_hline(yintercept = 0) +
   facet_wrap(~ race_eth) +
   labs(
-    title = "Small Groups Have Much Worse Accuracy for the Number of People with\nSalaries or Wages",
     subtitle = "Low Opt-in Improves the Proportion of People with Salaries and Wages",
     y = "Error in Proportion with Salaries and Wages",
     color = "White Multiplier"
@@ -260,7 +254,6 @@ bind_cols(
   ggplot(aes(opt_in, proportion_difference, color = white_multiplier)) +
   geom_point(alpha = 0.3) +
   labs(
-    title = "Low Opt-In Dramatically Improves Estimates of Mean\nWage and Salary Income",
     x = "Proportion Opt In",
     y = "Proportion Error in Mean Wage and Salary Income"
   ) +
@@ -278,7 +271,6 @@ bind_cols(
   geom_hline(yintercept = 0) +
   facet_wrap(~race) +
   labs(
-    title = "Low Opt-In Dramatically Improves Estimates of Mean Wage and Salary Income",
     x = "Proportion Opt In",
     y = "Proportion Error in Mean Wage and Salary Income",
     color = "White Multiplier"
@@ -306,7 +298,6 @@ bind_cols(
   geom_line(alpha = 0.5) +
   facet_wrap(~opt_in) +
   labs(
-    title = "Low Opt-In Dramatically Improves the Distribution of\nWage and Salary Income",
     x = "Percentile",
     y = "Proportion Error"
   ) +
@@ -325,7 +316,6 @@ bind_cols(
   geom_line(alpha = 0.5) +
   facet_wrap(~opt_in) +
   labs(
-    title = "Low Opt-In Dramatically Improves the Distribution of Total Family Income",
     x = "Percentile",
     y = "Proportion Error"
   ) +
@@ -343,7 +333,6 @@ bind_cols(
   geom_line(alpha = 0.5) +
   facet_wrap(~opt_in) +
   labs(
-    title = "Low Opt-In Dramatically Improves the Distribution of Total Income",
     x = "Percentile",
     y = "Proportion Error"
   ) +
@@ -361,7 +350,6 @@ bind_cols(
   geom_line(alpha = 0.5) +
   facet_wrap(~opt_in) +
   labs(
-    title = "Low Opt-In Dramatically Improves the Distribution of Income Residual",
     x = "Percentile",
     y = "Proportion Error"
   ) +
@@ -383,7 +371,6 @@ bind_cols(
   geom_point(alpha = 0.3) +
   scale_y_continuous(limits = c(0, NA)) +
   labs(
-    title = "Low Opt-In Improves Synthetic Correlations",
     x = "Proportion Opt In",
     y = "Mean Absolute Error in Pairwise Correlation Coefficient"
   ) +
@@ -401,7 +388,6 @@ bind_cols(
   geom_line() +
   geom_point() +
   labs(
-    title = "Low Opt-In Improves Synthetic Correlations",
     x = "Proportion Opt In",
     y = "Median Mean Absolute Error in Pairwise Correlation Coefficient"
   ) +
@@ -431,7 +417,6 @@ bind_cols(
   geom_hline(yintercept = k1_benchmark, color = "red") +
   scale_y_continuous(limits = c(NA, 1000)) +
   labs(
-    title = "All Syntheses Recreate 1-Dimensional Marginal Distributions",
     subtitle = "Score from Holdout Data in Red",
     x = "Opt-In Rate",
     y = "1-Marginal Score"
@@ -454,7 +439,6 @@ bind_cols(
   geom_hline(yintercept = k2_benchmark, color = "red") +
   scale_y_continuous(limits = c(NA, 1000)) +  
   labs(
-    title = "Low Opt-In Rates Improve the 2-Dimensional Marginal Distributions",
     subtitle = "Score from Holdout Data in Red",
     x = "Opt-In Rate",
     y = "2-Marginal Score"
@@ -477,7 +461,6 @@ bind_cols(
   geom_hline(yintercept = k3_benchmark, color = "red") +  
   scale_y_continuous(limits = c(NA, 1000)) +  
   labs(
-    title = "Low Opt-In Rates Improve the 3-Dimensional Marginal Distributions",
     subtitle = "Score from Holdout Data in Red",
     x = "Opt-In Rate",
     y = "3-Marginal Score"
@@ -531,7 +514,6 @@ bind_cols(
   ggplot(aes(opt_in, discriminator_auc, color = white_multiplier)) +
   geom_point(alpha = 0.3) +
   labs(
-    title = "Low Opt-In Rates Dramatically Improve Discriminant Metrics",
     subtitle = "The Discriminator Model is a Decision Tree",
     y = "AUC for Discrimnator Model"
   ) +
@@ -563,7 +545,6 @@ regression_ci_overlap |>
   ggplot(aes(opt_in, abs_std_coef_diff, color = white_multiplier)) +
   geom_point(alpha = 0.3) +
   labs(
-    title = "Coefficient Estimates are Closer with Low Opt-In Levels",
     x = "Opt-In Rate"
   ) +
   scatter_grid()
@@ -573,7 +554,6 @@ regression_ci_overlap |>
   ggplot(aes(opt_in, ci_overlap, color = white_multiplier)) +
   geom_point(alpha = 0.3) +
   labs(
-    title = "",
     x = "Opt-In Rate",
     y = "Regression Confidence Interval Overlap"
   ) +
@@ -584,7 +564,6 @@ regression_ci_overlap |>
   ggplot(aes(opt_in, sign_match, color = white_multiplier)) +
   geom_point(alpha = 0.3) +
   labs(
-    title = "",
     x = "Opt-In Rate"
   ) +
   scatter_grid()
@@ -594,7 +573,6 @@ regression_ci_overlap |>
   ggplot(aes(opt_in, inference_match, color = white_multiplier)) +
   geom_point(alpha = 0.3) +
   labs(
-    title = "",
     x = "Opt-In Rate"
   ) +
   scatter_grid()
@@ -641,9 +619,6 @@ bind_cols(
   ggplot(aes(opt_in, incwelfr_rmse)) +
   geom_point(alpha = 0.3) +
   geom_hline(yintercept = holdout_rmse, color = "red") +
-  labs(
-    title = "The Holdout Data Have Better Attribute Inferences than the Synthetic Data"
-  ) +
   scatter_grid()
 
 ```
@@ -662,7 +637,6 @@ bind_cols(
   ggplot(aes(opt_in, membership_inference_auc, color = white_multiplier)) +
   geom_point(alpha = 0.5) +
   labs(
-    title = "No Synthesis Demonstrates High Membership Inference Risks",
     x = "Opt-In Rate",
     y = "Membership Inference Test AUC",
     color = "White Multiplier"
