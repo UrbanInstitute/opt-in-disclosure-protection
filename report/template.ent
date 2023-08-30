@@ -1,39 +1,13 @@
 \@doanenote {1}
-macro:->Endnotes
-should
-appear
-automatically
-under
-the
-Notes
-heading.
-If
-they’re
-showing
-up
-somewhere
-else,
-ask
-your
-editor
-or
-your
-center’s
-Word
-expert
-for
-assistance.
-\@endanenote 
-\@doanenote {2}
 macro:->https://www.ipums.org/changes-to-census-bureau-data-products
 \@endanenote 
-\@doanenote {3}
+\@doanenote {2}
 macro:->https://www.census.gov/newsroom/blogs/random-samplings/2022/12/disclosure-avoidance-protections-acs.html
 \@endanenote 
-\@doanenote {4}
+\@doanenote {3}
 macro:->https://acsdatacommunity.prb.org/discussion-forum/m/2021-acs-conference-files/147/download
 \@endanenote 
-\@doanenote {5}
+\@doanenote {4}
 macro:->``The
 tidysynthesis
 R

@@ -184,7 +184,7 @@
 \date{}
 
 \begin{document}
-\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[boxrule=0pt, sharp corners, frame hidden, breakable, enhanced, interior hidden, borderline west={3pt}{0pt}{shadecolor}]}{\end{tcolorbox}}\fi
+\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[breakable, interior hidden, frame hidden, borderline west={3pt}{0pt}{shadecolor}, boxrule=0pt, enhanced, sharp corners]}{\end{tcolorbox}}\fi
 
 \pagenumbering{roman}
 
@@ -249,16 +249,17 @@
 
 People generate and share data about themselves every day when they
 browse the web, interact with government services, and respond to
-surveys, and they should be empowered to make decisions about how these
-data are accessed and used. Currently, disclosure protection policies at
-the US Census Bureau do not allow for such empowerment -- respondents to
-surveys like the decennial census and the American Community Survey are
-all subjected to disclosure protections. Data for all respondents are,
-by default, masked with some form of statistical disclosure control, and
-those who may wish to see themselves accurately reflected in the data
-are unable to do so. These data quality distortions may have greater
-impact for certain groups, such as smaller race and ethnicity groups,
-relative to others.
+questionnaires, and they should be empowered to make decisions about how
+these data are accessed and used. Currently, disclosure protection
+policies at the US Census Bureau do not allow for such empowerment --
+respondents to questionnaires like the decennial census and the American
+Community Survey are all subjected to disclosure protections. Data for
+all respondents are, by default, masked with some form of statistical
+disclosure control, and those who may wish to see themselves accurately
+reflected in the data are unable to do so. Statistical disclosure
+control may inflict greater damage to the accuracy of information for
+certain groups, such as smaller race and ethnicity groups, relative to
+others.
 
 In this brief, we explore a new framework for disclosure protections
 that would require respondents to actively opt in to disclosure
@@ -286,12 +287,11 @@ turning privacy disclosure choices over to participants.
 \section{Background}
 
 The primary goal of this report is to present the opt in privacy
-framework and early evidence on the impact of such a framework on census
-data quality under two disclosure avoidance methods. The data privacy
-literature is extensive, and we assume a baseline knowledge of certain
-key concepts. In this section, we provide a brief overview of a few key
-concepts, as well as a review of disclosure avoidance at the US Census
-Bureau.
+framework and early evidence on the impact of such a framework on two
+demonstrations. The data privacy literature is extensive, and we assume
+a baseline knowledge of certain key concepts. In this section, we
+provide a brief overview of a few key concepts, as well as a review of
+disclosure avoidance at the US Census Bureau.
 
 \subsection{Data Privacy Key Terms}
 
@@ -300,16 +300,16 @@ Bureau.
 Statistical Disclosure Control (SDC) methods are used to release
 sensitive or confidential data products while preserving the
 confidentiality of the data. Traditional SDC methods include
-suppression, rounding, top- and bottom-coding, synthetic data
-generation, and more.
+suppression, rounding, top- and bottom-coding, and synthetic data
+generation.
 
 \emph{Differential Privacy}
 
 Differential Privacy (DP) is a formal definition of privacy, meaning
 that DP methods meet certain mathematical properties and guarantees.
-With DP, it is possible to quantify the amount of privacy loss that
-occurs with a data release with the ``privacy-loss budget'', denoted by
-\(\epsilon\). The probability of privacy loss is denoted by \(\delta\).
+With DP, it is possible to quantify the worst-case disclosure risk of a
+data release using a ``privacy-loss budget.'' The privacy-loss budget is
+qunatified with parameters like \(\epsilon\) and \(\delta\).
 
 \emph{Utility-Privacy Trade-off}
 
@@ -323,7 +323,9 @@ overall data quality and usefulness for intended analyses or other
 applications. With DP methods, it is possible to ``tune'' the balance
 between utility and privacy by changing the value of \(\epsilon\), with
 lower values of \(\epsilon\) corresponding to greater noise infusion,
-implying lower data quality and higher disclosure protection.
+implying lower data quality and higher disclosure protection. With
+methods that are not formally private, the utility-privacy trade-off is
+ad hoc.
 
 \subsection{The US Census Bureau and Disclosure Avoidance}
 
@@ -369,8 +371,8 @@ algorithms and post-processing. The TDA satisfies zero-concentrated DP
 (\(\rho\)-zCDP), a relaxation of pure DP. As a formally private method,
 the privacy protections can be quantified, and the Census Bureau does
 translate the \(\rho\)-zCDP privacy parameter \(\rho\) to the
-corresponding values of \(\epsilon\) and \(\delta\) (C. M. Bowen,
-Williams, and Pickens 2022; J. Abowd et al. 2022).
+corresponding values of \(\epsilon\) and \(\delta\) (Bowen, Williams,
+and Pickens 2022; J. Abowd et al. 2022).
 
 In contrast, the Census Bureau has conceded that the ``science does not
 yet exist to comprehensively implement a formally private solution for
@@ -383,7 +385,7 @@ prefer to see their data accurately reflected.
 \section{Opt-In Privacy Framework and Implications}
 
 In our demonstrations, we imagine a framework for disclosure protection
-in which respondents would be asked to actively opt in to statistical
+in which respondents would be asked to actively opt into statistical
 disclosure control methods. Those who do not opt-in would simply
 contribute their true data to statistical products. The choices we make
 to build this framework may have significant ethical and legal
@@ -414,7 +416,7 @@ primary survey respondent, or householder, makes the opt in decision for
 all members of the household. This choice may be appropriate if the
 householder is the parent or legal guardian of a minor in the household,
 but may not be appropriate for other adults in the household who may
-disagree with the respondent's opt in decision.
+disagree with the respondent's opt-in decision.
 
 Finally, any application of an opt in framework to disclosure avoidance
 methods must consider the impact of one respondent choosing to forego
@@ -461,11 +463,11 @@ in its confidential form, and then infuses noise only for respondents
 who opt in.
 
 Many local DP mechanisms are based on the concept of Randomized
-Response, first proposed by S. L. Warner in 1965 (Warner 1965). The
-central idea is that a survey respondent flips a coin, and the result of
-the coin flips determines if they answer a yes/no question with the true
-answer or not. The randomization of the coin flip infuses the noise that
-grants disclosure protections (Near and Abuah 2022).
+Response, first proposed by Warner (1965). The central idea is that a
+survey respondent flips a coin, and the result of the coin flips
+determines if they answer a yes/no question with the true answer or not.
+The randomization of the coin flip infuses the noise that grants
+disclosure protections (Near and Abuah 2022).
 
 We use Generalized Random Response (GRR) for our use case, allowing us
 to move from a binary coin flip to a setting with higher cardinality.
@@ -711,9 +713,9 @@ in 2024 but their timeline has been delayed because of legitimate
 concerns about the impact of synthetic data.\footnote{https://acsdatacommunity.prb.org/discussion-forum/m/2021-acs-conference-files/147/download}
 
 Synthetic data could potentially harm the usefulness of the American
-Community Survey. Groups with fewer observations, include smaller racial
-and ethnic groups, could see the biggest losses in data quality. An
-opt-in disclosure protection methodology paired with synthetic data
+Community Survey. Groups with fewer observations, including smaller
+racial and ethnic groups, could see the biggest losses in data quality.
+An opt-in disclosure protection methodology paired with synthetic data
 could mitigate the harms of data synthesis and give outreach
 organizations a tool to improve data quality.
 
@@ -734,7 +736,7 @@ introduce topics central to this demonstration.
 There are two main flavors of synthetic data. With partially synthetic
 data, some but not all variables are synthesized (Little 1993). With
 fully synthetic data, all variables are synthesized (Rubin 1993). Fully
-synthetic data provides stronger disclosure protection.
+synthetic data generally provides stronger disclosure protection.
 
 Partially synthetic data maintains a one-to-one mapping between
 observations in the synthetic data and observations in the GSDS. This
@@ -743,21 +745,21 @@ risks. It also means it is possible to calculate disclosure metrics
 based on re-identification (J. P. Reiter and Mitra 2009).
 
 Fully synthetic data don't have a one-to-one mapping because every
-record is fully generated. This minimizes identity disclosure risks
+record is fully generated. This minimizes identity disclosure risks and
 attribute disclosure risks, but dramatically reduces approaches for
 evaluating disclosure risks. We create a fully synthetic version of the
 ACS for this demonstration.
 
 It is possible to create formally private synthetic data in idealized
-situations (C. M. Bowen and Snoke 2021). Model-based approaches
-generally require discretizing categorical variables. Promising
-approaches generate 1-, 2-, and 3-way marginals and then use graphical
-models to generate synthetic data (McKenna, Sheldon, and Miklau 2019).
-Other approaches use GANs but generally don't work well outside of
-idealized situations with modest privacy budgets (Tao et al. 2021). Like
-the Census Bureau, we abandon formal privacy for this demonstration
-because it is currently infeasible for the ACS. This means we no longer
-have a provable bound on the worst-case privacy loss.
+situations (Bowen and Snoke 2021). Model-based approaches generally
+require discretizing categorical variables. Promising approaches
+generate 1-, 2-, and 3-way marginals and then use graphical models to
+generate synthetic data (McKenna, Sheldon, and Miklau 2019). Other
+approaches use GANs but generally don't work well outside of idealized
+situations with modest privacy budgets (Tao et al. 2021). Like the
+Census Bureau, we abandon formal privacy for this demonstration because
+it is currently infeasible for the ACS. This means we no longer have a
+provable bound on the worst-case privacy loss.
 
 We use a fully conditional specification (FCS) to generate synthetic
 data. FCS uses a sequential approach to model the joint distribution of
@@ -836,16 +838,16 @@ dividend, and rental income; retirement income; and other income.
 
 Fourth, we ignore weights during synthesis and when calculating metrics.
 Synthesis with weights is an open area of research. Fifth and finally,
-we randomly partition the data into two halves. The half we synthesize
-is the gold standard data set (GSDS). The other half is a holdout data
-set (HDS) for calculating disclosure metrics.
+we randomly partition the data into two halves. The half we apply
+disclosure protection to is the gold standard data set (GSDS). The other
+half is a holdout data set (HDS) for calculating disclosure metrics.
 
 PUMS include statistical disclosure limitation to protect the
 confidentiality of responses. For example, high incomes are topcoded.
 When synthesizing data, the Census Bureau has more observations and
 unaltered variables that could improve the quality of the synthesis but
-also worsen utility metrics because out metrics do not reflect current
-SDC techniques.
+also worsen utility metrics because out metrics do not reflect the
+current SDC techniques like sampling and topcoding.
 
 \subsection{Simulations}
 
@@ -896,10 +898,10 @@ each metrics are available in the appendix. Complete results are
 available in the Urban Institute data catalog.
 
 General utility measures the univariate and multivariate distributional
-similarity between the gold standard data and the synthetic data (e.g.,
+similarity between the gold standard data and the candidate data (e.g.,
 comparing the medians for all numeric variables). Specific utility
 measures the similarity of results for a specific analysis of the gold
-standard data and synthetic data (e.g., comparing the coefficients in
+standard data and candidate data (e.g., comparing the coefficients in
 regression models). Disclosure risk metrics \emph{estimate} the risk of
 attribute and membership inference attacks.
 
@@ -1095,15 +1097,14 @@ low levels of opt-in.
 
 The synthesizer demonstrates promising \(\ell\)-diversity for all
 syntheses. This is unsurprising since we use conservative
-hyperparameters for the decision trees and regression trees.
+hyperparameters for the decision trees and regression trees. In the
+worst-case situation, less than 0.5\% of values for one variable come
+from nodes in regression trees with fewer than three unique values.
 
-In the worst-case situation, less than 0.5\% of values for one variable
-come from nodes in regression trees with fewer than three unique values.
-
-\ref{fig:membership} the AUC for the membership inference attack is
-close to 0.5. Given the synthetic data, an attacker would struggle to
-tell if a confidential record is from the GSDS or holdout data using
-distance-based matching.
+In Figure \ref{fig:membership}, the AUC for the membership inference
+attack is close to 0.5. Given the synthetic data, an attacker would
+struggle to tell if a confidential record is from the GSDS or holdout
+data using distance-based matching.
 
 \begin{figure}[!htb]
     \caption{No SYnthesis Demonstrates High Membership Inference Risks}
@@ -1132,8 +1133,10 @@ on one major implementation assumption. We do not label observations
 that forego disclosure protections. Doing so could increase disclosure
 risks by making differencing attacks easier. Data stewards need to be
 careful to not implicitly label the opt-in decision. For example, the
-GSDS could have precision to the closest integer but synthetic records
-go to three decimal places.
+GSDS and observations without opt-in could have precision to the closest
+integer when the synthetic records have precision to three decimal
+places. In this case, it would be trivial to identify the records with
+and without opt-in disclosure protection.
 
 \section{Conclusion}
 
@@ -1163,142 +1166,26 @@ Ample followup work is needed to explore the implementation of opt-in
 disclosure protection. We do not address questionnaire design and giving
 respondents clear information so they can provide informed consent.
 These implementation decisions inform the ethics of opt-in disclosure
-protection and would unambiguously affect the opt-in rate.
+protection and would unambiguously affect the opt-in rate. We also only
+allow for unit opt-in disclosure protection and do not consider item
+opt-in disclosure protection. Item opt-in disclosure protection would be
+more difficult to implement but would give respondents even more control
+over their data.
 
 The Census Bureau is wrestling with significant outstanding technical
 challenges for producing a fully synthetic ACS. Furthermore, the ACS is
 protected by Title 13 and would likely need legal changes to allow for
 an opt-in approach to disclosure protection.
 
-The Survey of Earned Doctorates is an ideal candidate for evaluating
-this approach. The survey is a census of persons who recently earned
-doctorate degrees. This population would be easier to inform because of
-their research backgrounds. The census has remarkably high response
-rates and we speculate that the population would opt-in to disclosure
-protections at very low rates. Furthermore, the file avoids many of the
-technical challenges currently facing a synthetic ACS.
+The Survey of Earned Doctorates (SED) could be an ideal candidate for
+evaluating this approach. The survey is a census of persons who recently
+earned doctorate degrees. This population would be easier to inform
+because of their research backgrounds. The SED has remarkably high
+response rates and we speculate that the population would opt-in to
+disclosure protections at very low rates. Furthermore, the file avoids
+many of the technical challenges currently facing a synthetic ACS.
 
 \subsection{Metrics Appendix}
-
-\emph{This is a placeholder section}
-
-\textbf{General utility}
-
-\begin{itemize}
-\item
-  \textbf{Absolute error for proportions for all categorical variables:}
-  For each categorical variable, calculate the proportion of
-  observations with each class for the GSDS and candidate data.
-  Calculate the absolute value of the difference between the GSDS and
-  candidate data.
-\item
-  \textbf{Absolute error for proportions for all categorical variables
-  by simplified race/ethnicity and detailed race:} For each categorical
-  variable, calculate the proportion of observations with each class for
-  each demographic group for the GSDS and candidate data. Calculate the
-  absolute value of the difference between the GSDS and candidate data.
-\item
-  \textbf{Absolute proportion error for means for all numeric
-  variables:} For each numeric variable, calculate the mean for the GSDS
-  and candidate data. Calculate the absolute value of the difference
-  between the GSDS and candidate data.
-\item
-  \textbf{Absolute proportion error for means for all numeric variables
-  by simplified race/ethnicity and detailed race:} For each numeric
-  variable, calculate the mean for the GSDS and candidate data for each
-  demographic group. Calculate the absolute value of the difference
-  between the GSDS and candidate data.
-\item
-  \textbf{Proportion error in percentiles for numeric variables:} For
-  each numeric variable, calculate the minimum, 10th percentile, 20th
-  percentile, 30th percentile, 40th percentile, 50th percentile, 60th
-  percentile, 70th percentile, 80th percentile, 90th percentile, and
-  maximum. Calculate the proportion difference between the GSDS and
-  candidate data.
-\item
-  \textbf{k-marginal score for all 1-way, 2-way, and 3-way marginals for
-  categorical variables:} (Raab, Nowok, and Dibben 2021; Sen et al.
-  2023) Select \(k\). Let \(v\) be the number of categorical variables.
-  Then there are \({v \choose k}\) \(k\)-marginals. Exhaustively
-  calculate the proportion of observations in each cell for all
-  \(k\)-way marginals for categorical variables. For each
-  \(k\)-marginal, calculate the mean absolute error (this is called mean
-  absolute difference between distributions). Finally, make the metric
-  ascending and rescale to max at 1,000 with
-  \((1 - mean(MADD)) \cdot 1000\).
-\item
-  \textbf{Mean absolute error in pairwise correlation coefficients for
-  numeric variables:} For all numeric variables, calculate a Pearson's
-  linear correlation matrix on the GSDS and candidate data. Difference
-  the lower triangle of the matrix for the GSDS and the matrix for the
-  candidate file. Calculate the mean absolute error.
-\item
-  \textbf{Discriminator ROC AUC:} Discriminator metrics measure how well
-  a predictive model can distinguish between observations from the GSDS
-  and candidate data. Ideally, the models perform poorly. The p-MSE
-  ratio (Woo et al. 2009; Snoke et al. 2018) and SPECKS (C. M. Bowen,
-  Liu, and Su 2021) summarize the propensity scores from discriminant
-  models. We take a different approach and look at the ROC AUC for the
-  discriminant models. The three measures are highly correlated, the
-  values for ROC AUC are more familiar to predictive modelers, and the
-  measure doesn't require bootstrapping.
-\end{itemize}
-
-\textbf{Specific utility}
-
-\begin{itemize}
-\tightlist
-\item
-  \textbf{Regression confidence interval overlap} measures the overlap
-  of confidence estimated on the gold standard data and synthetic data
-  (Karr et al. 2006; Snoke et al. 2018). 1 represents perfect overlap, 0
-  represents adjacency with no overlap, and negative values represent
-  gaps between the confidence intervals. We regress log wages and salary
-  income on potential experience, potential experience squared, an
-  indicator for white, and sex and calculate the regression confidence
-  interval overlap. This is a simplified version of a ``Mincer model''
-  (Card 1999).
-\end{itemize}
-
-\textbf{Disclosure risk}
-
-\begin{itemize}
-\item
-  \textbf{\(\ell\)-diversity for regression trees summarized for each
-  numeric variable:} (C. Bowen et al. 2020) We are concerned that our
-  synthesizer could memorize the confidential data or too closely fit
-  the confidential data. We calculate \(\ell\)-diversity
-  (Machanavajjhala et al. 2007) on the nodes from decision trees and
-  regression trees to measure the heterogeneity of values in the nodes.
-  We calculate the proportion of synthetic values for each variable in
-  the candidate data that come from nodes with low heterogeneity
-  \(\ell < 10\).
-\item
-  \textbf{Attribute inference test on welfare income:} (El Emam,
-  Mosquera, and Bass 2020) We are concerned that an attacker could train
-  predictive models on the synthetic data and make precise inferences
-  about observations in the confidential data. We train a regression
-  tree to predict welfare income on the synthetic data using all other
-  variables as predictors. We assume that an attacker knows all
-  variables but welfare income for the confidential data. We make
-  predictions and calculate the RMSE. We repeat this process using the
-  holdout data instead of the synthetic data to benchmark against the
-  RMSE of models trained when an attacker has access to another random
-  sample from the population instead of the synthetic data.
-\item
-  \textbf{Membership inference test:} (Zhang, Yan, and Malin 2022) We
-  are concerned that an attacker could determine if a confidential
-  observation is in the training data for the candidate file. We
-  construct a data set that is about 10,000 observations from the GSDS
-  and 10,000 observations from the holdout data. For each observation,
-  we measure Gower's distance (Gower 1971) to all synthetic
-  observations. Traditionally, analysts pick different thresholds to
-  predict membership and then calculate precision. We normalize the
-  distances so they are in {[}0, 1{]} and are like probabilities. We
-  then calculate the ROC AUC to measure the tradeoff between true
-  positives and false positives for different thresholds. ROC AUC closer
-  to 0.5 indicates difficulty assessing membership.
-\end{itemize}
 
 \include{backmatter/appendix}
 
@@ -1341,12 +1228,6 @@ Equity Analysis.''}
 Benedetto, Gary, and Evan Totty. 2020. {``Synthesizing Familial Linkages
 for Privacy in Microdata.''} CED-DA Working Paper.
 
-\leavevmode\vadjust pre{\hypertarget{ref-bowen2021a}{}}%
-Bowen, Claire McKay, Fang Liu, and Bingyue Su. 2021. {``Differentially
-Private Data Release via Statistical Election to Partition Sequentially:
-Statistical Election to Partition Sequentially.''} \emph{METRON} 79 (1):
-1--31. \url{https://doi.org/10.1007/s40300-021-00201-0}.
-
 \leavevmode\vadjust pre{\hypertarget{ref-bowen2021}{}}%
 Bowen, Claire McKay, and Joshua Snoke. 2021. {``Comparative Study of
 Differentially Private Synthetic Data Algorithms from the NIST PSCR
@@ -1359,19 +1240,6 @@ Bowen, Claire McKay, Aaron R Williams, and Madeline Pickens. 2022.
 {``Decennial Disclosure: An Explainer on Formal Privacy and the TopDown
 Algorithm.''}
 
-\leavevmode\vadjust pre{\hypertarget{ref-bowen2020}{}}%
-Bowen, Claire, Victoria L. Bryant, Len Burman, Surachai Khitatrakun,
-Graham MacDonald, Robert McClelland, Philip Stallworth, Kyle Ueyama,
-Aaron R. Williams, and Noah Zwiefel. 2020. {``A Synthetic Supplemental
-Public-Use File of Low-Income Information Return Data: Methodology,
-Utility, and Privacy Implications.''} Washington, DC.
-\url{https://www.urban.org/research/publication/synthetic-supplemental-public-use-file-low-income-information-return-data-methodology-utility-and-privacy-implications}.
-
-\leavevmode\vadjust pre{\hypertarget{ref-card1999}{}}%
-Card, David. 1999. {``The Causal Effect of Education on Earnings.''} In.
-Vol. 3.
-\url{https://davidcard.berkeley.edu/papers/causal_educ_earnings.pdf}.
-
 \leavevmode\vadjust pre{\hypertarget{ref-daily2022a}{}}%
 Daily, Donna. 2022. {``Disclosure Avoidance Protections for the American
 Community Survey.''}
@@ -1383,17 +1251,6 @@ Dwork, Cynthia, Frank McSherry, Kobbi Nissim, and Adam Smith. 2006.
 edited by Shai Halevi and Tal Rabin, 3876:265--84. Berlin, Heidelberg:
 Springer Berlin Heidelberg.
 \url{http://link.springer.com/10.1007/11681878_14}.
-
-\leavevmode\vadjust pre{\hypertarget{ref-elemam2020}{}}%
-El Emam, Khaled, Lucy Mosquera, and Jason Bass. 2020. {``Evaluating
-Identity Disclosure Risk in Fully Synthetic Health Data: Model
-Development and Validation.''} \emph{Journal of Medical Internet
-Research} 22 (11): e23139. \url{https://doi.org/10.2196/23139}.
-
-\leavevmode\vadjust pre{\hypertarget{ref-gower1971}{}}%
-Gower, J. C. 1971. {``A General Coefficient of Similarity and Some of
-Its Properties.''} \emph{Biometrics} 27 (4): 857.
-\url{https://doi.org/10.2307/2528823}.
 
 \leavevmode\vadjust pre{\hypertarget{ref-hotchkiss2017a}{}}%
 Hotchkiss, Marisa, and Jessica Phelan. 2017. {``Uses of Census Bureau
@@ -1412,23 +1269,10 @@ Hu, Jingchen, and Claire McKay Bowen. 2023. {``Advancing Microdata
 Privacy Protection: A Review of Synthetic Data.''}
 \url{https://doi.org/10.48550/ARXIV.2308.00872}.
 
-\leavevmode\vadjust pre{\hypertarget{ref-karr2006}{}}%
-Karr, A. F, C. N Kohnen, A Oganian, J. P Reiter, and A. P Sanil. 2006.
-{``A Framework for Evaluating the Utility of Data Altered to Protect
-Confidentiality.''} \emph{The American Statistician} 60 (3): 224--32.
-\url{https://doi.org/10.1198/000313006X124640}.
-
 \leavevmode\vadjust pre{\hypertarget{ref-little1993}{}}%
 Little, Roderick JA. 1993. {``Statistical Analysis of Masked Data.''}
 \emph{Journal of Official Statistics} 9 (2): 407.
 \url{https://www.scb.se/contentassets/ca21efb41fee47d293bbee5bf7be7fb3/statistical-analysis-of-masked-data.pdf}.
-
-\leavevmode\vadjust pre{\hypertarget{ref-machanavajjhala2007}{}}%
-Machanavajjhala, Ashwin, Daniel Kifer, Johannes Gehrke, and
-Muthuramakrishnan Venkitasubramaniam. 2007. {``{\emph{L}} -Diversity:
-Privacy Beyond {\emph{k}} -Anonymity.''} \emph{ACM Transactions on
-Knowledge Discovery from Data} 1 (1): 3.
-\url{https://doi.org/10.1145/1217299.1217302}.
 
 \leavevmode\vadjust pre{\hypertarget{ref-mather2019a}{}}%
 Mather, Mark, and Paola Scommegna. 2019. {``Why Is the u.s. Census so
@@ -1445,11 +1289,6 @@ Machine Learning} 97: 4435--44.
 \leavevmode\vadjust pre{\hypertarget{ref-near2022}{}}%
 Near, Joseph P, and Chiké Abuah. 2022. \emph{Programming Differential
 Privacy}.
-
-\leavevmode\vadjust pre{\hypertarget{ref-raab2021}{}}%
-Raab, Gillian M, Beata Nowok, and Chris Dibben. 2021. {``Assessing,
-Visualizing and Improving the Utility of Synthetic Data.''}
-\url{https://doi.org/10.48550/ARXIV.2109.12717}.
 
 \leavevmode\vadjust pre{\hypertarget{ref-reiter2009}{}}%
 Reiter, Jerome P., and Robin Mitra. 2009. {``Estimating Risks of
@@ -1470,17 +1309,6 @@ Rubin, Donald B. 1993. {``Statistical Disclosure Limitation.''}
 Ruggles, Steven, Sarah Flood, Matthew Sobek, Danika Brockman, Grace
 Cooper, Stephanie Richards, and Megan Schouwiler. n.d. {``IPUMS USA:
 Version 13.0.''} \url{https://doi.org/10.18128/D010.V13.0}.
-
-\leavevmode\vadjust pre{\hypertarget{ref-sen2023}{}}%
-Sen, Aniruddha, Christine Task, Dhruv Kapur, Gary Howarth, and Karan
-Bhagat. 2023. {``Diverse Community Data for Benchmarking Data Privacy
-Algorithms.''} \url{https://doi.org/10.48550/ARXIV.2306.13216}.
-
-\leavevmode\vadjust pre{\hypertarget{ref-snoke2018}{}}%
-Snoke, Joshua, Gillian M. Raab, Beata Nowok, Chris Dibben, and
-Aleksandra Slavkovic. 2018. {``General and Specific Utility Measures for
-Syntheticdata.''} \emph{Journal of the Royal Statistical Society},
-January.
 
 \leavevmode\vadjust pre{\hypertarget{ref-tao2021}{}}%
 Tao, Yuchao, Ryan McKenna, Michael Hay, Ashwin Machanavajjhala, and
@@ -1517,18 +1345,6 @@ Statistical Association} 60 (309): 63--69.
 Williams, Aaron R., and Claire McKay Bowen. 2023. {``The Promise and
 Limitations of Formal Privacy.''} \emph{WIREs Computational Statistics},
 May, e1615. \url{https://doi.org/10.1002/wics.1615}.
-
-\leavevmode\vadjust pre{\hypertarget{ref-woo2009}{}}%
-Woo, Mi-Ja, Jerome P. Reiter, Anna Oganian, and Alan F. Karr. 2009.
-{``Global Measures of Data Utility for Microdata Masked for Disclosure
-Limitation.''} \emph{Journal of Privacy and Confidentiality} 1 (1).
-\url{https://doi.org/10.29012/jpc.v1i1.568}.
-
-\leavevmode\vadjust pre{\hypertarget{ref-zhang2022}{}}%
-Zhang, Ziqi, Chao Yan, and Bradley A. Malin. 2022. {``Membership
-Inference Attacks Against Synthetic Health Data.''} \emph{Journal of
-Biomedical Informatics} 125 (January): 103977.
-\url{https://doi.org/10.1016/j.jbi.2021.103977}.
 
 \end{CSLReferences}
 
