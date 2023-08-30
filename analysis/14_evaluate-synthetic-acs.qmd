@@ -619,6 +619,10 @@ bind_cols(
   ggplot(aes(opt_in, incwelfr_rmse)) +
   geom_point(alpha = 0.3) +
   geom_hline(yintercept = holdout_rmse, color = "red") +
+  labs(
+    x = "Opt-In Rate",
+    y = "Welfare Income RMSE"
+  )
   scatter_grid()
 
 ```
