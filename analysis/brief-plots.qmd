@@ -73,6 +73,7 @@ boxplot_methods <- function(data, metric, ylab) {
                y = {{metric}}, 
                x = as.factor(opt_in))) +
       geom_boxplot() +
+      geom_hline(yintercept = 0, color = "black", size = 0.01) +
       labs(x = "Opt-in rate",
            y = ylab) +
       scale_fill_discrete(labels = c("global" = "Central", 
@@ -123,6 +124,7 @@ boxplot_race_same <- function(data, state, metric, ylab, eps) {
     ggplot(aes(y = {{metric}}, 
                x = as.factor(opt_in))) +
       geom_boxplot() +
+      geom_hline(yintercept = 0, color = "black", size = 0.01) +
       labs(x = "Opt-in rate",
            y = ylab) +
       facet_grid(race_simple ~ .)
