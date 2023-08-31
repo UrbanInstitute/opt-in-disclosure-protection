@@ -1,7 +1,7 @@
 #' Membership inference test
 #' 
 #' @param postsynth A data frame with the synthetic data
-#' @param data Training set of confidential data
+#' @param data A data frame with the confidential data
 #' @param holdout_data Holdout set of confidential data
 #' 
 #' @return Evaluation metrics

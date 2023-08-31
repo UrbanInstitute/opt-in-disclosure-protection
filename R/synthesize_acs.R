@@ -1,3 +1,11 @@
+#' Generate synthetic data
+#' 
+#' @param data A data frame with the confidential data
+#' @param id ID for export object
+#' @param description Description for export object
+#' 
+#' @return Synth object
+
 synthesize_acs <- function(data, id, description) {
   
   data_opt_in <- data |>
