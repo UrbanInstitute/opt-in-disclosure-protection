@@ -184,7 +184,7 @@
 \date{}
 
 \begin{document}
-\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[interior hidden, breakable, boxrule=0pt, sharp corners, enhanced, borderline west={3pt}{0pt}{shadecolor}, frame hidden]}{\end{tcolorbox}}\fi
+\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[breakable, interior hidden, frame hidden, borderline west={3pt}{0pt}{shadecolor}, boxrule=0pt, enhanced, sharp corners]}{\end{tcolorbox}}\fi
 
 \pagenumbering{roman}
 
@@ -202,7 +202,7 @@
     % Adding the cover image - code forces the image to be width of full paper (ignoring margins)
     \vspace*{-1.7cm}
     \noindent
-    \makebox[\textwidth]{\includegraphics{images/cover.jpg}}
+    \makebox[8.5in][s]{\includegraphics{images/cover.jpg}}
     
     \vspace{0.35in}
     \noindent\textcolor{urban-blue}{\MakeUppercase{\textbf{Research Report}}}
@@ -213,14 +213,12 @@
     
     \reportsubtitle{Empowering Survey Respondents to Improve Data Quality}
     % Multiple column author names - change the "4" to the number of desired columns
-    \begin{multicols}{4}
+    \begin{multicols}{2}
         \authorfont{Aaron R. Williams}
         
         \authorfont{Jennifer Andre}
       
     \end{multicols}
-    
-    \vspace{-0.75cm}
     
     \datefont{August 2023}
 
@@ -251,16 +249,17 @@
 
 People generate and share data about themselves every day when they
 browse the web, interact with government services, and respond to
-surveys, and they should be empowered to make decisions about how these
-data are accessed and used. Currently, disclosure protection policies at
-the US Census Bureau do not allow for such empowerment -- respondents to
-surveys like the decennial census and the American Community Survey are
-all subjected to disclosure protections. Data for all respondents are,
-by default, masked with some form of statistical disclosure control, and
-those who may wish to see themselves accurately reflected in the data
-are unable to do so. These data quality distortions may have greater
-impact for certain groups, such as smaller race and ethnicity groups,
-relative to others.
+questionnaires, and they should be empowered to make decisions about how
+these data are accessed and used. Currently, disclosure protection
+policies at the US Census Bureau do not allow for such empowerment --
+respondents to questionnaires like the decennial census and the American
+Community Survey are all subjected to disclosure protections. Data for
+all respondents are, by default, masked with some form of statistical
+disclosure control, and those who may wish to see themselves accurately
+reflected in the data are unable to do so. Statistical disclosure
+control may inflict greater damage to the accuracy of information for
+certain groups, such as smaller race and ethnicity groups, relative to
+others.
 
 In this brief, we explore a new framework for disclosure protections
 that would require respondents to actively opt in to disclosure
@@ -288,12 +287,11 @@ turning privacy disclosure choices over to participants.
 \section{Background}
 
 The primary goal of this report is to present the opt in privacy
-framework and early evidence on the impact of such a framework on census
-data quality under two disclosure avoidance methods. The data privacy
-literature is extensive, and we assume a baseline knowledge of certain
-key concepts. In this section, we provide a brief overview of a few key
-concepts, as well as a review of disclosure avoidance at the US Census
-Bureau.
+framework and early evidence on the impact of such a framework on two
+demonstrations. The data privacy literature is extensive, and we assume
+a baseline knowledge of certain key concepts. In this section, we
+provide a brief overview of a few key concepts, as well as a review of
+disclosure avoidance at the US Census Bureau.
 
 \subsection{Data Privacy Key Terms}
 
@@ -302,16 +300,16 @@ Bureau.
 Statistical Disclosure Control (SDC) methods are used to release
 sensitive or confidential data products while preserving the
 confidentiality of the data. Traditional SDC methods include
-suppression, rounding, top- and bottom-coding, synthetic data
-generation, and more.
+suppression, rounding, top- and bottom-coding, and synthetic data
+generation.
 
 \emph{Differential Privacy}
 
 Differential Privacy (DP) is a formal definition of privacy, meaning
 that DP methods meet certain mathematical properties and guarantees.
-With DP, it is possible to quantify the amount of privacy loss that
-occurs with a data release with the ``privacy-loss budget'', denoted by
-\(\epsilon\). The probability of privacy loss is denoted by \(\delta\).
+With DP, it is possible to quantify the worst-case disclosure risk of a
+data release using a ``privacy-loss budget.'' The privacy-loss budget is
+qunatified with parameters like \(\epsilon\) and \(\delta\).
 
 \emph{Utility-Privacy Trade-off}
 
@@ -325,7 +323,9 @@ overall data quality and usefulness for intended analyses or other
 applications. With DP methods, it is possible to ``tune'' the balance
 between utility and privacy by changing the value of \(\epsilon\), with
 lower values of \(\epsilon\) corresponding to greater noise infusion,
-implying lower data quality and higher disclosure protection.
+implying lower data quality and higher disclosure protection. With
+methods that are not formally private, the utility-privacy trade-off is
+ad hoc.
 
 \subsection{The US Census Bureau and Disclosure Avoidance}
 
@@ -371,8 +371,8 @@ algorithms and post-processing. The TDA satisfies zero-concentrated DP
 (\(\rho\)-zCDP), a relaxation of pure DP. As a formally private method,
 the privacy protections can be quantified, and the Census Bureau does
 translate the \(\rho\)-zCDP privacy parameter \(\rho\) to the
-corresponding values of \(\epsilon\) and \(\delta\) {[}Bowen, Williams,
-and Pickens (2022){]}(J. Abowd et al. 2022).
+corresponding values of \(\epsilon\) and \(\delta\) (Bowen, Williams,
+and Pickens 2022; J. Abowd et al. 2022).
 
 In contrast, the Census Bureau has conceded that the ``science does not
 yet exist to comprehensively implement a formally private solution for
@@ -385,7 +385,7 @@ prefer to see their data accurately reflected.
 \section{Opt-In Privacy Framework and Implications}
 
 In our demonstrations, we imagine a framework for disclosure protection
-in which respondents would be asked to actively opt in to statistical
+in which respondents would be asked to actively opt into statistical
 disclosure control methods. Those who do not opt-in would simply
 contribute their true data to statistical products. The choices we make
 to build this framework may have significant ethical and legal
@@ -416,7 +416,7 @@ primary survey respondent, or householder, makes the opt in decision for
 all members of the household. This choice may be appropriate if the
 householder is the parent or legal guardian of a minor in the household,
 but may not be appropriate for other adults in the household who may
-disagree with the respondent's opt in decision.
+disagree with the respondent's opt-in decision.
 
 Finally, any application of an opt in framework to disclosure avoidance
 methods must consider the impact of one respondent choosing to forego
@@ -460,14 +460,14 @@ trusted, and so a respondent adds noise to their data before sending it
 to the curator. For this use case, we can imagine a slight variation on
 this approach in which the trusted Census Bureau still receives all data
 in its confidential form, and then infuses noise only for respondents
-who opt in.~
+who opt in.
 
 Many local DP mechanisms are based on the concept of Randomized
-Response, first proposed by S. L. Warner in 1965 (Warner 1965). The
-central idea is that a survey respondent flips a coin, and the result of
-the coin flips determines if they answer a yes/no question with the true
-answer or not. The randomization of the coin flip infuses the noise that
-grants disclosure protections (Near and Abuah 2022).
+Response, first proposed by Warner (1965). The central idea is that a
+survey respondent flips a coin, and the result of the coin flips
+determines if they answer a yes/no question with the true answer or not.
+The randomization of the coin flip infuses the noise that grants
+disclosure protections (Near and Abuah 2022).
 
 We use Generalized Random Response (GRR) for our use case, allowing us
 to move from a binary coin flip to a setting with higher cardinality.
@@ -498,18 +498,18 @@ approach to a local opt-in approach. The first is a Laplace sanitizer, a
 global method in which cells are infused with noise from a Laplace
 distribution. The Laplace distribution is centered at zero and the
 variability is the ratio of the privacy loss budget, \(\epsilon\), over
-the \(l_1\)-global sensitivity of the statistic {[}Dwork et al.
-(2006){]}(Williams and Bowen 2023). The second is the previously
-described GRR method, a local method in which individuals who opt in to
-disclosure protections report a true response with probability \$p =
-\textbackslash frac\{e\^{}\textbackslash epsilon\}\{e\^{}\textbackslash epsilon
-+ d - 1\}\$, where \(d\) is the overall cardinality of possible response
-values. Otherwise, the record is randomly replaced with another
-combination of fields. Though the TDA deployed by the Census Bureau is a
-more complicated series of algorithms and processing steps than the
-simple Laplace mechanism presented here, this simplification allows us
-to compare more easily with a simple local approach and focus
-specifically on the impact of the opt in framework on data quality.
+the \(l_1\)-global sensitivity of the statistic (Dwork et al. 2006;
+Williams and Bowen 2023). The second is the previously described GRR
+method, a local method in which individuals who opt in to disclosure
+protections report a true response with probability
+\(p = \frac{e^\epsilon}{e^\epsilon + d - 1}\), where \(d\) is the
+overall cardinality of possible response values. Otherwise, the record
+is randomly replaced with another combination of fields. Though the TDA
+deployed by the Census Bureau is a more complicated series of algorithms
+and processing steps than the simple Laplace mechanism presented here,
+this simplification allows us to compare more easily with a simple local
+approach and focus specifically on the impact of the opt in framework on
+data quality.
 
 The specifications for our simulations are as follows. For each
 combination of specifications, we run 100 iterations of each disclosure
@@ -595,12 +595,12 @@ For Scenario 1, we focus primarily on results allowing us to compare the
 performance of the local GRR method to the central Laplace method. With
 a cardinality of just 2 (Hispanic or Latino, Not Hispanic or Latino),
 this scenario allows for the most similar comparison with the global
-method (in which epsilon is allocated to just one statistic).~
+method (in which epsilon is allocated to just one statistic).
 
 Figure \ref{fig:methods-bias} shows the distribution of bias metrics
 from our simulations at the defined levels of \(\epsilon\) and opt in
 rate. Both the local and central methods are unbiased, with the
-distribution of mean percent error values centered around zero.~
+distribution of mean percent error values centered around zero.
 
 \begin{figure}[!htb]
     \centering
@@ -611,7 +611,7 @@ distribution of mean percent error values centered around zero.~
 
 Figure \ref{fig:methods-accuracy} shows the distribution of accuracy
 metrics from our simulations at the defined levels of epsilon and opt in
-rate.~
+rate.
 
 \begin{figure}[!htb]
     \centering
@@ -630,7 +630,7 @@ terms of accuracy at nearly every tested level of \(\epsilon\) and opt
 in rate, even with very small opt in rates. The local method only
 outperforms the central method with a very high privacy loss budget of
 \(\epsilon\) = 20, and the errors for both methods are very small for
-that level of privacy loss anyway.~
+that level of privacy loss anyway.
 
 While the opt-in local approach does improve the accuracy of estimates
 with lower levels of opt in, this improvement alone is unfortunately not
@@ -639,7 +639,7 @@ Existing local DP methods cannot offer the same level of accuracy as
 central methods, especially for datasets with even higher cardinality.
 However, the potential to improve data quality results with a local
 method and opt-in framework motivates greater focus on developing local
-DP methods in the future.~
+DP methods in the future.
 
 \textbf{Opt-in Privacy Offers the Potential to Improve Data Quality for
 Small Groups}
@@ -649,7 +649,7 @@ accuracy, an opt-in local DP framework still offers the potential to
 improve data quality for small groups. Data quality may be especially
 improved for groups that opt-in at relatively lower rates than others.
 For Scenario 2, we focus on results allowing us to compare differences
-in data quality by racial/ethnic group.~
+in data quality by racial/ethnic group.
 
 Figures \ref{fig:groups_dc} and \ref{fig:groups_ia} show the
 distribution of accuracy results for the specified opt in rates for each
@@ -692,28 +692,500 @@ to help respondents understand the implications of foregoing disclosure
 protections, both for their privacy but also for the wide-ranging
 impacts of improving their data quality. This type of outreach could
 result in better data quality for these groups, with positive downstream
-impacts on representation and funding allocations to communities.~
+impacts on representation and funding allocations to communities.
 
 All in all, existing local DP methods generate protected data of overall
 lower accuracy than data generated by central models. However, this
 demonstration shows the potential of local DP to improve data accuracy
 for small groups, while still protecting privacy, with an opt-in DP
 framework. This use case motivates further development of local DP
-methods and opt in experimentation to improve accuracy results.~
+methods and opt in experimentation to improve accuracy results.
 
 \section{Demonstration 2: Synthetic Data for the American Community Survey}
 
+The Census Bureau is investigating the creation of a fully synthetic
+American Community Survey paired with a validation server\footnote{https://www.ipums.org/changes-to-census-bureau-data-products}.
+The Census Bureau intended to create formally private data by 2025 but
+later conceded that the science does not exist yet to comprehensively
+implement a formally private solution for the ACS\footnote{https://www.census.gov/newsroom/blogs/random-samplings/2022/12/disclosure-avoidance-protections-acs.html}.
+Next, the Census Bureau intended to release a non-formally private ACS
+in 2024 but their timeline has been delayed because of legitimate
+concerns about the impact of synthetic data.\footnote{https://acsdatacommunity.prb.org/discussion-forum/m/2021-acs-conference-files/147/download}
+
+Synthetic data could potentially harm the usefulness of the American
+Community Survey. Groups with fewer observations, including smaller
+racial and ethnic groups, could see the biggest losses in data quality.
+An opt-in disclosure protection methodology paired with synthetic data
+could mitigate the harms of data synthesis and give outreach
+organizations a tool to improve data quality.
+
 \subsection{Synthetic Data}
+
+Demonstration 1 focused on summary statistics calculated on microdata.
+We now pivot to a demonstration where the goal is to produce
+high-quality microdata that can be used for a range of valid analyses.
+We will pursue this goal with synthetic data generation.
+
+Synthetic data generation is a statistical disclosure control method
+that replaces confidential microdata with pseudo microdata that can
+maintain the statistical properties of the confidential data while
+limiting disclosure risks. United Nations (2022) and Hu and Bowen (2023)
+offer thorough introductions to synthetic data. We will briefly
+introduce topics central to this demonstration.
+
+There are two main flavors of synthetic data. With partially synthetic
+data, some but not all variables are synthesized (Little 1993). With
+fully synthetic data, all variables are synthesized (Rubin 1993). Fully
+synthetic data generally provides stronger disclosure protection.
+
+Partially synthetic data maintains a one-to-one mapping between
+observations in the synthetic data and observations in the GSDS. This
+creates identity disclosure risks and increases attribute disclosure
+risks. It also means it is possible to calculate disclosure metrics
+based on re-identification (J. P. Reiter and Mitra 2009).
+
+Fully synthetic data don't have a one-to-one mapping because every
+record is fully generated. This minimizes identity disclosure risks and
+attribute disclosure risks, but dramatically reduces approaches for
+evaluating disclosure risks. We create a fully synthetic version of the
+ACS for this demonstration.
+
+It is possible to create formally private synthetic data in idealized
+situations (Bowen and Snoke 2021). Model-based approaches generally
+require discretizing categorical variables. Promising approaches
+generate 1-, 2-, and 3-way marginals and then use graphical models to
+generate synthetic data (McKenna, Sheldon, and Miklau 2019). Other
+approaches use GANs but generally don't work well outside of idealized
+situations with modest privacy budgets (Tao et al. 2021). Like the
+Census Bureau, we abandon formal privacy for this demonstration because
+it is currently infeasible for the ACS. This means we no longer have a
+provable bound on the worst-case privacy loss.
+
+We use a fully conditional specification (FCS) to generate synthetic
+data. FCS uses a sequential approach to model the joint distribution of
+the ACS as a sequence of univariate conditional distributions. We use
+non-parametric decision trees and regression trees because they are easy
+to fit and model relatively complex distributions with ease (J. Reiter
+2005). We modify the decision trees and regression trees so that
+predictions are samples from the final nodes instead of using the means
+and modes of the nodes. This increases the sample variances in the
+synthetic data.
+
+We use the tidysynthesis\footnote{``The tidysynthesis R package.''
+  Presentation given at rstudio::conf(2022), Washington, DC, July 25 --
+  28.} and syntheval R packages to synthesize data and evaluate
+synthetic data.
 
 \subsection{Data}
 
+For this demonstration, we use person-level records from the 2021 1-Year
+American Community Survey (ACS). The ACS is a roughly 1-in-100 sample of
+households in the US and is the premier source of information for small
+area estimation. The 2021 ACS Public Use Microdata Sample (PUMS)
+contains about 3.25 million individuals and 1.44 million households. We
+implement an opt-in disclosure protection demonstration using synthetic
+data and the 2021 1-Year American Community Survey. We access all ACS
+data through IPUMS (Ruggles et al., n.d.).
+
+We restrict the data in five important ways to minimize computation and
+simplify comparisons. First, we restrict our data to observations from
+Florida, Michigan, and Pennsylvania. We chose these states because they
+are large states with different types of racial and ethnic diversity.
+Second, we restrict our data to heads of households ages 18 or older who
+are not in group quarters. This limits structurally missing values.
+Furthermore, synthesizing relationships within households is a major
+technical challenge (Benedetto and Totty 2020). Third, we only
+synthesize a subset of variables.
+
+\begin{itemize}
+\tightlist
+\item
+  State (categorical)
+\item
+  Sex (binary)
+\item
+  Age (numeric)
+\item
+  Marital status (categorical)
+\item
+  Race (categorical)
+\item
+  Hispanicity (categorical)
+\item
+  Any health insurance coverage (binary)
+\item
+  Educational attainment (categorical)
+\item
+  Employment status (categorical)
+\item
+  Labor force participation (binary)
+\item
+  Total family income (numeric)
+\item
+  Total personal income (numeric)
+\item
+  Wage and salary income (numeric)
+\item
+  Welfare income (numeric)
+\item
+  Income residual (numeric)
+\end{itemize}
+
+The income residual is personal income minus wages and salary and
+welfare income. The income residual captures all other sources of income
+including business income; Social Security income; SSI income; interest,
+dividend, and rental income; retirement income; and other income.
+
+Fourth, we ignore weights during synthesis and when calculating metrics.
+Synthesis with weights is an open area of research. Fifth and finally,
+we randomly partition the data into two halves. The half we apply
+disclosure protection to is the gold standard data set (GSDS). The other
+half is a holdout data set (HDS) for calculating disclosure metrics.
+
+PUMS include statistical disclosure limitation to protect the
+confidentiality of responses. For example, high incomes are topcoded.
+When synthesizing data, the Census Bureau has more observations and
+unaltered variables that could improve the quality of the synthesis but
+also worsen utility metrics because out metrics do not reflect the
+current SDC techniques like sampling and topcoding.
+
 \subsection{Simulations}
+
+To evaluate the benefits and costs of opt-in disclosure protection we
+implement a simulation study. We vary two key parameters for each
+specification. First, we vary the opt-in rate with the values 0.1, 0.5,
+0.9, and 1. For example, 90\% of observations are unaltered and 10\% of
+observations are synthesized when the opt-in rate is set to 0.1. All
+observations are synthesized when the opt-in rate is 1. We call the
+result of this SDC approach candidate data. The opt-in decision for each
+observation is stochastic. We use a function to set the probability of
+opt-in and then randomly select the opt-in decision based on that
+probability. Second, we vary the nature of the opt-in. Under the default
+settings, all observations have the same opt-in probability within a
+specification.
+
+It's plausible that different racial and ethnic groups would opt into
+disclosure protections at different rates. We vary individual opt-in
+propensities based on race. In addition to equal opt-in probabilities,
+we implement a white multiplier such that white individuals opt in at
+half the rate of other individuals (0.5) and twice the rate of other
+individuals (2). The white multiplier is approximate because the opt-in
+decisions are stochastic and because the multiplier is imprecise at high
+levels of opt in.
+
+We need to pick an order to synthesize the variables since we adopt a
+sequential approach. Typically, more information is preserved for a
+synthetic variable by moving it from later in the synthesis order to
+earlier in the synthesis order. We prioritize race and ethnicity. Next,
+we synthesize the remaining categorical variables. Next, we synthesize
+age and educational attainment. We treat both as numeric variables.
+Finally, we synthesize all of the income variables.
+
+We implement a simple synthesis without much customization. We use the
+rpart implementation of decision trees and regression trees (Therneau
+and Atkinson 2022) using their default values (minsplit = 20, minbucket
+= 8, and cp = 0.01). These parameters keep the trees from going too deep
+and overfitting the data.
+
+We run each specification five times to evaluate the
+simulation-to-simulation variation in metrics.
 
 \subsection{Evaluation}
 
+We evaluate the results of the simulations with general utility metrics,
+specific utility metrics, and disclosure risk metrics. Descriptions of
+each metrics are available in the appendix. Complete results are
+available in the Urban Institute data catalog.
+
+General utility measures the univariate and multivariate distributional
+similarity between the gold standard data and the candidate data (e.g.,
+comparing the medians for all numeric variables). Specific utility
+measures the similarity of results for a specific analysis of the gold
+standard data and candidate data (e.g., comparing the coefficients in
+regression models). Disclosure risk metrics \emph{estimate} the risk of
+attribute and membership inference attacks.
+
+We calculate the following metrics for all simulations:
+
+\textbf{General utility}
+
+\begin{itemize}
+\tightlist
+\item
+  Absolute error for proportions for all categorical variables
+\item
+  Absolute error for proportions for all categorical variables by
+  simplified race/ethnicity and detailed race
+\item
+  Absolute proportion error for means for all numeric variables
+\item
+  Absolute proportion error for means for all numeric variables by
+  simplified race/ethnicity and detailed race
+\item
+  Proportion error in percentiles for numeric variables
+\item
+  k-marginal score for all 1-way, 2-way, and 3-way marginals for
+  categorical variables
+\item
+  Mean absolute error in pairwise correlation coefficients for numeric
+  variables
+\item
+  Discriminator ROC AUC
+\end{itemize}
+
+\textbf{Specific utility}
+
+\begin{itemize}
+\tightlist
+\item
+  Regression confidence interval overlap for a Mincer model
+\end{itemize}
+
+\textbf{Disclosure risk}
+
+\begin{itemize}
+\tightlist
+\item
+  \(\ell\)-diversity for regression trees summarized for each numeric
+  variable
+\item
+  Attribute inference test on welfare income
+\item
+  Membership inference test
+\end{itemize}
+
 \subsection{Results and Discussion}
 
+We have two main concerns with opt-in fully synthetic data. First, the
+approach may lead to untenable disclosure risks. Second, the utility
+improvements from including unaltered records in released data may be
+dampened by synthetic data with worse utility because the synthesizer is
+trained on smaller and non-random subsets of the GSDS. Essentially, as
+opt-in decreases the number of observations in the training data
+decreases, which could lead to terrible models for the synthetic data.
+
+Our demonstration suggests that opt-in fully synthetic data do not
+significantly increase disclosure risks. We also observe that all
+utility metrics improve with the introduction of an opt-in and improve
+as the opt-in rate decreases. Most of the utility metrics are
+surprisingly resilient to differential rates of opt-in for white
+vs.~non-white respondents. Our results support the idea that opt-in
+approaches to synthetic data can improve data quality with minimal
+changes to disclosure risks.
+
+\textbf{Multivariate Utility}
+
+\begin{figure}[!htb]
+    \caption{Low Opt-In Rates Dramatically Improve Discriminant Metrics}
+    \centering
+    \includegraphics[width=6.5in]{../analysis/figures/discriminator-auc-1.png}
+    \label{fig:discriminator}
+\end{figure}
+
+We start with multivariate utility. The discriminator AUC, shown in
+figure \ref{fig:discriminator}, is high when all observations opt-in to
+disclosure protections and quickly declines with lower opt-in rates.
+This suggests that a simple predictive model has difficulty
+distinguishing between the synthetic data and the GSDS after the
+introduction of opt-in synthesis.
+
+\begin{figure}[!htb]
+    \caption{Low Opt-In Improves Synthetic Correlations}
+    \centering
+    \includegraphics[width=6.5in]{../analysis/figures/correlation-difference-1.png}
+    \label{fig:correlation-difference}
+\end{figure}
+
+The correlation difference, shown in figure
+\ref{fig:correlation-difference} is modest for all opt-in rates and
+improves with low levels of opt-in.
+
+Finally, regression estimates dramatically improve with low levels of
+opt-in. Figure \ref{fig:regression} shows that the gap between
+confidence intervals, which is about six times the length of the
+confidence interval with full opt-in disclosure protection, fully
+disappears with low levels of opt-in.
+
+\begin{figure}[!htb]
+    \caption{Coefficient Estimates are Closer with Low Opt-In Levels}
+    \centering
+    \includegraphics[width=6.5in]{../analysis/figures/regression-overlap-1.png}
+    \label{fig:regression}
+\end{figure}
+
+\textbf{Univaritate Utility}
+
+We next zoom in on specific variables and subsets of variables. The
+categorical utility of the synthetic data is very high for all scenarios
+but improves marginally with low opt-in rates.
+
+Figure \ref{fig:proportions} shows the error in proportions for all
+categories of all categorical variables. Figure
+\ref{fig:proportions-race-ethnicity} shows the proportions for all
+classes of all categorical variables disaggregated into four
+race/ethnicity groups. Some race/ethnicity groups are poorly represented
+in the synthetic data. For example, the Black proportions for ``Married,
+spouse present'' and ``Never married, spouse not present'' are very
+wrong in the synthetic data because the estimates are attenuated to the
+proportions in the majority group. Some of these differences can be
+refined by using different hyperparameters during the synthesis process.
+
+\begin{figure}[!htb]
+    \caption{Low Opt-In Modestly Improves Univariate Proportion Estimates}
+    \centering
+    \includegraphics[width=6.5in]{../analysis/figures/proportions-1.png}
+    \label{fig:proportions}
+\end{figure}
+
+\begin{figure}[!htb]
+    \caption{Low Opt-In Reduces Major Racial/Ethnic Errors in Estimates}
+    \centering
+    \includegraphics[width=6.5in]{../analysis/figures/proportions-3.png}
+    \label{fig:proportions-race-ethnicity}
+\end{figure}
+
+We see a similar patterns when reviewing the proportion of indiduals
+with Salaries or Wages. Figure \ref{fig:prop-wages} shows that the
+synthetic data generally overestimates the number of white people with
+salaries and wages and underestimates for Hispanic and Other Races and
+Ethnicities.
+
+\begin{figure}[!htb]
+    \caption{Low Opt-In Improves Estimates of the Proportions of People with Salaries and Wages}
+    \centering
+    \includegraphics[width=6.5in]{../analysis/figures/proportion-with-wages-3.png}
+    \label{fig:prop-wages}
+\end{figure}
+
+The 1-marginal score for the synthetic data is always better than the
+1-marginal score for the holdout data. The results flip for the
+2-marginal score and 3-marginal score. In all three cases, low levels of
+opt-in dramatically improve the results. Figure \ref{fig:kmarginals}
+shows the k-marginal score for 1-marginals and 3-marginals.
+
+\begin{figure}[!htb]
+    \caption{Low Opt-In Improves Higher-Dimensional Distributions}
+    \centering
+    \includegraphics[width=6.5in]{../analysis/figures/kmarginals-4.png}
+    \label{fig:kmarginals}
+\end{figure}
+
+The syntheses have mixed results for numeric variables. Figure
+\ref{fig:family-income} shows that all syntheses closely match the
+distribution of total family income. The only major errors are for the
+minimum and maximum values.
+
+\begin{figure}[!htb]
+    \caption{All Syntheses Recreate the Total Family Income Distribution}
+    \centering
+    \includegraphics[width=6.5in]{../analysis/figures/percentiles-2.png}
+    \label{fig:family-income}
+\end{figure}
+
+The syntheses miss the distribution of salary and wage income, shown in
+figure \ref{fig:wage-income} but the results improve dramatically with
+low levels of opt-in.
+
+\begin{figure}[!htb]
+    \caption{Low Opt-In Improves the Distribution of Salary and Wage Income}
+    \centering
+    \includegraphics[width=6.5in]{../analysis/figures/percentiles-1.png}
+    \label{fig:wage-income}
+\end{figure}
+
+\textbf{Disclosure Risks}
+
+The synthesizer demonstrates promising \(\ell\)-diversity for all
+syntheses. This is unsurprising since we use conservative
+hyperparameters for the decision trees and regression trees. In the
+worst-case situation, less than 0.5\% of values for one variable come
+from nodes in regression trees with fewer than three unique values.
+
+In Figure \ref{fig:membership}, the AUC for the membership inference
+attack is close to 0.5. Given the synthetic data, an attacker would
+struggle to tell if a confidential record is from the GSDS or holdout
+data using distance-based matching.
+
+\begin{figure}[!htb]
+    \caption{No SYnthesis Demonstrates High Membership Inference Risks}
+    \centering
+    \includegraphics[width=6.5in]{../analysis/figures/membership-inference-1.png}
+    \label{fig:membership}
+\end{figure}
+
+Finally, the RMSE for the attribute inference test from the synthetic
+data is always lower than the RMSE for a model trained on the holdout
+data. Using a simple predictive model, this suggests that the synthetic
+data are not copying chance features of the GSDS. These disclosure
+metrics enable us to infer the disclosive properties of the synthetic
+but they don't not provide a bound or guarantee on the disclosure risks
+of the synthetic data. This is a major disadvantage of non-formally
+private synthetic data when compared with formally private tabulations
+like in the first demonstration.
+
+Nonetheless, we believe the results are promising. Allowing individuals
+to forego disclosure protections increases data utility without
+increasing disclosure risks for the individuals who still want
+disclosure protection.
+
+The idea of opt-in disclosure protection with synthetic microdata rests
+on one major implementation assumption. We do not label observations
+that forego disclosure protections. Doing so could increase disclosure
+risks by making differencing attacks easier. Data stewards need to be
+careful to not implicitly label the opt-in decision. For example, the
+GSDS and observations without opt-in could have precision to the closest
+integer when the synthetic records have precision to three decimal
+places. In this case, it would be trivial to identify the records with
+and without opt-in disclosure protection.
+
 \section{Conclusion}
+
+\hypertarget{ldp}{%
+\subsection{LDP}\label{ldp}}
+
+The first demonstration shows the benefits and infeasibility of opt-in
+disclosure protections with a differentially private Decennial Census.
+The errors introduced when switching from a centralized DP approach to a
+local DP approach dramatically outweigh the benefits of embracing opt-in
+disclosure protections. Either major methodological breakthroughs for
+local DP are needed or opt-in disclosure protections will not improve
+the utility-disclosure risk trade off for the Decennial Census.
+
+\hypertarget{synthetic-data}{%
+\subsection{Synthetic Data}\label{synthetic-data}}
+
+The second demonstration shows the benefits and feasibility of opt-in
+disclosure protections with a fully-synthetic American Community Survey.
+In all cases, low levels of opt-in improved the utility of the synthetic
+data without worsening disclosure risk metrics. Our synthesis
+methodology was simple and suffered from some errors including major
+errors for certain race and ethnicity groups. Low levels of opt-in
+mitigated many of these issues.
+
+Ample followup work is needed to explore the implementation of opt-in
+disclosure protection. We do not address questionnaire design and giving
+respondents clear information so they can provide informed consent.
+These implementation decisions inform the ethics of opt-in disclosure
+protection and would unambiguously affect the opt-in rate. We also only
+allow for unit opt-in disclosure protection and do not consider item
+opt-in disclosure protection. Item opt-in disclosure protection would be
+more difficult to implement but would give respondents even more control
+over their data.
+
+The Census Bureau is wrestling with significant outstanding technical
+challenges for producing a fully synthetic ACS. Furthermore, the ACS is
+protected by Title 13 and would likely need legal changes to allow for
+an opt-in approach to disclosure protection.
+
+The Survey of Earned Doctorates (SED) could be an ideal candidate for
+evaluating this approach. The survey is a census of persons who recently
+earned doctorate degrees. This population would be easier to inform
+because of their research backgrounds. The SED has remarkably high
+response rates and we speculate that the population would opt-in to
+disclosure protections at very low rates. Furthermore, the file avoids
+many of the technical challenges currently facing a synthetic ACS.
+
+\subsection{Metrics Appendix}
 
 \include{backmatter/appendix}
 
@@ -752,6 +1224,17 @@ Axelrod, Judah, Karolina Ramos, and Rebecca Bullied. 2022.
 {``Opportunities and Challenges in Using Private-Sector Data for Racial
 Equity Analysis.''}
 
+\leavevmode\vadjust pre{\hypertarget{ref-benedetto2020}{}}%
+Benedetto, Gary, and Evan Totty. 2020. {``Synthesizing Familial Linkages
+for Privacy in Microdata.''} CED-DA Working Paper.
+
+\leavevmode\vadjust pre{\hypertarget{ref-bowen2021}{}}%
+Bowen, Claire McKay, and Joshua Snoke. 2021. {``Comparative Study of
+Differentially Private Synthetic Data Algorithms from the NIST PSCR
+Differential Privacy Synthetic Data Challenge.''} \emph{Journal of
+Privacy and Confidentiality} 11 (1).
+\url{https://doi.org/10.29012/jpc.748}.
+
 \leavevmode\vadjust pre{\hypertarget{ref-bowen2022}{}}%
 Bowen, Claire McKay, Aaron R Williams, and Madeline Pickens. 2022.
 {``Decennial Disclosure: An Explainer on Formal Privacy and the TopDown
@@ -781,14 +1264,66 @@ Application of Differential Privacy to the 2020 Census.''} \emph{Harvard
 Data Science Review}, June.
 \url{https://doi.org/10.1162/99608f92.ff891fe5}.
 
+\leavevmode\vadjust pre{\hypertarget{ref-hu2023}{}}%
+Hu, Jingchen, and Claire McKay Bowen. 2023. {``Advancing Microdata
+Privacy Protection: A Review of Synthetic Data.''}
+\url{https://doi.org/10.48550/ARXIV.2308.00872}.
+
+\leavevmode\vadjust pre{\hypertarget{ref-little1993}{}}%
+Little, Roderick JA. 1993. {``Statistical Analysis of Masked Data.''}
+\emph{Journal of Official Statistics} 9 (2): 407.
+\url{https://www.scb.se/contentassets/ca21efb41fee47d293bbee5bf7be7fb3/statistical-analysis-of-masked-data.pdf}.
+
 \leavevmode\vadjust pre{\hypertarget{ref-mather2019a}{}}%
 Mather, Mark, and Paola Scommegna. 2019. {``Why Is the u.s. Census so
 Important?''} March.
 \url{https://www.prb.org/resources/importance-of-u-s-census/}.
 
+\leavevmode\vadjust pre{\hypertarget{ref-mckenna2019}{}}%
+McKenna, Ryan, Daniel Sheldon, and Gerome Miklau. 2019.
+{``Graphical-Model Based Estimation and Inference for Differential
+Privacy.''} \emph{Proceedings of the 36th International Conference on
+Machine Learning} 97: 4435--44.
+\url{http://proceedings.mlr.press/v97/mckenna19a/mckenna19a.pdf}.
+
 \leavevmode\vadjust pre{\hypertarget{ref-near2022}{}}%
 Near, Joseph P, and Chiké Abuah. 2022. \emph{Programming Differential
 Privacy}.
+
+\leavevmode\vadjust pre{\hypertarget{ref-reiter2009}{}}%
+Reiter, Jerome P., and Robin Mitra. 2009. {``Estimating Risks of
+Identification Disclosure in Partially Synthetic Data.''} \emph{Journal
+of Privacy and Confidentiality} 1 (1).
+\url{https://doi.org/10.29012/jpc.v1i1.567}.
+
+\leavevmode\vadjust pre{\hypertarget{ref-reiter2005}{}}%
+Reiter, JP. 2005. {``Using CART to Generate Partially Synthetic Public
+Use Microdata.''} \emph{Journal of Official Statistics} 21 (3): 441.
+\url{https://www.proquest.com/docview/1266792149/abstract/B4CAD6D1A888424FPQ/1?accountid=11091}.
+
+\leavevmode\vadjust pre{\hypertarget{ref-rubin1993}{}}%
+Rubin, Donald B. 1993. {``Statistical Disclosure Limitation.''}
+\emph{Journal of Official Statistics} 9 (2): 461--68.
+
+\leavevmode\vadjust pre{\hypertarget{ref-ruggles}{}}%
+Ruggles, Steven, Sarah Flood, Matthew Sobek, Danika Brockman, Grace
+Cooper, Stephanie Richards, and Megan Schouwiler. n.d. {``IPUMS USA:
+Version 13.0.''} \url{https://doi.org/10.18128/D010.V13.0}.
+
+\leavevmode\vadjust pre{\hypertarget{ref-tao2021}{}}%
+Tao, Yuchao, Ryan McKenna, Michael Hay, Ashwin Machanavajjhala, and
+Gerome Miklau. 2021. {``Benchmarking Differentially Private Synthetic
+Data Generation Algorithms.''}
+\url{https://doi.org/10.48550/ARXIV.2112.09238}.
+
+\leavevmode\vadjust pre{\hypertarget{ref-therneau2022}{}}%
+Therneau, Terry M., and Elizabeth J. Atkinson. 2022. {``An Introduction
+to Recursive Partitioning Using the RPART Routines.''}
+\url{https://cran.r-project.org/web/packages/rpart/vignettes/longintro.pdf}.
+
+\leavevmode\vadjust pre{\hypertarget{ref-syntheti2022}{}}%
+United Nations, ed. 2022. \emph{Synthetic Data for Official Statistics:
+A Starter Guide}. Geneva: United Nations.
 
 \leavevmode\vadjust pre{\hypertarget{ref-unitedstatescensusbureau2017}{}}%
 United States Census Bureau. 2017. {``American Community Survey

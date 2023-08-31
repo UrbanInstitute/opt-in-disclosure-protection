@@ -30,7 +30,7 @@ prediction_test <- function(postsynth, data, formula, model = NULL, recipe = NUL
   # train model -------------------------------------------------------------
   if (is.null(model)) {
     
-    model <- parsnip::decision_tree() %>%
+    model <- parsnip::decision_tree(cost_complexity = 0.001) %>%
       parsnip::set_mode("regression") %>%
       parsnip::set_engine("rpart") 
     

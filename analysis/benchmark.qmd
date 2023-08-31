@@ -1,0 +1,113 @@
+---
+title: "Data #1"
+format: 
+  html:
+    embed-resources: true
+    toc: true
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r}
+library(tidyverse)
+library(microbenchmark)
+library(here)
+
+source(here("R", "prep001.R"))
+source(here("R", "hist_grr.R"))
+source(here("R", "hist_unaryencode.R"))
+source(here("R", "add_D_i.R"))
+source(here("R", "create_D.R"))
+source(here("R", "add_prob_opt_in.R"))
+source(here("R", "add_opt_in.R"))
+
+options(dplyr.summarise.inform = FALSE)
+
+```
+
+## Set Up Data
+
+```{r}
+data <- prep001()
+
+attribs <- c("age_bucket", "race_simple", "sex_val")
+
+```
+
+
+```{r}
+specs <- expand_grid(
+  run = 1:3, 
+  epsilon = c(1, 5, 10, 20),
+  opt_in = c(0.1, 0.5, 0.9, 1)
+)
+
+```
+
+```{r}
+data <- data |>
+  add_prob_opt_in(prob = 0.5) |>
+  add_opt_in() |>
+  add_D_i(attribs = attribs)
+
+```
+
+
+### Central Methods
+
+### Local Methods
+
+```{r}
+# microbenchmark()
+
+hist_grr(data, epsilon = 10)
+
+
+
+
+
+summarize_results <- function(data) {
+  
+  data |>
+    group_by(epsilon, opt_in) |>
+    summarize(
+      mean_error = mean(n - n_noisy),
+      mean_abs_error = mean(abs(n - n_noisy))
+    ) |>
+    ungroup()
+  
+}
+
+results <- bind_rows(
+  `grr` = pmap_dfr(
+    .l = specs,
+    .f = function(run, epsilon, opt_in) data |>
+      prep_data(opt_in = opt_in) |>
+      group_split(state) |>
+      map_dfr(hist_grr, epsilon = epsilon) |>
+      mutate(run = run, epsilon = epsilon, opt_in = opt_in) |>
+      summarize_results()
+  ),
+  `sue` = pmap_dfr(
+    .l = specs,
+    .f = function(run, epsilon, opt_in) data |>
+      prep_data(opt_in = opt_in) |>
+      group_split(state) |>
+      map_dfr(hist_unaryencode, epsilon = epsilon, type = "SUE", attribs = attribs) |>
+      mutate(run = run, epsilon = epsilon, opt_in = opt_in) |>
+      summarize_results()
+  ),
+  `oue` = pmap_dfr(
+    .l = specs,
+    .f = function(run, epsilon, opt_in) data |>
+      prep_data(opt_in = opt_in) |>      
+      group_split(state) |>
+      map_dfr(hist_unaryencode, epsilon = epsilon, type = "OUE", attribs = attribs) |>
+      mutate(run = run, epsilon = epsilon, opt_in = opt_in) |>
+      summarize_results()
+  ),
+  .id = "method"
+)
+
+
+```

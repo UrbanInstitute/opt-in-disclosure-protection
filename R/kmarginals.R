@@ -34,11 +34,11 @@ kmarginals <- function(postsynth, data, k) {
   
   vars_difference <- length(synth_vars) - length(synth_data_vars)
   
-  if (vars_difference != 0) {
-    
-    cat("Warning: the synthetic data contains", vars_difference, "more variables than data")
-    
-  }
+  # if (vars_difference != 0) {
+  #   
+  #   cat("Warning: the synthetic data contains", vars_difference, "more variables than data \n")
+  #   
+  # }
   
   # 2. create list of 1-, 2-, or 3-way marginals
   kmarginals_vars <- t(combn(synth_data_vars, m = k))

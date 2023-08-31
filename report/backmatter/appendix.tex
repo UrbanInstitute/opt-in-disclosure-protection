@@ -7,7 +7,35 @@
 % Footer Formatting: DO NOT CHANGE -----------------------------------
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Appendix %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{FlushLeft}
-    \part{Appendix Letter. Appendix Title in Title Case}
+    \part{A. Metrics Descriptions}
 \end{FlushLeft}
 
-Use the same text styles you used in the main report.
+**General utility**
+
+-   **Absolute error for proportions for all categorical variables:** For each categorical variable, calculate the proportion of observations with each class for the GSDS and candidate data. Calculate the absolute value of the difference between the GSDS and candidate data.
+
+-   **Absolute error for proportions for all categorical variables by simplified race/ethnicity and detailed race:** For each categorical variable, calculate the proportion of observations with each class for each demographic group for the GSDS and candidate data. Calculate the absolute value of the difference between the GSDS and candidate data.
+
+-   **Absolute proportion error for means for all numeric variables:** For each numeric variable, calculate the mean for the GSDS and candidate data. Calculate the absolute value of the difference between the GSDS and candidate data.
+
+-   **Absolute proportion error for means for all numeric variables by simplified race/ethnicity and detailed race:** For each numeric variable, calculate the mean for the GSDS and candidate data for each demographic group. Calculate the absolute value of the difference between the GSDS and candidate data.
+
+-   **Proportion error in percentiles for numeric variables:** For each numeric variable, calculate the minimum, 10th percentile, 20th percentile, 30th percentile, 40th percentile, 50th percentile, 60th percentile, 70th percentile, 80th percentile, 90th percentile, and maximum. Calculate the proportion difference between the GSDS and candidate data.
+
+-   **k-marginal score for all 1-way, 2-way, and 3-way marginals for categorical variables:** [@raab2021; @sen2023] Select $k$. Let $v$ be the number of categorical variables. Then there are ${v \choose k}$ $k$-marginals. Exhaustively calculate the proportion of observations in each cell for all $k$-way marginals for categorical variables. For each $k$-marginal, calculate the mean absolute error (this is called mean absolute difference between distributions). Finally, make the metric ascending and rescale to max at 1,000 with $(1 - mean(MADD)) \cdot 1000$.
+
+-   **Mean absolute error in pairwise correlation coefficients for numeric variables:** For all numeric variables, calculate a Pearson's linear correlation matrix on the GSDS and candidate data. Difference the lower triangle of the matrix for the GSDS and the matrix for the candidate file. Calculate the mean absolute error.
+
+-   **Discriminator ROC AUC:** Discriminator metrics measure how well a predictive model can distinguish between observations from the GSDS and candidate data. Ideally, the models perform poorly. The p-MSE ratio [@woo2009; @snoke2018] and SPECKS [@bowen2021a] summarize the propensity scores from discriminant models. We take a different approach and look at the ROC AUC for the discriminant models. The three measures are highly correlated, the values for ROC AUC are more familiar to predictive modelers, and the measure doesn't require bootstrapping.
+
+**Specific utility**
+
+-   **Regression confidence interval overlap** measures the overlap of confidence estimated on the gold standard data and synthetic data [@karr2006; @snoke2018]. 1 represents perfect overlap, 0 represents adjacency with no overlap, and negative values represent gaps between the confidence intervals. We regress log wages and salary income on potential experience, potential experience squared, an indicator for white, and sex and calculate the regression confidence interval overlap. This is a simplified version of a "Mincer model" [@card1999].
+
+**Disclosure risk**
+
+-   **$\ell$-diversity for regression trees summarized for each numeric variable:** [@bowen2020] We are concerned that our synthesizer could memorize the confidential data or too closely fit the confidential data. We calculate $\ell$-diversity [@machanavajjhala2007] on the nodes from decision trees and regression trees to measure the heterogeneity of values in the nodes. We calculate the proportion of synthetic values for each variable in the candidate data that come from nodes with low heterogeneity $\ell < 10$.
+
+-   **Attribute inference test on welfare income:** [@elemam2020] We are concerned that an attacker could train predictive models on the synthetic data and make precise inferences about observations in the confidential data. We train a regression tree to predict welfare income on the synthetic data using all other variables as predictors. We assume that an attacker knows all variables but welfare income for the confidential data. We make predictions and calculate the RMSE. We repeat this process using the holdout data instead of the synthetic data to benchmark against the RMSE of models trained when an attacker has access to another random sample from the population instead of the synthetic data.
+
+-   **Membership inference test:** [@zhang2022] We are concerned that an attacker could determine if a confidential observation is in the training data for the candidate file. We construct a data set that is about 10,000 observations from the GSDS and 10,000 observations from the holdout data. For each observation, we measure Gower's distance [@gower1971] to all synthetic observations. Traditionally, analysts pick different thresholds to predict membership and then calculate precision. We normalize the distances so they are in \[0, 1\] and are like probabilities. We then calculate the ROC AUC to measure the tradeoff between true positives and false positives for different thresholds. ROC AUC closer to 0.5 indicates difficulty assessing membership.

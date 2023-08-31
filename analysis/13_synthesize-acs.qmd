@@ -1,0 +1,100 @@
+---
+title: "Synthesize the ACS"
+format: 
+  html:
+    embed-resources: true
+    toc: true
+editor: source
+execute:
+  echo: true
+  warning: false
+  message: false
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r}
+#| label: load-packages-and-function
+
+library(tidyverse)
+library(furrr)
+library(here)
+library(tidysynthesis)
+library(syntheval)
+library(tictoc)
+
+source(here("R", "prediction_test.R"))
+source(here("R", "kmarginals.R"))
+source(here("R", "proportions.R"))
+
+source(here("R", "summarize_results.R"))
+source(here("R", "add_prob_opt_in.R"))
+source(here("R", "add_opt_in.R"))
+
+source(here("R", "synthesize_acs.R"))
+
+```
+
+## Load ACS
+
+```{r}
+#| label: load-data
+
+gsds <- readRDS(here("data", "starting", "acs-gsds.rds")) |>
+  select(-serial)
+
+```
+
+## Create Testing Grid
+
+```{r}
+#| label: testing-grid
+
+specs <- expand_grid(
+  implicate = 1:5, 
+  opt_in = c(0.1, 0.5, 0.9, 1),
+  white_multiplier = c(0.5, 1, 2)
+) |>
+  mutate(run = row_number()) |>
+  mutate(
+    id = str_pad(row_number(), side = "left", pad = "0", width = 3),
+    description = str_glue("Run: {run}; Implicate: {implicate}; Opt-in: {opt_in}; White Mulitplier: {white_multiplier}")
+  )
+
+write_csv(specs, here("data", "results", "acs", "specs.csv"))
+
+```
+
+## Synthesize
+
+```{r}
+#| label: synthesize
+
+prep_data <- function(data, opt_in, white_multiplier) {
+  
+  data |>
+    rename(race_simple = race) |>
+    add_prob_opt_in(prob = opt_in, white_multiplier = white_multiplier) |>
+    add_opt_in() |>
+    rename(race = race_simple)
+  
+}
+
+plan(multisession, workers = 8)
+
+set.seed(20230718)
+
+tic()
+syntheses <- 
+  future_pmap(
+    .l = specs,
+    .f = function(implicate, run, opt_in, white_multiplier, description, id) gsds |>
+      prep_data(opt_in = opt_in, white_multiplier = white_multiplier) |>
+      synthesize_acs(id = id, description = description),
+    .options = furrr_options(seed = TRUE)
+  )
+toc()
+
+map(syntheses, "description")
+
+```
