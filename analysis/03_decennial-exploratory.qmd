@@ -1,0 +1,369 @@
+---
+title: "Exploring Stateside PUMS Files"
+format: 
+  html:
+    embed-resources: true
+    toc: true
+editor: source
+execute:
+  echo: true
+  warning: false
+  message: false
+---
+
+## Stateside Public Use Microdata Sample Files
+
+[Census Page](https://www.census.gov/data/datasets/2010/dec/stateside-pums.html)
+
+[Technical Documentation](https://www2.census.gov/programs-surveys/decennial/2010/technical-documentation/complete-tech-docs/us-pums/pumsus.pdf)
+
+About PUMS files:
+
+* 10% samples of occupied and vacant housing units in the US (and the people in the occupied units) and 10% sample of group quarters (noninstitutional and institutional) persons
+* Subsample numbers are included for working with smaller sample sizes
+* Use weights for each person or housing unit to reflect totals (if working with subsample, adjust the weights appropriately)
+
+This document contains exploratory analysis for Washington, DC.
+
+```{r}
+library(tidyverse)
+library(purrr)
+library(readxl)
+library(knitr)
+library(here)
+
+options(scipen = 999)
+```
+
+```{r}
+df <- readRDS(here("data", "starting", "decennial-exploratory.rds"))
+```
+
+## EDA - Geography
+
+Geographic fields include:
+
+* STATE: FIPS State Code
+* REGION: Region Code
+* DIVISION: Division Code
+* PUMA: Public Use Microdata Area Code
+
+Washington, DC has `r length(unique(df$puma))` PUMAs.
+
+```{r}
+df %>%
+  group_by(state, state_val, region, region_val, division, division_val, puma) %>%
+  summarize(records = n(),
+            persons = sum(as.numeric(pweight)),
+            .groups = "drop") %>%
+  mutate(across(c(records, persons),  ~ (.x / sum(.x)) * 100,
+                .names = "{.col}_pct")) %>%
+  kable(digits = 1)
+```
+
+## EDA - Housing
+
+``` {r}
+# helper functions
+housing_tab_fn <- function(var_val){
+  
+  tab <- df %>%
+    select(serialno, hweight, {{var_val}}) %>%
+    distinct() %>%
+    group_by({{var_val}}) %>%
+    summarize(units = n(),
+              weighted = sum(as.numeric(hweight))) %>%
+    mutate(across(c(units, weighted), ~ (.x / sum(.x)) * 100,
+                  .names = "{.col}_pct")) %>%
+    arrange(-weighted_pct) %>%
+    kable(digits = 1)
+  
+  return(tab)
+  
+}
+
+housing_num_fn <- function(var){
+  sumdf <- df %>%
+    select(serialno, hweight, {{var}}) %>%
+    distinct() %>%
+    mutate(num = as.numeric({{var}}))
+  
+  summ <- summary(sumdf$num)
+  
+  return(summ)
+}
+```
+
+### Unit Type
+
+Housing unit (occupied or vacant, 10% sample of units) or group quarters (noninstitutional and institutional, 10% sample of persons)
+
+```{r}
+housing_tab_fn(unittype_val)
+```
+
+### Vacancy Status
+
+Vacant units were already removed in processing, only occupied and group quarters remain.
+
+```{r}
+housing_tab_fn(vacs_val)
+```
+
+### Tenure
+
+Home ownership type
+
+```{r}
+housing_tab_fn(tenure_val)
+```
+
+### Household/family type
+
+```{r}
+housing_tab_fn(hht_val)
+```
+
+### Presence and age of own children under 18 years
+
+```{r}
+housing_tab_fn(paoc_val)
+```
+
+### Presence and age of related children under 18 years
+
+```{r}
+housing_tab_fn(parc_val)
+```
+
+### Presence and type of unmarried partner household
+
+```{r}
+housing_tab_fn(upart_val)
+```
+
+### Multigenerational household
+
+```{r}
+housing_tab_fn(multg_val)
+```
+
+### Number of persons in housing record
+
+```{r}
+housing_num_fn(persons)
+```
+
+```{r}
+housing_tab_fn(persons)
+```
+
+### Number of persons age 60+ housing record
+
+```{r}
+housing_num_fn(p60)
+```
+
+```{r}
+housing_tab_fn(p60)
+```
+
+### Number of persons age 65+ housing record
+
+```{r}
+housing_num_fn(p65)
+```
+
+```{r}
+housing_tab_fn(p65)
+```
+
+### Number of persons under age 18 in housing record
+
+```{r}
+housing_num_fn(p18)
+```
+
+```{r}
+housing_tab_fn(p18)
+```
+
+### Number of people in family in housing record
+
+```{r}
+housing_num_fn(npf)
+```
+
+```{r}
+housing_tab_fn(npf)
+```
+
+### Number of own children under age 18 in housing record
+
+```{r}
+housing_num_fn(noch)
+```
+
+```{r}
+housing_tab_fn(noch)
+```
+
+### Number of related children under age 18 in housing record
+
+```{r}
+housing_num_fn(nrch)
+```
+
+```{r}
+housing_tab_fn(nrch)
+```
+
+## EDA - Persons
+
+``` {r}
+# helper function
+persons_tab_fn <- function(var_val){
+  
+  tab <- df %>%
+    group_by({{var_val}}) %>%
+    summarize(persons = n(),
+              weighted = sum(as.numeric(pweight))) %>%
+    mutate(across(c(persons, weighted), ~ (.x / sum(.x)) * 100,
+                  .names = "{.col}_pct")) %>%
+    arrange(-weighted_pct) %>%
+    kable(digits = 1)
+  
+  return(tab)
+  
+}
+```
+
+### Coverage
+
+Persons are identified by `serialno` (housing/group quarters unit serial number) and `pnum` (person sequence number).
+
+There are `r nrow(df)` person records. These records reflect `r sum(as.numeric(df$pweight))` total people.
+
+### Relationship
+
+``` {r}
+persons_tab_fn(relate_val)
+```
+
+### Own child indicator
+
+``` {r}
+persons_tab_fn(oc_val)
+```
+
+### Related child indicator
+
+``` {r}
+persons_tab_fn(rc_val)
+```
+
+### Sex
+
+``` {r}
+persons_tab_fn(sex_val)
+```
+
+### Same sex spouse flag
+
+Documentation: "includes a flag allowing for the identification of those same-sex couples who originally reported their relationship to householder as “husband or wife” but were changed to “unmarried partner” during the editing process"
+
+``` {r}
+persons_tab_fn(sspa_val)
+```
+
+### Age
+
+Age values above the state topcode (age 90 for Washington, DC) are replaced with the mean of topcoded values (93 for Washington, DC).
+
+``` {r}
+summary(as.numeric(df$age))
+```
+
+### Quarter of birth
+
+``` {r}
+persons_tab_fn(qtrbir_val)
+```
+
+### Hispanic or Latino origin
+
+``` {r}
+persons_tab_fn(hispan_val)
+```
+
+### Number of major race groups marked
+
+``` {r}
+persons_tab_fn(numrace_val)
+```
+
+### White recode
+
+``` {r}
+persons_tab_fn(white_val)
+```
+
+### Black or African American recode
+
+``` {r}
+persons_tab_fn(black_val)
+```
+
+### American Indian and Alaska Native recode
+
+``` {r}
+persons_tab_fn(aian_val)
+```
+
+### Asian recode
+
+``` {r}
+persons_tab_fn(asian_val)
+```
+
+### Native Hawaiian recode
+
+``` {r}
+persons_tab_fn(nhaw_val)
+```
+
+### Other Pacific Islander recode
+
+``` {r}
+persons_tab_fn(opi_val)
+```
+
+### Some other race recode
+
+``` {r}
+persons_tab_fn(other_val)
+```
+
+### Race short recode
+
+``` {r}
+persons_tab_fn(raceshort_val)
+```
+
+### Race detailed recode
+
+``` {r}
+persons_tab_fn(racedet_val)
+```
+
+### Race checkbox recode
+
+``` {r}
+persons_tab_fn(racechkbx_val)
+```
+
+### Group quarters type
+
+``` {r}
+persons_tab_fn(gqtyp_val)
+```
