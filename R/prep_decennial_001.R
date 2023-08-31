@@ -6,7 +6,7 @@
 #'
 #' @return Dataframe starting data 001
 #'
-prep001 <- function() {
+prep_decennial_001 <- function() {
   
   source(here::here("R", "process_pums.R"))
   

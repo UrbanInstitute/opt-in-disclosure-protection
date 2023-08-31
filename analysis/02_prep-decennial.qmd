@@ -18,8 +18,8 @@ library(tidyverse)
 library(here)
 
 source(here("R", "process_pums.R"))
-source(here("R", "prep001.R"))
-source(here("R", "prep002.R"))
+source(here("R", "prep_decennial_001.R"))
+source(here("R", "prep_decennial_002.R"))
 source(here("R", "add_prob_opt_in.R"))
 source(here("R", "add_opt_in.R"))
 ```
@@ -40,7 +40,7 @@ attributes: age bucket, sex, race simple
 geo: state
 
 ```{r, message = FALSE}
-starting001 <- prep001()
+starting001 <- prep_decennial_001()
 saveRDS(starting001, file = paste(here("data", "starting"), "decennial-starting-001.rds", sep = "/"))
 ```
 
@@ -51,7 +51,7 @@ attributes: hispanic simple
 geo: state
 
 ```{r, message = FALSE}
-starting002 <- prep002()
+starting002 <- prep_decennial_002()
 saveRDS(starting002, file = paste(here("data", "starting"), "decennial-starting-002.rds", sep = "/"))
 ```
 
