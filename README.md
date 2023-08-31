@@ -1,6 +1,6 @@
 # Opt-In Privacy
 
-This repository contains two simulation demonstrations of opt-in disclosure proetctions. The first demonstration applies opt-in formal privacy to Decennial Census data. The second demonstration applies sequential data synthesis to American Community Survey microdata.  
+This repository contains two simulation demonstrations of opt-in disclosure protections. The first demonstration applies opt-in formal privacy to Decennial Census data. The second demonstration applies sequential data synthesis to American Community Survey microdata.  
 
 ## Table of Contents
 
@@ -27,4 +27,4 @@ This repository contains two simulation demonstrations of opt-in disclosure proe
 
 ## Contact
 
-Please contact [Aaron R. Williams](awilliams@urban.org) with questions. 
+Please contact [Aaron R. Williams](awilliams@urban.org) with questions.
