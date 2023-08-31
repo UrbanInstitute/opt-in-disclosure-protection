@@ -28,10 +28,10 @@ options(scipen = 999)
 The excel layout file provides variable widths, names, dictionary values, etc. for the Census Stateside PUMS microdata. Use this layout file to help process the fixed-width stateside PUMS data.
 
 ```{r}
-person_layout <- read_excel(here("resources", "2010 PUMS Record Layout.xlsx"), sheet = "Person", skip = 1)
+person_layout <- read_excel(here("data", "resources", "2010 PUMS Record Layout.xlsx"), sheet = "Person", skip = 1)
 saveRDS(layout, file = paste(here("data", "layout"), "fwf-person-layout.rds", sep = "/"))
 
-housing_layout <- read_excel(here("resources", "2010 PUMS Record Layout.xlsx"), sheet = "Housing", skip = 1)
+housing_layout <- read_excel(here("data", "resources", "2010 PUMS Record Layout.xlsx"), sheet = "Housing", skip = 1)
 saveRDS(layout, file = paste(here("data", "layout"), "fwf-housing-layout.rds", sep = "/"))
 
 layout <- rbind(person_layout, housing_layout)
