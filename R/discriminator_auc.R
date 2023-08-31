@@ -1,11 +1,12 @@
-#' Compute observed pmse for a single synthetic data set
+#' Compute AUC and var importance for a single synthetic data set
 #' 
 #' @param postsynth A data frame with the synthetic data
 #' @param data A postsynth object or data frame with confidential data
 #' @param formula A formula for the predictive model
 #' @param cp A hyperparameter for rpart
+#' @param model Model type - "decision tree" or "random forest"
 #' 
-#' @return joint distributional utility metric (num)
+#' @return List with AUC and var importances
 #' 
 #' @importFrom stats predict
 #' @importFrom rlang .data

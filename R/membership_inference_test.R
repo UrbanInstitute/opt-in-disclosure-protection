@@ -1,3 +1,11 @@
+#' Membership inference test
+#' 
+#' @param postsynth A data frame with the synthetic data
+#' @param data Training set of confidential data
+#' @param holdout_data Holdout set of confidential data
+#' 
+#' @return Evaluation metrics
+
 membership_inference_test <- function(postsynth, data, holdout_data) {
   
   if ("postsynth" %in% class(postsynth)) {
