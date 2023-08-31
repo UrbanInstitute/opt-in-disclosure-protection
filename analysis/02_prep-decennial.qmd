@@ -30,10 +30,10 @@ source(here("R", "add_opt_in.R"))
 
 ```{r, message = FALSE}
 df_dc <- process_pums("DC")
-saveRDS(df_dc, file = paste(here("data", "pums"), "pums-dc.rds", sep = "/"))
+saveRDS(df_dc, file = paste(here("data", "starting"), "decennial-exploratory.rds", sep = "/"))
 ```
 
-### starting-data-001
+### decennial-starting-001
 
 DC and IA only
 attributes: age bucket, sex, race simple
@@ -41,10 +41,10 @@ geo: state
 
 ```{r, message = FALSE}
 starting001 <- prep001()
-saveRDS(starting001, file = paste(here("data", "starting"), "starting-data-001.rds", sep = "/"))
+saveRDS(starting001, file = paste(here("data", "starting"), "decennial-starting-001.rds", sep = "/"))
 ```
 
-### starting-data-002
+### decennial-starting-002
 
 DC and IA only
 attributes: hispanic simple
@@ -52,6 +52,6 @@ geo: state
 
 ```{r, message = FALSE}
 starting002 <- prep002()
-saveRDS(starting002, file = paste(here("data", "starting"), "starting-data-002.rds", sep = "/"))
+saveRDS(starting002, file = paste(here("data", "starting"), "decennial-starting-002.rds", sep = "/"))
 ```
 
