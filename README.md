@@ -14,6 +14,14 @@ This repository contains two simulation demonstrations of opt-in disclosure prot
 
 ## Formally Private Decennial Census
 
+The 2010 Census Stateside Public Use Microdata Sample data files and supporting resources can be found on the [Census Bureau website](https://www.census.gov/data/datasets/2010/dec/stateside-pums.html).
+
+1. Run `analysis/01_prep-decennial-resources.qmd` to prepare the PUMS layout file for processing the microdata.
+2. Run `analysis/02_prep-decennial.qmd` to read and process the microdata.
+3. Run `analysis/03_decennial-exploratory.qmd` to conduct exploratory analysis of the DC PUMS data.
+4. Run `analysis/04_decennial-dp-simulations.qmd` to run the full set of scenarios.
+5. Run `analysis/05_decennial-dp-evaluation.qmd` to generate and visualize summary evaluation metrics.
+
 
 ## Synthetic ACS
 
