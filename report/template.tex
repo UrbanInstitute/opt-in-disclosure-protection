@@ -184,7 +184,7 @@
 \date{}
 
 \begin{document}
-\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[interior hidden, borderline west={3pt}{0pt}{shadecolor}, frame hidden, breakable, sharp corners, enhanced, boxrule=0pt]}{\end{tcolorbox}}\fi
+\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[interior hidden, borderline west={3pt}{0pt}{shadecolor}, enhanced, sharp corners, breakable, frame hidden, boxrule=0pt]}{\end{tcolorbox}}\fi
 
 \pagenumbering{roman}
 
@@ -648,7 +648,7 @@ a cardinality of just 2 (Hispanic or Latino, Not Hispanic or Latino),
 this scenario allows for the most similar comparison with the global
 method (in which \(\epsilon\) is allocated to just one statistic).
 
-Figure \ref{fig:methods-bias} shows the distribution of bias metrics
+Figure \ref{fig:dec-methods-bias} shows the distribution of bias metrics
 from our simulations at the defined levels of \(\epsilon\) and opt in
 rate. Both the local and central methods are unbiased, with the
 distribution of mean percent error values centered around zero.
@@ -656,11 +656,11 @@ distribution of mean percent error values centered around zero.
 \begin{figure}[!htb]
     \centering
     \caption{Local and Central DP Approaches are Similarly Unbiased}
-    \includegraphics[width=4in]{../figures/methods_bias.png}
-    \label{fig:methods-bias}
+    \includegraphics[width=4in]{../analysis/figures/dec-methods-bias.png}
+    \label{fig:dec-methods-bias}
 \end{figure}
 
-Figure \ref{fig:methods-accuracy} shows the distribution of accuracy
+Figure \ref{fig:dec-methods-accuracy} shows the distribution of accuracy
 metrics from our simulations at the defined levels of \(\epsilon\) and
 opt in rate, demonstrating two key takeaways about the accuracy of these
 methods. First, the opt-in framework approach does improve the overall
@@ -677,8 +677,8 @@ loss anyway.
 \begin{figure}[!htb]
     \centering
     \caption{Local Method Outperforms Central Method Only with Very High Privacy Loss Budget}
-    \includegraphics[width=4in]{../figures/methods_accuracy.png}
-    \label{fig:methods-accuracy}
+    \includegraphics[width=4in]{../analysis/figures/dec-methods-accuracy.png}
+    \label{fig:dec-methods-accuracy}
 \end{figure}
 
 While the opt-in local approach does improve the accuracy of estimates
@@ -700,23 +700,23 @@ improved for groups that opt-in at relatively lower rates than others.
 For Scenario 2, we focus on results allowing us to compare differences
 in data quality by racial/ethnic group.
 
-Figures \ref{fig:groups_dc} and \ref{fig:groups_ia} show the
-distribution of accuracy results for the specified opt in rates for each
-racial/ethnic group (using \(\epsilon\) = 1), separately for Washington,
-DC and Iowa.
+Figures \ref{fig:dec-race-accuracy-dc} and
+\ref{fig:dec-race-accuracy-ia} show the distribution of accuracy results
+for the specified opt in rates for each racial/ethnic group (using
+\(\epsilon\) = 1), separately for Washington, DC and Iowa.
 
 \begin{figure}[!htb]
     \centering
     \caption{Accuracy By Racial/Ethnic Group - Washington, DC}
-    \includegraphics[width=4in]{../figures/groups_dc.png}
-    \label{fig:groups_dc}
+    \includegraphics[width=4in]{../analysis/figures/dec-race-accuracy-dc.png}
+    \label{fig:dec-race-accuracy-dc}
 \end{figure}
 
 \begin{figure}[!htb]
     \centering
     \caption{Accuracy By Racial/Ethnic Group - Iowa}
-    \includegraphics[width=4in]{../figures/groups_ia.png}
-    \label{fig:groups_ia}
+    \includegraphics[width=4in]{../analysis/figures/dec-race-accuracy-ia.png}
+    \label{fig:dec-race-accuracy-ia}
 \end{figure}
 
 According to the 2010 Census Redistricting Data (Public Law 94-171)
@@ -729,10 +729,10 @@ the smaller groups in both places.
 
 The opt-in framework offers a solution path to improve data accuracy for
 these smaller racial/ethnic groups. For example, the median absolute
-percent error for the Hispanic group is about 4.5\% in Washington, DC
-and 6.2\% in Iowa when there is 100\% opt in, or when all respondents
+percent error for the Hispanic group is about 5.3\% in Washington, DC
+and 5.9\% in Iowa when there is 100\% opt in, or when all respondents
 are subjected to disclosure protections. These error values shrink to
-about 1.6\% and 1.7\%, respectively, with a Hispanic group opt-in rate
+about 1.4\% and 1.8\%, respectively, with a Hispanic group opt-in rate
 of 10\%. Given the properties of formal privacy, the privacy protections
 afforded to those who opt-in are unaffected by those who choose to
 forego protections.
