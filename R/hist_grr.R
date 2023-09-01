@@ -90,8 +90,8 @@ hist_grr <- function(data, epsilon, attribs) {
 
   # join optin and truth
   combine <- optin_corrected |>
-    dplyr::left_join(truth_sum, by = "D_i") |>
-    tidyr::replace_na(list(n_perterbed = 0, n_truth = 0)) |>
+    dplyr::full_join(truth_sum, by = "D_i") |>
+    tidyr::replace_na(list(n_perturbed = 0, n_truth = 0)) |>
     dplyr::mutate(n_noisy = n_perturbed + n_truth) |>
     dplyr::select(-n_perturbed, -n_truth)
   
@@ -99,7 +99,7 @@ hist_grr <- function(data, epsilon, attribs) {
   # comparisons
   data_out <- histogram |> 
     dplyr::left_join(combine, by = "D_i") |>
-    tidyr::replace_na(list(n = 0)) |>
+    tidyr::replace_na(list(n = 0, n_noisy = 0)) |>
     dplyr::relocate(D_i, n, n_noisy)
   
   # temporary workaround to keep state identifier
