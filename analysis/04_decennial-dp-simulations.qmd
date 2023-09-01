@@ -1,0 +1,171 @@
+---
+title: "Decennial DP Simulations"
+format: 
+  html:
+    embed-resources: true
+    toc: true
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r, message = FALSE, warning = FALSE}
+library(tidyverse)
+library(here)
+
+source(here("R", "hist_grr.R"))
+source(here("R", "hist_global.R"))
+source(here("R", "add_D_i.R"))
+source(here("R", "add_prob_opt_in.R"))
+source(here("R", "add_opt_in.R"))
+
+options(dplyr.summarise.inform = FALSE)
+```
+
+## Starting Data 001
+
+### Set Up Starting Data
+
+```{r}
+data001 <- readRDS(here("data", "starting", "decennial-starting-001.rds"))
+
+attribs001 <- c("age_bucket", "race_simple", "sex_val")
+```
+
+### Set Up No Mult Grid Specs
+
+```{r}
+specs_nomult <- expand_grid(
+  run = 1:100, 
+  epsilon = c(1, 5, 10, 20),
+  opt_in = c(0.01, 0.1, 0.5, 0.9, 1)
+)
+```
+
+### Functions for No Mult Data Prep and Summary
+
+```{r}
+prep_data_nomult <- function(data, opt_in, attribs) {
+  
+  data |>
+      add_prob_opt_in(prob = opt_in) |>
+      add_opt_in() |>
+      add_D_i(attribs = attribs)
+  
+}
+```
+
+### Function for No Mult Spec Grid
+
+```{r}
+spec_nomult_grid <- function(data, attribs) {
+  
+  bind_rows(
+    `grr` = pmap_dfr(
+      .l = specs_nomult,
+      .f = function(run, epsilon, opt_in) data |>
+        prep_data_nomult(opt_in = opt_in, attribs = attribs) |>
+        group_split(state) |>
+        map_dfr(hist_grr, epsilon = epsilon, attribs = attribs) |>
+        mutate(run = run, epsilon = epsilon, opt_in = opt_in)
+    ),
+    `global` = pmap_dfr(
+      .l = distinct(select(specs_nomult, c(epsilon, run))),
+      .f = function(run, epsilon) data |>
+        group_split(state) |>
+        map_dfr(hist_global, epsilon = epsilon, attribs = attribs) |>
+        mutate(run = run, epsilon = epsilon) %>%
+        uncount(weights = length(unique(specs_nomult$opt_in))) %>% 
+        mutate(opt_in = rep(unique(specs_nomult$opt_in), length.out = n()))
+      ),
+    .id = "method"
+  )
+  
+}
+```
+
+### Run No Mult Spec Grid
+
+```{r}
+results_nomult_001 <- spec_nomult_grid(data001, attribs001)
+saveRDS(results_nomult_001, file = here("data", "results", "decennial-results-nomult-001.rds"))
+```
+
+## Starting Data 002
+
+### Set Up Starting Data
+
+```{r}
+data002 <- readRDS(here("data", "starting", "decennial-starting-002.rds"))
+
+attribs002 <- c("hisp_simple")
+```
+
+### Run No Mult Spec Grid
+
+```{r}
+results_nomult_002 <- spec_nomult_grid(data002, attribs002)
+saveRDS(results_nomult_002, file = here("data", "results", "decennial-results-nomult-002.rds"))
+```
+
+## Starting Data 001 - With White Multiplier
+
+### Set Up Mult Grid Specs
+
+```{r}
+specs_mult <- expand_grid(
+  run = 1:100, 
+  epsilon = c(1, 5, 10, 20),
+  opt_in = c(0.01, 0.1, 0.5, 0.9, 1),
+  white_multiplier = c(0.5, 1, 2)
+)
+```
+
+### Functions for Mult Data Prep and Summary
+
+```{r}
+prep_data_mult <- function(data, opt_in, attribs, white_multiplier) {
+  
+  data |>
+      add_prob_opt_in(prob = opt_in, white_multiplier = white_multiplier) |>
+      add_opt_in() |>
+      add_D_i(attribs = attribs)
+  
+}
+```
+
+### Function for Mult Spec Grid
+
+```{r}
+spec_mult_grid <- function(data, attribs) {
+  
+  results <- bind_rows(
+    `grr` = pmap_dfr(
+      .l = specs_mult,
+      .f = function(run, epsilon, opt_in, white_multiplier) data |>
+        prep_data_mult(opt_in = opt_in, attribs = attribs, white_multiplier = white_multiplier) |>
+        group_split(state) |>
+        map_dfr(hist_grr, epsilon = epsilon, attribs = attribs) |>
+        mutate(run = run, epsilon = epsilon, opt_in = opt_in, white_multiplier = white_multiplier)
+    ),
+    `global` = pmap_dfr(
+      .l = distinct(select(specs_mult, c(epsilon, run))),
+      .f = function(run, epsilon) data |>
+        group_split(state) |>
+        map_dfr(hist_global, epsilon = epsilon, attribs = attribs) |>
+        mutate(run = run, epsilon = epsilon) %>%
+        uncount(weights = nrow(unique(select(specs_mult, c(opt_in, white_multiplier))))) %>% 
+        mutate(opt_in = rep(unique(specs_mult$opt_in), length.out = n()),
+               white_multiplier = rep(unique(specs_mult$white_multiplier), length.out = n()))
+      ),
+    .id = "method"
+  )
+}
+```
+
+### Run Mult Spec Grid
+
+```{r}
+results_mult_001 <- spec_mult_grid(data001, attribs001)
+saveRDS(results_mult_001, file = here("data", "results", "decennial-results-mult-001.rds"))
+```
+

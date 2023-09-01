@@ -193,24 +193,24 @@ We evaluate the results of these simulations using bias and accuracy metrics, co
 
 For Scenario 1, we focus primarily on results allowing us to compare the performance of the local GRR method to the central Laplace method. With a cardinality of just 2 (Hispanic or Latino, Not Hispanic or Latino), this scenario allows for the most similar comparison with the global method (in which $\epsilon$ is allocated to just one statistic).
 
-Figure \ref{fig:methods-bias} shows the distribution of bias metrics from our simulations at the defined levels of $\epsilon$ and opt in rate. Both the local and central methods are unbiased, with the distribution of mean percent error values centered around zero.
+Figure \ref{fig:dec-methods-bias} shows the distribution of bias metrics from our simulations at the defined levels of $\epsilon$ and opt in rate. Both the local and central methods are unbiased, with the distribution of mean percent error values centered around zero.
 
 ```{=tex}
 \begin{figure}[!htb]
     \centering
     \caption{Local and Central DP Approaches are Similarly Unbiased}
-    \includegraphics[width=4in]{../figures/methods_bias.png}
-    \label{fig:methods-bias}
+    \includegraphics[width=4in]{../analysis/figures/dec-methods-bias.png}
+    \label{fig:dec-methods-bias}
 \end{figure}
 ```
-Figure \ref{fig:methods-accuracy} shows the distribution of accuracy metrics from our simulations at the defined levels of $\epsilon$ and opt in rate, demonstrating two key takeaways about the accuracy of these methods. First, the opt-in framework approach does improve the overall accuracy of the local GRR method. As we decrease the level of opt in, the width of the mean percent error distribution shrinks and moves closer to zero. However, the second key takeaway is that the central method significantly outperforms the local method in terms of accuracy at nearly every tested level of $\epsilon$ and opt in rate, even with very small opt in rates. The local method only outperforms the central method with a very high privacy loss budget of $\epsilon$ = 20, and the errors for both methods are very small for that level of privacy loss anyway.
+Figure \ref{fig:dec-methods-accuracy} shows the distribution of accuracy metrics from our simulations at the defined levels of $\epsilon$ and opt in rate, demonstrating two key takeaways about the accuracy of these methods. First, the opt-in framework approach does improve the overall accuracy of the local GRR method. As we decrease the level of opt in, the width of the mean percent error distribution shrinks and moves closer to zero. However, the second key takeaway is that the central method significantly outperforms the local method in terms of accuracy at nearly every tested level of $\epsilon$ and opt in rate, even with very small opt in rates. The local method only outperforms the central method with a very high privacy loss budget of $\epsilon$ = 20, and the errors for both methods are very small for that level of privacy loss anyway.
 
 ```{=tex}
 \begin{figure}[!htb]
     \centering
     \caption{Local Method Outperforms Central Method Only with Very High Privacy Loss Budget}
-    \includegraphics[width=4in]{../figures/methods_accuracy.png}
-    \label{fig:methods-accuracy}
+    \includegraphics[width=4in]{../analysis/figures/dec-methods-accuracy.png}
+    \label{fig:dec-methods-accuracy}
 \end{figure}
 ```
 While the opt-in local approach does improve the accuracy of estimates with lower levels of opt in, this improvement alone is unfortunately not enough to justify a switch from a central model to a local model. Existing local DP methods cannot offer the same level of accuracy as central methods, especially for datasets with even higher cardinality. However, the potential to improve data quality results with a local method and opt-in framework motivates greater focus on developing potentially more powerful local DP methods in the future.
@@ -219,27 +219,27 @@ While the opt-in local approach does improve the accuracy of estimates with lowe
 
 Although existing local DP methods may be disappointing for overall accuracy, an opt-in local DP framework still offers the potential to improve data quality for small groups. Data quality may be especially improved for groups that opt-in at relatively lower rates than others. For Scenario 2, we focus on results allowing us to compare differences in data quality by racial/ethnic group.
 
-Figures \ref{fig:groups_dc} and \ref{fig:groups_ia} show the distribution of accuracy results for the specified opt in rates for each racial/ethnic group (using $\epsilon$ = 1), separately for Washington, DC and Iowa.
+Figures \ref{fig:dec-race-accuracy-dc} and \ref{fig:dec-race-accuracy-ia} show the distribution of accuracy results for the specified opt in rates for each racial/ethnic group (using $\epsilon$ = 1), separately for Washington, DC and Iowa.
 
 ```{=tex}
 \begin{figure}[!htb]
     \centering
     \caption{Accuracy By Racial/Ethnic Group - Washington, DC}
-    \includegraphics[width=4in]{../figures/groups_dc.png}
-    \label{fig:groups_dc}
+    \includegraphics[width=4in]{../analysis/figures/dec-race-accuracy-dc.png}
+    \label{fig:dec-race-accuracy-dc}
 \end{figure}
 ```
 ```{=tex}
 \begin{figure}[!htb]
     \centering
     \caption{Accuracy By Racial/Ethnic Group - Iowa}
-    \includegraphics[width=4in]{../figures/groups_ia.png}
-    \label{fig:groups_ia}
+    \includegraphics[width=4in]{../analysis/figures/dec-race-accuracy-ia.png}
+    \label{fig:dec-race-accuracy-ia}
 \end{figure}
 ```
 According to the 2010 Census Redistricting Data (Public Law 94-171) Summary File, the population of Washington DC was 38% white, non-Hispanic and 51% Black, non-Hispanic, and the population of Iowa was 91% white, non-Hispanic. For both states, mean percent error is smallest for these relatively large groups, reflecting the larger sample sizes. Error tends to be relatively larger, and with larger spreads, for the smaller groups in both places.
 
-The opt-in framework offers a solution path to improve data accuracy for these smaller racial/ethnic groups. For example, the median absolute percent error for the Hispanic group is about 4.5% in Washington, DC and 6.2% in Iowa when there is 100% opt in, or when all respondents are subjected to disclosure protections. These error values shrink to about 1.6% and 1.7%, respectively, with a Hispanic group opt-in rate of 10%. Given the properties of formal privacy, the privacy protections afforded to those who opt-in are unaffected by those who choose to forego protections.
+The opt-in framework offers a solution path to improve data accuracy for these smaller racial/ethnic groups. For example, the median absolute percent error for the Hispanic group is about 5.3% in Washington, DC and 5.9% in Iowa when there is 100% opt in, or when all respondents are subjected to disclosure protections. These error values shrink to about 1.4% and 1.8%, respectively, with a Hispanic group opt-in rate of 10%. Given the properties of formal privacy, the privacy protections afforded to those who opt-in are unaffected by those who choose to forego protections.
 
 With an opt-in disclosure framework, the US Census Bureau and community groups could engage in outreach efforts, especially to smaller groups, to help respondents understand the implications of foregoing disclosure protections, both for their privacy but also for the wide-ranging impacts of improving their data quality. This type of outreach could result in better data quality for these groups, with positive downstream impacts on representation and funding allocations to communities.
 

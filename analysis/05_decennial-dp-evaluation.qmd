@@ -1,0 +1,322 @@
+---
+title: "Decennial DP Evaluation"
+format: 
+  html:
+    embed-resources: true
+    toc: true
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r, message = FALSE, warning = FALSE}
+library(tidyverse)
+library(here)
+library(urbnthemes)
+library(tigris)
+
+source(here("R", "metrics_config.R"))
+source(here("R", "metric_all.R"))
+
+set_urbn_defaults(style = "print")
+options(dplyr.summarise.inform = FALSE)
+```
+
+# Prep
+
+## Summarize Metrics
+
+```{r}
+summarize_results <- function(data) {
+  
+  data |>
+    metric_all(n = n, n_noisy = n_noisy, threshold = 0.1, drop_zeros = TRUE) |>
+    ungroup()
+  
+}
+```
+
+## Identify Summary Level
+
+```{r}
+methods_summary_level <- c("method", "run", "epsilon", "opt_in")
+race_state_summary_level <- c("race_simple", "state", "method", "run", "epsilon", "opt_in")
+hisp_state_summary_level <- c("hisp_simple", "state", "method", "run", "epsilon", "opt_in")
+mult_race_state_summary_level <- c("white_multiplier", "race_simple", "state", "method", "run", "epsilon", "opt_in")
+```
+
+## Plotting Functions
+
+```{r}
+boxplot_methods <- function(data, metric, ylab) {
+  
+  data %>%
+    ggplot(aes(fill = method, 
+               y = {{metric}}, 
+               x = as.factor(opt_in))) +
+      geom_boxplot() +
+      geom_hline(yintercept = 0, color = "black", size = 0.01) +
+      labs(x = "Opt-in rate",
+           y = ylab) +
+      scale_fill_discrete(labels = c("global" = "Central", 
+                                     "grr" = "Local")) +
+      facet_grid(epsilon ~ ., scales = "free_y", 
+                 labeller = label_bquote(epsilon == .(epsilon)))
+  
+}
+
+boxplot_race_state <- function(data, mech, state, metric, ylab, eps) {
+  
+  state_fips <- parse_number(lookup_code(state))
+  
+  data %>%
+    filter(state == state_fips & epsilon == eps & method == mech) %>%
+    ggplot(aes(y = {{metric}}, 
+               x = as.factor(opt_in))) +
+      geom_boxplot() +
+      geom_hline(yintercept = 0, color = "black", size = 0.01) +
+      labs(x = "Opt-in rate",
+           y = ylab) +
+      facet_grid(race_simple ~ .)
+  
+}
+
+boxplot_hisp_state <- function(data, mech, state, metric, ylab, eps) {
+  
+  state_fips <- parse_number(lookup_code(state))
+  
+  data %>%
+    filter(state == state_fips & epsilon == eps & method == mech) %>%
+    ggplot(aes(y = {{metric}}, 
+               x = as.factor(opt_in))) +
+      geom_boxplot() +
+      geom_hline(yintercept = 0, color = "black", size = 0.01) +
+      labs(x = "Opt-in rate",
+           y = ylab) +
+    facet_grid(hisp_simple ~ .)
+
+}
+
+boxplot_mult_race_state <- function(data, mech, state, metric, eps, optin) {
+  
+  state_fips <- parse_number(lookup_code(state))
+  
+  data %>%
+    filter(method == mech & 
+           epsilon == eps & 
+           state == state_fips & 
+           opt_in == optin) %>%
+    ggplot(aes(fill = race_simple, 
+               y = {{metric}}, 
+               x = as.factor(white_multiplier))) +
+      geom_boxplot() +
+      geom_hline(yintercept = 0, color = "black", size = 0.01) +
+      labs(x = "White Multiplier")
+
+}
+```
+
+# Decennial 001 No Mult Results
+
+## Prep Data
+
+```{r}
+results_nomult001 <- readRDS(here("data", "results", "decennial-results-nomult-001.rds"))
+```
+
+```{r}
+methods_summary_nomult001 <- results_nomult001 %>%
+  group_by(across(all_of(methods_summary_level))) %>%
+  summarize_results()
+
+race_state_summary_nomult001 <- results_nomult001 %>%
+  group_by(across(all_of(race_state_summary_level))) %>%
+  summarize_results()
+```
+
+## Results
+
+### Methods Overall
+
+#### Bias
+
+```{r}
+methods_summary_nomult001 %>%
+  boxplot_methods(mean_pct_error, "Mean percent error")
+```
+
+#### Accuracy
+
+```{r}
+methods_summary_nomult001 %>%
+  boxplot_methods(mean_abs_pct_error, "Mean absolute percent error")
+```
+
+### Methods by Race & State
+
+#### Bias
+
+```{r}
+race_state_summary_nomult001 %>%
+  boxplot_race_state(mech = "grr",
+                     state = "DC",
+                     metric = mean_pct_error,
+                     ylab = "Mean percent error",
+                     eps = 1)
+```
+
+```{r}
+race_state_summary_nomult001 %>%
+  boxplot_race_state(mech = "grr",
+                     state = "IA",
+                     metric = mean_pct_error,
+                     ylab = "Mean percent error",
+                     eps = 1)
+```
+
+#### Accuracy
+
+```{r}
+race_state_summary_nomult001 %>%
+  boxplot_race_state(mech = "grr",
+                     state = "DC",
+                     metric = mean_abs_pct_error,
+                     ylab = "Mean absolute percent error",
+                     eps = 1)
+ggsave(here("analysis", "figures", "dec-race-accuracy-dc.png"))
+```
+
+```{r}
+race_state_summary_nomult001 %>%
+  boxplot_race_state(mech = "grr",
+                     state = "IA",
+                     metric = mean_abs_pct_error,
+                     ylab = "Mean absolute percent error",
+                     eps = 1)
+ggsave(here("analysis", "figures", "dec-race-accuracy-ia.png"))
+```
+
+```{r}
+race_state_summary_nomult001 %>%
+  filter(epsilon == 1, method == "grr", race_simple == "Hispanic") %>%
+  group_by(across(all_of(c("state", "opt_in")))) %>%
+  summarize(median_mape = median(mean_abs_pct_error))
+```
+
+# Decennial 002 No Mult Results
+
+## Prep Data
+
+```{r}
+results_nomult002 <- readRDS(here("data", "results", "decennial-results-nomult-002.rds"))
+```
+
+```{r}
+methods_summary_nomult002 <- results_nomult002 %>%
+  group_by(across(all_of(methods_summary_level))) %>%
+  summarize_results()
+
+hisp_state_summary_nomult002 <- results_nomult002 %>%
+  group_by(across(all_of(hisp_state_summary_level))) %>%
+  summarize_results()
+```
+
+## Results
+
+### Methods Overall
+
+#### Bias
+
+```{r}
+methods_summary_nomult002 %>%
+  boxplot_methods(mean_pct_error, "Mean percent error")
+ggsave(here("analysis", "figures", "dec-methods-bias.png"))
+```
+
+#### Accuracy
+
+```{r}
+methods_summary_nomult002 %>%
+  boxplot_methods(mean_abs_pct_error, "Mean absolute percent error")
+ggsave(here("analysis", "figures", "dec-methods-accuracy.png"))
+```
+
+### Methods by Hisp & State
+
+#### Bias
+
+```{r}
+hisp_state_summary_nomult002 %>%
+  boxplot_hisp_state(state = "DC",
+                     mech = "grr",
+                     metric = mean_pct_error,
+                     ylab = "Mean percent error",
+                     eps = 1)
+```
+
+```{r}
+hisp_state_summary_nomult002 %>%
+  boxplot_hisp_state(state = "IA",
+                     mech = "grr",
+                     metric = mean_pct_error,
+                     ylab = "Mean percent error",
+                     eps = 1)
+```
+
+#### Accuracy
+
+```{r}
+hisp_state_summary_nomult002 %>%
+  boxplot_hisp_state(state = "DC",
+                     mech = "grr",
+                     metric = mean_abs_pct_error,
+                     ylab = "Mean absolute percent error",
+                     eps = 1)
+```
+
+```{r}
+hisp_state_summary_nomult002 %>%
+  boxplot_hisp_state(state = "IA",
+                     mech = "grr",
+                     metric = mean_abs_pct_error,
+                     ylab = "Mean absolute percent error",
+                     eps = 1)
+```
+
+# Decennial 001 Mult Results
+
+## Prep Data
+
+```{r}
+results_mult001 <- readRDS(here("data", "results", "decennial-results-mult-001.rds"))
+```
+
+```{r}
+mult_race_state_summary_mult001 <- results_mult001 %>%
+  group_by(across(all_of(mult_race_state_summary_level))) %>%
+  summarize_results()
+```
+
+## Results
+
+### Methods by Hisp & State
+
+#### Accuracy
+
+```{r}
+boxplot_mult_race_state(data = mult_race_state_summary_mult001,
+                        mech = "grr",
+                        state = "IA",
+                        metric = mean_abs_pct_error,
+                        eps = 1,
+                        optin = 0.5)
+```
+
+```{r}
+boxplot_mult_race_state(data = mult_race_state_summary_mult001,
+                        mech = "grr",
+                        state = "DC",
+                        metric = mean_abs_pct_error,
+                        eps = 1,
+                        optin = 0.5)
+```
+

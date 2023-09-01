@@ -1,3 +1,11 @@
+#' Regression confidence interval overlap
+#' 
+#' @param postsynth A data frame with the synthetic data
+#' @param data A data frame with confidential data
+#' @param formula Regression specification
+#' 
+#' @return Regression CI overlap and coefficients
+
 regression_ci_overlap <- function(postsynth, data, formula) {
   
   if ("postsynth" %in% class(postsynth)) {
