@@ -61,7 +61,7 @@ specs <- expand_grid(
     description = str_glue("Run: {run}; Implicate: {implicate}; Opt-in: {opt_in}; White Mulitplier: {white_multiplier}")
   )
 
-write_csv(specs, here("data", "results", "acs", "specs.csv"))
+write_csv(specs, here("data", "results", "specs.csv"))
 
 ```
 
