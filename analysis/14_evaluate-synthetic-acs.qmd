@@ -68,7 +68,7 @@ syntheses <- syntheses |>
 # plan(multisession, workers = 4)
 # message("Number of parallel workers: ", nbrOfWorkers())
 
-if (!file.exists(here("data", "results", "acs", "acs-metrics.rds"))) {
+if (!file.exists(here("data", "results", "acs-metrics.rds"))) {
 
   set.seed(20230818)
   tic()
@@ -80,17 +80,17 @@ if (!file.exists(here("data", "results", "acs", "acs-metrics.rds"))) {
     )
   toc()
   
-  saveRDS(results, here("data", "results", "acs", "acs-metrics.rds"))
+  saveRDS(results, here("data", "results", "acs-metrics.rds"))
   
 } else {
   
-  results <- readRDS(here("data", "results", "acs", "acs-metrics.rds"))
+  results <- readRDS(here("data", "results", "acs-metrics.rds"))
   
 }
 
 
 
-specs <- read_csv(here::here("data", "results", "acs", "specs.csv")) |>
+specs <- read_csv(here::here("data", "results", "specs.csv")) |>
   mutate(
     opt_in = factor(opt_in),
     white_multiplier = factor(white_multiplier)
@@ -120,7 +120,6 @@ bind_cols(
   geom_point(alpha = 0.4) +
   facet_wrap(~variable) +
   labs(
-    subtitle = "Equal Opt-In Probabilities for All Races",
     x = "Proportion Opt In",
     y = "Absolute Error In Proportion"
   ) +
@@ -142,7 +141,6 @@ bind_cols(
   geom_point(alpha = 0.4) +
   facet_wrap(~variable) +
   labs(
-    subtitle = "Equal Opt-In Probabilities for All Races and Ethnicities",
     x = "Proportion Opt In",
     y = "Error In Proportion"
   ) +
@@ -164,7 +162,6 @@ bind_cols(
   geom_point(alpha = 0.4) +
   facet_wrap(~variable) +
   labs(
-    subtitle = "Equal Opt-In Probabilities for All Races and Ethnicities",
     x = "Proportion Opt In",
     y = "Absolute Error In Proportion"
   ) +
@@ -214,7 +211,6 @@ bind_cols(
   geom_hline(yintercept = 0) +
   facet_wrap(~race) +
   labs(
-    subtitle = "Low Opt-in Improves the Proportion of People with Salaries and Wages",
     y = "Error in Proportion with Salaries and Wages",
     color = "White Multiplier"
   ) +
@@ -232,7 +228,6 @@ bind_cols(
   geom_hline(yintercept = 0) +
   facet_wrap(~ race_eth) +
   labs(
-    subtitle = "Low Opt-in Improves the Proportion of People with Salaries and Wages",
     y = "Error in Proportion with Salaries and Wages",
     color = "White Multiplier"
   ) +
@@ -514,7 +509,6 @@ bind_cols(
   ggplot(aes(opt_in, discriminator_auc, color = white_multiplier)) +
   geom_point(alpha = 0.3) +
   labs(
-    subtitle = "The Discriminator Model is a Decision Tree",
     y = "AUC for Discrimnator Model"
   ) +
   scatter_grid()
