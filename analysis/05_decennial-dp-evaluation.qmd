@@ -19,6 +19,7 @@ source(here("R", "metric_all.R"))
 
 set_urbn_defaults(style = "print")
 options(dplyr.summarise.inform = FALSE)
+options(scipen = 999)
 ```
 
 # Prep
