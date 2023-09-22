@@ -55,10 +55,11 @@ boxplot_methods <- function(data, metric, ylab) {
                y = {{metric}}, 
                x = as.factor(opt_in))) +
       geom_boxplot() +
-      geom_hline(yintercept = 0, color = "black", size = 0.05) +
+      geom_hline(yintercept = 0, color = "black", size = 0.1) +
       labs(x = "Opt-in rate",
            y = ylab) +
-      scale_fill_discrete(labels = c("global" = "Central", 
+      scale_fill_manual(values = c("#fdbf11", "#1696d2"),
+                          labels = c("global" = "Central", 
                                      "grr" = "Local")) +
       facet_grid(epsilon ~ ., scales = "free_y", 
                  labeller = label_bquote(epsilon == .(epsilon)))
@@ -74,7 +75,7 @@ boxplot_race_state <- function(data, mech, state, metric, ylab, eps) {
     ggplot(aes(y = {{metric}}, 
                x = as.factor(opt_in))) +
       geom_boxplot() +
-      geom_hline(yintercept = 0, color = "black", size = 0.05) +
+      geom_hline(yintercept = 0, color = "black", size = 0.1) +
       labs(x = "Opt-in rate",
            y = ylab) +
       facet_grid(race_simple ~ .)
@@ -90,7 +91,7 @@ boxplot_hisp_state <- function(data, mech, state, metric, ylab, eps) {
     ggplot(aes(y = {{metric}}, 
                x = as.factor(opt_in))) +
       geom_boxplot() +
-      geom_hline(yintercept = 0, color = "black", size = 0.05) +
+      geom_hline(yintercept = 0, color = "black", size = 0.1) +
       labs(x = "Opt-in rate",
            y = ylab) +
     facet_grid(hisp_simple ~ .)
@@ -110,7 +111,7 @@ boxplot_mult_race_state <- function(data, mech, state, metric, eps, optin) {
                y = {{metric}}, 
                x = as.factor(white_multiplier))) +
       geom_boxplot() +
-      geom_hline(yintercept = 0, color = "black", size = 0.05) +
+      geom_hline(yintercept = 0, color = "black", size = 0.1) +
       labs(x = "White Multiplier")
 
 }
