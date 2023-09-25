@@ -20,6 +20,7 @@ source(here("R", "metric_all.R"))
 set_urbn_defaults(style = "print")
 options(dplyr.summarise.inform = FALSE)
 options(scipen = 999)
+
 ```
 
 # Prep
@@ -39,7 +40,7 @@ summarize_results <- function(data) {
 ## Identify Summary Level
 
 ```{r}
-methods_summary_level <- c("method", "run", "epsilon", "opt_in")
+methods_summary_level <- c("method", "run", "epsilon", "opt_in", "state")
 race_state_summary_level <- c("race_simple", "state", "method", "run", "epsilon", "opt_in")
 hisp_state_summary_level <- c("hisp_simple", "state", "method", "run", "epsilon", "opt_in")
 mult_race_state_summary_level <- c("white_multiplier", "race_simple", "state", "method", "run", "epsilon", "opt_in")
@@ -61,24 +62,21 @@ boxplot_methods <- function(data, metric, ylab) {
       scale_fill_manual(values = c("#fdbf11", "#1696d2"),
                           labels = c("global" = "Central", 
                                      "grr" = "Local")) +
-      facet_grid(epsilon ~ ., scales = "free_y", 
+      facet_grid(epsilon ~ state, scales = "free_y", 
                  labeller = label_bquote(epsilon == .(epsilon)))
   
 }
 
-boxplot_race_state <- function(data, mech, state, metric, ylab, eps) {
-  
-  state_fips <- parse_number(lookup_code(state))
+boxplot_race_state <- function(data, mech, metric, ylab, eps) {
   
   data %>%
-    filter(state == state_fips & epsilon == eps & method == mech) %>%
-    ggplot(aes(y = {{metric}}, 
-               x = as.factor(opt_in))) +
-      geom_boxplot() +
-      geom_hline(yintercept = 0, color = "black", size = 0.1) +
-      labs(x = "Opt-in rate",
-           y = ylab) +
-      facet_grid(race_simple ~ .)
+    filter(epsilon == eps & method == mech) %>%
+    ggplot(aes(x = as.factor(opt_in), y = {{metric}}, fill = state)) +
+    geom_boxplot(aes(fill = state)) +
+    geom_hline(yintercept = 0, color = "black", size = 0.1) +
+    labs(x = "Opt-in rate",
+         y = ylab) +
+    facet_grid(race_simple ~ .)
   
 }
 
@@ -143,14 +141,18 @@ race_state_summary_nomult001 <- results_nomult001 %>%
 
 ```{r}
 methods_summary_nomult001 %>%
+  mutate(state = if_else(state == "11", "District of Columbia", "Iowa")) %>% 
   boxplot_methods(mean_pct_error, "Mean percent error")
+
 ```
 
 #### Accuracy
 
 ```{r}
 methods_summary_nomult001 %>%
+  mutate(state = if_else(state == "11", "District of Columbia", "Iowa")) %>% 
   boxplot_methods(mean_abs_pct_error, "Mean absolute percent error")
+
 ```
 
 ### Methods by Race & State
@@ -159,17 +161,8 @@ methods_summary_nomult001 %>%
 
 ```{r}
 race_state_summary_nomult001 %>%
+  mutate(state = if_else(state == "11", "District of Columbia", "Iowa")) %>% 
   boxplot_race_state(mech = "grr",
-                     state = "DC",
-                     metric = mean_pct_error,
-                     ylab = "Mean percent error",
-                     eps = 1)
-```
-
-```{r}
-race_state_summary_nomult001 %>%
-  boxplot_race_state(mech = "grr",
-                     state = "IA",
                      metric = mean_pct_error,
                      ylab = "Mean percent error",
                      eps = 1)
@@ -179,22 +172,13 @@ race_state_summary_nomult001 %>%
 
 ```{r}
 race_state_summary_nomult001 %>%
+  mutate(state = if_else(state == "11", "District of Columbia", "Iowa")) %>%  
   boxplot_race_state(mech = "grr",
-                     state = "DC",
                      metric = mean_abs_pct_error,
                      ylab = "Mean absolute percent error",
                      eps = 1)
-ggsave(here("analysis", "figures", "dec-race-accuracy-dc.png"))
-```
 
-```{r}
-race_state_summary_nomult001 %>%
-  boxplot_race_state(mech = "grr",
-                     state = "IA",
-                     metric = mean_abs_pct_error,
-                     ylab = "Mean absolute percent error",
-                     eps = 1)
-ggsave(here("analysis", "figures", "dec-race-accuracy-ia.png"))
+ggsave(here("analysis", "figures", "dec-race-accuracy.png"), width = 6.5, heigh = 6)
 ```
 
 ```{r}
@@ -230,16 +214,20 @@ hisp_state_summary_nomult002 <- results_nomult002 %>%
 
 ```{r}
 methods_summary_nomult002 %>%
+  mutate(state = if_else(state == "11", "District of Columbia", "Iowa")) %>%   
   boxplot_methods(mean_pct_error, "Mean percent error")
-ggsave(here("analysis", "figures", "dec-methods-bias.png"))
+
+ggsave(here("analysis", "figures", "dec-methods-bias.png"), width = 6.5, heigh = 6)
 ```
 
 #### Accuracy
 
 ```{r}
 methods_summary_nomult002 %>%
+  mutate(state = if_else(state == "11", "District of Columbia", "Iowa")) %>%   
   boxplot_methods(mean_abs_pct_error, "Mean absolute percent error")
-ggsave(here("analysis", "figures", "dec-methods-accuracy.png"))
+
+ggsave(here("analysis", "figures", "dec-methods-accuracy.png"), width = 6.5, heigh = 6)
 ```
 
 ### Methods by Hisp & State
