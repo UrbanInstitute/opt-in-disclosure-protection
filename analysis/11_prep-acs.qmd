@@ -1,0 +1,250 @@
+---
+title: "Prep ACS data for analysis"
+date: today
+format: 
+  html:
+    embed-resources: true
+    toc: true
+editor: source
+execute:
+  echo: true
+  warning: false
+  message: false
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup}
+library(tidyverse)
+library(here)
+library(ipumsr)
+
+```
+
+## Load ACS
+
+ACS income: https://usa.ipums.org/usa-action/variables/INCTOT#comparability_section
+
+`INCTOT` = `INCWAGE + INCBUS + INCSS + INCWELFR + INCSUPP + INCINVST + INCRETIR + INCOTHER`
+
+```{r}
+if (!file.exists(here("data", "pums", "acs2021.rds"))) {
+
+  variables <- c(
+    "STATEFIP",
+    "RELATE", # for filtering, not synthesized
+    "SEX",
+    "AGE", 
+    "MARST", 
+    "RACE", 
+    "HISPAN", 
+    "HCOVANY", 
+    "EDUC", 
+    "EMPSTAT", 
+    "LABFORCE", 
+    "FTOTINC", 
+    "INCTOT", 
+    "INCWAGE", 
+    "INCWELFR", 
+    "INCBUS00", # for residual
+    "INCSS", # for residual
+    "INCSUPP", # for residual
+    "INCINVST", # for residual
+    "INCRETIR", # for residual
+    "INCOTHER" # for residual
+  )
+  
+  # define the desired samples and variables
+  acs_extract_definition <- define_extract_usa(
+    description = "2021 1-Year ACS extraction for synthetic data",
+    samples = "us2021a",
+    variables = variables
+  )
+  
+  # submit the extract to IPUMS systems
+  acs_extract <- submit_extract(acs_extract_definition)
+  
+  # wait for the extract to process
+  acs_extract <- wait_for_extract(acs_extract)
+  
+  # define the data set to load
+  ddi_path <- download_extract(
+    acs_extract,
+    download_dir = here("data", "pums")
+  )
+  ddi <- read_ipums_ddi(ddi_path)
+  
+  # load the data
+  acs2021 <- read_ipums_micro(ddi)
+  
+  # save the data
+  saveRDS(acs2021, here("data", "pums", "acs2021.rds"))
+  
+}
+
+```
+
+```{r}
+acs2021 <- readRDS(here("data", "pums", "acs2021.rds"))
+
+```
+
+```{r}
+acs2021 |>
+  nrow()
+
+acs2021 |>
+  count(SERIAL) |>
+  nrow()
+
+```
+
+## Clean ACS
+
+Rename the variables to lower case. 
+
+```{r}
+acs2021 <- acs2021 |>
+  rename_with(tolower)
+
+```
+
+We simplify the observations included in the data to simplify the synthesis:
+
+* only heads of households
+* only outside of group quarters
+* only adults
+
+```{r}
+acs2021 <- acs2021 |>
+  filter(relate == 1, gq == 1, age >=18) 
+
+```
+
+IPUMS data come with annoying variable labels. We drop unnecessary variables and remove variable labels.  
+
+```{r}
+acs2021 <- acs2021 |>
+  select(
+    -year,
+    -sample,
+    -pernum, 
+    -gq, 
+    -cbserial,
+    -perwt,
+    -hhwt,
+    -cluster,
+    -strata,
+    -relate,
+    -related,
+    -raced,
+    -educ,
+    -hispand,
+    -empstatd,
+    -incbus00,
+    -incss,
+    -incinvst,
+    -incretir,
+    -incsupp,
+    -incother
+  ) |>
+  mutate(
+    statefip = as_factor(statefip),
+    sex = as_factor(sex),
+    marst = as_factor(marst),
+    race = as_factor(race),
+    educd = zap_ipums_attributes(educd),
+    hispan = as_factor(hispan),
+    hcovany = as_factor(hcovany),
+    empstat = as_factor(empstat),
+    labforce = as_factor(labforce),
+    age = zap_ipums_attributes(age),
+    inctot = zap_ipums_attributes(inctot),
+    ftotinc = zap_ipums_attributes(ftotinc),
+    incwage = zap_ipums_attributes(incwage),
+    incwelfr = zap_ipums_attributes(incwelfr),
+  )
+
+```
+
+We create a residual income variable that combines all of the types of personal income other than salaries and wages income and welfare income. 
+
+```{r}
+acs2021 <- acs2021 |>
+  mutate(
+    incresid = inctot - incwage - incwelfr
+  )
+
+```
+
+We convert education into integers to avoid a categorical variable with high cardinality. 
+
+```{r}
+# capture the IPUMS values
+educ_labels <- names(table(acs2021$educd))
+
+# create new integer values
+educ_values <- 1:length(educ_labels)
+
+# create a named vector for the recode
+names(educ_values) <- educ_labels
+
+# recode
+acs2021 <- acs2021 |>
+  mutate(educd = recode(educd, !!!educ_values))
+
+```
+
+For now, we focus on the simplified variables for `race` and `hispan`.
+
+We limit the data to Florida, Michigan, and Pennsylvania. 
+
+```{r}
+acs2021 <- acs2021 |>
+  filter(statefip %in% c("Florida", "Michigan", "Pennsylvania"))
+
+```
+
+Clean up factor levels:
+
+```{r}
+acs2021 <- acs2021 |>
+  mutate(across(where(is.factor), droplevels))
+
+```
+
+
+## Create Gold Standard Data Set (GSDS)
+
+Some states
+Sample
+
+```{r}
+count(acs2021, statefip)
+
+acs2021 |>
+  group_by(statefip) |>
+  summarize(n(), mean(race == "White")) |> 
+  print(n = Inf)
+
+```
+
+```{r}
+set.seed(20230728)
+
+sample_index <- sample(1:nrow(acs2021), size = round(nrow(acs2021) / 2))
+
+acs2021 |>
+  slice(sample_index) |>
+  saveRDS(here("data", "starting", "acs-gsds.rds"))
+
+```
+
+## Create Holdout Data Set
+
+```{r}
+acs2021 |>
+  slice(-sample_index) |>
+  saveRDS(here("data", "starting", "acs-holdout.rds"))
+
+```

@@ -1,0 +1,59 @@
+---
+title: "Prep PUMS data for analysis"
+format: 
+  html:
+    embed-resources: true
+    toc: true
+editor: source
+execute:
+  echo: true
+  warning: false
+  message: false
+---
+
+## Prep starting data
+
+```{r setup}
+library(tidyverse)
+library(here)
+
+source(here("R", "process_pums.R"))
+source(here("R", "prep_decennial_001.R"))
+source(here("R", "prep_decennial_002.R"))
+source(here("R", "add_prob_opt_in.R"))
+source(here("R", "add_opt_in.R"))
+```
+
+### DC only - for exploratory
+
+This section loads the data for Washington, DC for exploratory purposes. 
+
+10% sample of total population
+
+```{r, message = FALSE}
+df_dc <- process_pums("DC")
+saveRDS(df_dc, file = paste(here("data", "starting"), "decennial-exploratory.rds", sep = "/"))
+```
+
+### decennial-starting-001
+
+DC and IA only
+attributes: age bucket, sex, race simple
+geo: state
+
+```{r, message = FALSE}
+starting001 <- prep_decennial_001()
+saveRDS(starting001, file = paste(here("data", "starting"), "decennial-starting-001.rds", sep = "/"))
+```
+
+### decennial-starting-002
+
+DC and IA only
+attributes: hispanic simple
+geo: state
+
+```{r, message = FALSE}
+starting002 <- prep_decennial_002()
+saveRDS(starting002, file = paste(here("data", "starting"), "decennial-starting-002.rds", sep = "/"))
+```
+

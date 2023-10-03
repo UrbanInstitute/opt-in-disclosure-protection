@@ -1,0 +1,111 @@
+---
+title: "Data 001 Grid"
+format: 
+  html:
+    embed-resources: true
+    toc: true
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r, message = FALSE, warning = FALSE}
+library(tidyverse)
+library(here)
+
+source(here("R", "hist_grr.R"))
+source(here("R", "hist_unaryencode.R"))
+source(here("R", "hist_global.R"))
+source(here("R", "add_D_i.R"))
+source(here("R", "create_D.R"))
+source(here("R", "add_prob_opt_in.R"))
+source(here("R", "add_opt_in.R"))
+
+options(dplyr.summarise.inform = FALSE)
+```
+
+## Set Up Starting Data
+
+```{r}
+data <- readRDS(here("data", "starting", "starting-data-002.rds"))
+
+attribs <- c("hispanicity")
+```
+
+## Set Up Grid Specs
+
+```{r}
+convert_rho <- function(rho, delta) {
+  
+  rho + 2 * sqrt(rho * log(1 / delta))
+  
+}
+
+rho <- (447/4099) * (5/4097)
+
+epsilon <- convert_rho(rho, 10^-10)
+
+```
+
+```{r}
+specs <- expand_grid(
+  run = 1:100, 
+  epsilon = epsilon,
+  opt_in = c(0.01, 0.1, 0.5, 0.9, 1)
+)
+```
+
+## Functions for Data Prep and Summary
+
+```{r}
+prep_data <- function(data, opt_in) {
+  
+  data |>
+      add_prob_opt_in(prob = opt_in) |>
+      add_opt_in() |>
+      add_D_i(attribs)
+  
+}
+```
+
+## Run Spec Grid
+
+```{r}
+results <- bind_rows(
+  `grr` = pmap_dfr(
+    .l = specs,
+    .f = function(run, epsilon, opt_in) data |>
+      prep_data(opt_in = opt_in) |>
+      group_split(state) |>
+      map_dfr(hist_grr, epsilon = epsilon, attribs = attribs) |>
+      mutate(run = run, epsilon = epsilon, opt_in = opt_in)
+  ),
+  `sue` = pmap_dfr(
+    .l = specs,
+    .f = function(run, epsilon, opt_in) data |>
+      prep_data(opt_in = opt_in) |>
+      group_split(state) |>
+      map_dfr(hist_unaryencode, epsilon = epsilon, type = "SUE", attribs = attribs) |>
+      mutate(run = run, epsilon = epsilon, opt_in = opt_in)
+  ),
+  `oue` = pmap_dfr(
+    .l = specs,
+    .f = function(run, epsilon, opt_in) data |>
+      prep_data(opt_in = opt_in) |>      
+      group_split(state) |>
+      map_dfr(hist_unaryencode, epsilon = epsilon, type = "OUE", attribs = attribs) |>
+      mutate(run = run, epsilon = epsilon, opt_in = opt_in)
+  ),
+  `global` = pmap_dfr(
+    .l = distinct(select(specs, c(epsilon, run))),
+    .f = function(run, epsilon) data |>
+      group_split(state) |>
+      map_dfr(hist_global, epsilon = epsilon, attribs = attribs) |>
+      mutate(run = run, epsilon = epsilon) %>%
+      uncount(weights = length(unique(specs$opt_in))) %>% 
+      mutate(opt_in = rep(unique(specs$opt_in), length.out = n()))
+    ),
+  .id = "method"
+)
+
+saveRDS(results, file = here("data", "results", "results-002.rds"))
+```
