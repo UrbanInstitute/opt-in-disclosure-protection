@@ -54,9 +54,13 @@ saveRDS(layout_dict, file = paste(here("data", "layout"), "fwf-layout-dict.rds",
 
 ### Prep layout dictionary and helper list
 
+Create a list of variables. 
+
 ```{r}
 layout_dictlist <- unique(layout_dict$VARIABLE)
 ```
+
+Pull values for different variables and save them in a layout file.
 
 ```{r}
 prep_layout_dict <- function(variable) {

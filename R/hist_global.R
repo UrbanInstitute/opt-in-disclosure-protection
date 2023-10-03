@@ -10,7 +10,8 @@ hist_global <- function(data, epsilon, attribs) {
   
   source(here("R", "lap_mech.R"))
   
-  # temporary workaround to keep state identifier -------------------------
+  # workaround to keep state identifier
+  # this function is not generalized
   if(("state" %in% colnames(data)) & (length(unique(data$state)) == 1)) {
     state_id <- unique(data$state)
   }
@@ -21,7 +22,7 @@ hist_global <- function(data, epsilon, attribs) {
     dplyr::count() %>%
     dplyr::ungroup()
 
-  # epsilon divided by 2?
+  # apply noise
   data_synth <- histogram %>%
     dplyr::bind_cols(noise = lap_mech(n = nrow(histogram),
                                       eps = epsilon, 
