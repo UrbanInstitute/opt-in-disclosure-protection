@@ -248,5 +248,3 @@ acs2021 |>
   saveRDS(here("data", "starting", "acs-holdout.rds"))
 
 ```
-
-check for impossible combinations (not in labor force but employed)

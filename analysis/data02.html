@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Setup and prep</title>
+<title>Data 001 Grid</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -3023,12 +3023,10 @@ vertical-align: -.125em;
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#setup-and-prep" id="toc-setup-and-prep" class="nav-link active" data-scroll-target="#setup-and-prep">Setup and prep</a>
-  <ul class="collapse">
-  <li><a href="#prep-stateside-pums-fixed-width-layout-file" id="toc-prep-stateside-pums-fixed-width-layout-file" class="nav-link" data-scroll-target="#prep-stateside-pums-fixed-width-layout-file">Prep Stateside PUMS fixed-width layout file</a></li>
-  <li><a href="#prep-value-description-fields" id="toc-prep-value-description-fields" class="nav-link" data-scroll-target="#prep-value-description-fields">Prep value description fields</a></li>
-  <li><a href="#prep-layout-dictionary-and-helper-list" id="toc-prep-layout-dictionary-and-helper-list" class="nav-link" data-scroll-target="#prep-layout-dictionary-and-helper-list">Prep layout dictionary and helper list</a></li>
-  </ul></li>
+  <li><a href="#set-up-starting-data" id="toc-set-up-starting-data" class="nav-link active" data-scroll-target="#set-up-starting-data">Set Up Starting Data</a></li>
+  <li><a href="#set-up-grid-specs" id="toc-set-up-grid-specs" class="nav-link" data-scroll-target="#set-up-grid-specs">Set Up Grid Specs</a></li>
+  <li><a href="#functions-for-data-prep-and-summary" id="toc-functions-for-data-prep-and-summary" class="nav-link" data-scroll-target="#functions-for-data-prep-and-summary">Functions for Data Prep and Summary</a></li>
+  <li><a href="#run-spec-grid" id="toc-run-spec-grid" class="nav-link" data-scroll-target="#run-spec-grid">Run Spec Grid</a></li>
   </ul>
 </nav>
 </div>
@@ -3036,7 +3034,7 @@ vertical-align: -.125em;
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Setup and prep</h1>
+<h1 class="title">Data 001 Grid</h1>
 </div>
 
 
@@ -3051,67 +3049,104 @@ vertical-align: -.125em;
 
 </header>
 
-<section id="setup-and-prep" class="level2">
-<h2 class="anchored" data-anchor-id="setup-and-prep">Setup and prep</h2>
-<p>This document contains setup/prep steps for the opt-out privacy workflow.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(readxl)</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(here)</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">options</span>(<span class="at">scipen =</span> <span class="dv">999</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(here)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="fu">here</span>(<span class="st">&quot;R&quot;</span>, <span class="st">&quot;hist_grr.R&quot;</span>))</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="fu">here</span>(<span class="st">&quot;R&quot;</span>, <span class="st">&quot;hist_unaryencode.R&quot;</span>))</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="fu">here</span>(<span class="st">&quot;R&quot;</span>, <span class="st">&quot;hist_global.R&quot;</span>))</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="fu">here</span>(<span class="st">&quot;R&quot;</span>, <span class="st">&quot;add_D_i.R&quot;</span>))</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="fu">here</span>(<span class="st">&quot;R&quot;</span>, <span class="st">&quot;create_D.R&quot;</span>))</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="fu">here</span>(<span class="st">&quot;R&quot;</span>, <span class="st">&quot;add_prob_opt_in.R&quot;</span>))</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="fu">here</span>(<span class="st">&quot;R&quot;</span>, <span class="st">&quot;add_opt_in.R&quot;</span>))</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="fu">options</span>(<span class="at">dplyr.summarise.inform =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<section id="prep-stateside-pums-fixed-width-layout-file" class="level3">
-<h3 class="anchored" data-anchor-id="prep-stateside-pums-fixed-width-layout-file">Prep Stateside PUMS fixed-width layout file</h3>
-<p>The excel layout file provides variable widths, names, dictionary values, etc. for the Census Stateside PUMS microdata. Use this layout file to help process the fixed-width stateside PUMS data.</p>
+<section id="set-up-starting-data" class="level2">
+<h2 class="anchored" data-anchor-id="set-up-starting-data">Set Up Starting Data</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>person_layout <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="fu">here</span>(<span class="st">&quot;data&quot;</span>, <span class="st">&quot;resources&quot;</span>, <span class="st">&quot;2010 PUMS Record Layout.xlsx&quot;</span>), <span class="at">sheet =</span> <span class="st">&quot;Person&quot;</span>, <span class="at">skip =</span> <span class="dv">1</span>)</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(layout, <span class="at">file =</span> <span class="fu">paste</span>(<span class="fu">here</span>(<span class="st">&quot;data&quot;</span>, <span class="st">&quot;layout&quot;</span>), <span class="st">&quot;fwf-person-layout.rds&quot;</span>, <span class="at">sep =</span> <span class="st">&quot;/&quot;</span>))</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>housing_layout <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="fu">here</span>(<span class="st">&quot;data&quot;</span>, <span class="st">&quot;resources&quot;</span>, <span class="st">&quot;2010 PUMS Record Layout.xlsx&quot;</span>), <span class="at">sheet =</span> <span class="st">&quot;Housing&quot;</span>, <span class="at">skip =</span> <span class="dv">1</span>)</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(layout, <span class="at">file =</span> <span class="fu">paste</span>(<span class="fu">here</span>(<span class="st">&quot;data&quot;</span>, <span class="st">&quot;layout&quot;</span>), <span class="st">&quot;fwf-housing-layout.rds&quot;</span>, <span class="at">sep =</span> <span class="st">&quot;/&quot;</span>))</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>layout <span class="ot">&lt;-</span> <span class="fu">rbind</span>(person_layout, housing_layout)</span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(layout, <span class="at">file =</span> <span class="fu">paste</span>(<span class="fu">here</span>(<span class="st">&quot;data&quot;</span>, <span class="st">&quot;layout&quot;</span>), <span class="st">&quot;fwf-layout.rds&quot;</span>, <span class="at">sep =</span> <span class="st">&quot;/&quot;</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-</section>
-<section id="prep-value-description-fields" class="level3">
-<h3 class="anchored" data-anchor-id="prep-value-description-fields">Prep value description fields</h3>
-<p>Variable values are encoded. Prep layout file dictionary description (“_VAL”) fields to merge with data for easier use.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>layout_dict <span class="ot">&lt;-</span> layout <span class="sc">%&gt;%</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">is.na</span>(HI) <span class="sc">&amp;</span> <span class="sc">!</span><span class="fu">is.na</span>(LO) <span class="sc">&amp;</span> VARIABLE <span class="sc">!=</span> <span class="st">&quot;RECTYPE&quot;</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="fu">c</span>(VARIABLE, <span class="st">`</span><span class="at">VALUE DESCRIPTION</span><span class="st">`</span>, LO)) <span class="sc">%&gt;%</span></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(VARIABLE) <span class="sc">%&gt;%</span></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">n</span>() <span class="sc">&gt;</span> <span class="dv">1</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(layout_dict, <span class="at">file =</span> <span class="fu">paste</span>(<span class="fu">here</span>(<span class="st">&quot;data&quot;</span>, <span class="st">&quot;layout&quot;</span>), <span class="st">&quot;fwf-layout-dict.rds&quot;</span>, <span class="at">sep =</span> <span class="st">&quot;/&quot;</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>data <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="fu">here</span>(<span class="st">&quot;data&quot;</span>, <span class="st">&quot;starting&quot;</span>, <span class="st">&quot;starting-data-002.rds&quot;</span>))</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>attribs <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;hispanicity&quot;</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="prep-layout-dictionary-and-helper-list" class="level3">
-<h3 class="anchored" data-anchor-id="prep-layout-dictionary-and-helper-list">Prep layout dictionary and helper list</h3>
-<p>Create a list of variables.</p>
+<section id="set-up-grid-specs" class="level2">
+<h2 class="anchored" data-anchor-id="set-up-grid-specs">Set Up Grid Specs</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>layout_dictlist <span class="ot">&lt;-</span> <span class="fu">unique</span>(layout_dict<span class="sc">$</span>VARIABLE)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>convert_rho <span class="ot">&lt;-</span> <span class="cf">function</span>(rho, delta) {</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  rho <span class="sc">+</span> <span class="dv">2</span> <span class="sc">*</span> <span class="fu">sqrt</span>(rho <span class="sc">*</span> <span class="fu">log</span>(<span class="dv">1</span> <span class="sc">/</span> delta))</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>rho <span class="ot">&lt;-</span> (<span class="dv">447</span><span class="sc">/</span><span class="dv">4099</span>) <span class="sc">*</span> (<span class="dv">5</span><span class="sc">/</span><span class="dv">4097</span>)</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>epsilon <span class="ot">&lt;-</span> <span class="fu">convert_rho</span>(rho, <span class="dv">10</span><span class="sc">^-</span><span class="dv">10</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>Pull values for different variables and save them in a layout file.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>prep_layout_dict <span class="ot">&lt;-</span> <span class="cf">function</span>(variable) {</span>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>specs <span class="ot">&lt;-</span> <span class="fu">expand_grid</span>(</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">run =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">100</span>, </span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">epsilon =</span> epsilon,</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">opt_in =</span> <span class="fu">c</span>(<span class="fl">0.01</span>, <span class="fl">0.1</span>, <span class="fl">0.5</span>, <span class="fl">0.9</span>, <span class="dv">1</span>)</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="functions-for-data-prep-and-summary" class="level2">
+<h2 class="anchored" data-anchor-id="functions-for-data-prep-and-summary">Functions for Data Prep and Summary</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>prep_data <span class="ot">&lt;-</span> <span class="cf">function</span>(data, opt_in) {</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  helper_dict <span class="ot">&lt;-</span> layout_dict <span class="sc">%&gt;%</span></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(VARIABLE <span class="sc">==</span> variable) <span class="sc">%&gt;%</span></span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(<span class="sc">-</span><span class="fu">c</span>(VARIABLE)) <span class="sc">%&gt;%</span></span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">rename</span>(<span class="sc">!!</span><span class="fu">as.name</span>(variable) <span class="sc">:</span><span class="er">=</span> LO,</span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>           <span class="sc">!!</span><span class="fu">paste0</span>(variable, <span class="st">&quot;_VAL&quot;</span>) <span class="sc">:</span><span class="er">=</span> <span class="st">`</span><span class="at">VALUE DESCRIPTION</span><span class="st">`</span>)</span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(helper_dict)</span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>layout_list <span class="ot">&lt;-</span> <span class="fu">map</span>(layout_dictlist, prep_layout_dict)</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(layout_list, <span class="at">file =</span> <span class="fu">paste</span>(<span class="fu">here</span>(<span class="st">&quot;data&quot;</span>, <span class="st">&quot;layout&quot;</span>), <span class="st">&quot;fwf-layout-list.rds&quot;</span>, <span class="at">sep =</span> <span class="st">&quot;/&quot;</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  data <span class="sc">|&gt;</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>      <span class="fu">add_prob_opt_in</span>(<span class="at">prob =</span> opt_in) <span class="sc">|&gt;</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>      <span class="fu">add_opt_in</span>() <span class="sc">|&gt;</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>      <span class="fu">add_D_i</span>(attribs)</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
+<section id="run-spec-grid" class="level2">
+<h2 class="anchored" data-anchor-id="run-spec-grid">Run Spec Grid</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>results <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="st">`</span><span class="at">grr</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">pmap_dfr</span>(</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">.l =</span> specs,</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">.f =</span> <span class="cf">function</span>(run, epsilon, opt_in) data <span class="sc">|&gt;</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>      <span class="fu">prep_data</span>(<span class="at">opt_in =</span> opt_in) <span class="sc">|&gt;</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>      <span class="fu">group_split</span>(state) <span class="sc">|&gt;</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>      <span class="fu">map_dfr</span>(hist_grr, <span class="at">epsilon =</span> epsilon, <span class="at">attribs =</span> attribs) <span class="sc">|&gt;</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>      <span class="fu">mutate</span>(<span class="at">run =</span> run, <span class="at">epsilon =</span> epsilon, <span class="at">opt_in =</span> opt_in)</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>  ),</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>  <span class="st">`</span><span class="at">sue</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">pmap_dfr</span>(</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">.l =</span> specs,</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">.f =</span> <span class="cf">function</span>(run, epsilon, opt_in) data <span class="sc">|&gt;</span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>      <span class="fu">prep_data</span>(<span class="at">opt_in =</span> opt_in) <span class="sc">|&gt;</span></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>      <span class="fu">group_split</span>(state) <span class="sc">|&gt;</span></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>      <span class="fu">map_dfr</span>(hist_unaryencode, <span class="at">epsilon =</span> epsilon, <span class="at">type =</span> <span class="st">&quot;SUE&quot;</span>, <span class="at">attribs =</span> attribs) <span class="sc">|&gt;</span></span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>      <span class="fu">mutate</span>(<span class="at">run =</span> run, <span class="at">epsilon =</span> epsilon, <span class="at">opt_in =</span> opt_in)</span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>  ),</span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>  <span class="st">`</span><span class="at">oue</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">pmap_dfr</span>(</span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">.l =</span> specs,</span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">.f =</span> <span class="cf">function</span>(run, epsilon, opt_in) data <span class="sc">|&gt;</span></span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>      <span class="fu">prep_data</span>(<span class="at">opt_in =</span> opt_in) <span class="sc">|&gt;</span>      </span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>      <span class="fu">group_split</span>(state) <span class="sc">|&gt;</span></span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>      <span class="fu">map_dfr</span>(hist_unaryencode, <span class="at">epsilon =</span> epsilon, <span class="at">type =</span> <span class="st">&quot;OUE&quot;</span>, <span class="at">attribs =</span> attribs) <span class="sc">|&gt;</span></span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>      <span class="fu">mutate</span>(<span class="at">run =</span> run, <span class="at">epsilon =</span> epsilon, <span class="at">opt_in =</span> opt_in)</span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>  ),</span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>  <span class="st">`</span><span class="at">global</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">pmap_dfr</span>(</span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a>    <span class="at">.l =</span> <span class="fu">distinct</span>(<span class="fu">select</span>(specs, <span class="fu">c</span>(epsilon, run))),</span>
+<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a>    <span class="at">.f =</span> <span class="cf">function</span>(run, epsilon) data <span class="sc">|&gt;</span></span>
+<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a>      <span class="fu">group_split</span>(state) <span class="sc">|&gt;</span></span>
+<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a>      <span class="fu">map_dfr</span>(hist_global, <span class="at">epsilon =</span> epsilon, <span class="at">attribs =</span> attribs) <span class="sc">|&gt;</span></span>
+<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a>      <span class="fu">mutate</span>(<span class="at">run =</span> run, <span class="at">epsilon =</span> epsilon) <span class="sc">%&gt;%</span></span>
+<span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a>      <span class="fu">uncount</span>(<span class="at">weights =</span> <span class="fu">length</span>(<span class="fu">unique</span>(specs<span class="sc">$</span>opt_in))) <span class="sc">%&gt;%</span> </span>
+<span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a>      <span class="fu">mutate</span>(<span class="at">opt_in =</span> <span class="fu">rep</span>(<span class="fu">unique</span>(specs<span class="sc">$</span>opt_in), <span class="at">length.out =</span> <span class="fu">n</span>()))</span>
+<span id="cb6-34"><a href="#cb6-34" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb6-35"><a href="#cb6-35" aria-hidden="true" tabindex="-1"></a>  <span class="at">.id =</span> <span class="st">&quot;method&quot;</span></span>
+<span id="cb6-36"><a href="#cb6-36" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb6-37"><a href="#cb6-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-38"><a href="#cb6-38" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(results, <span class="at">file =</span> <span class="fu">here</span>(<span class="st">&quot;data&quot;</span>, <span class="st">&quot;results&quot;</span>, <span class="st">&quot;results-002.rds&quot;</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
 </section>
 
 </main>

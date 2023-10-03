@@ -1,10 +1,10 @@
 #' Run utility and disclosure metrics/tests
 #' 
-#' @param postsynth A data frame with the synthetic data
+#' @param postsynth A postsynth object or data frame with the synthetic data
 #' @param data A data frame with the confidential data
 #' @param holdout_data Holdout set of confidential data
 #' 
-#' @return Utility and disclosure results
+#' @return Utility and disclosure results in a list
 
 summarize_results <- function(postsynth, data, holdout) {
   

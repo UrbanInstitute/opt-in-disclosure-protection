@@ -1,10 +1,10 @@
 #' Regression confidence interval overlap
 #' 
-#' @param postsynth A data frame with the synthetic data
+#' @param postsynth A postsynth object or data frame with the synthetic data
 #' @param data A data frame with confidential data
 #' @param formula Regression specification
 #' 
-#' @return Regression CI overlap and coefficients
+#' @return Regression CI overlap and coefficients as a list
 
 regression_ci_overlap <- function(postsynth, data, formula) {
   

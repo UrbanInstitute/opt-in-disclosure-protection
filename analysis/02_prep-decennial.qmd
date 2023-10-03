@@ -26,6 +26,8 @@ source(here("R", "add_opt_in.R"))
 
 ### DC only - for exploratory
 
+This section loads the data for Washington, DC for exploratory purposes. 
+
 10% sample of total population
 
 ```{r, message = FALSE}

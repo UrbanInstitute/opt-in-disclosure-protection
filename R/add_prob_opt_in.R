@@ -2,8 +2,9 @@
 #'
 #' @param starting_data A dataframe of starting data
 #' @param prob A number in \[0, 1\] for the probability of opting in
-#' @param white_multiplier A multiplier for the white probability of opting in
-#' All probabilities are normalized using the data so the mean is prob
+#' @param white_multiplier A multiplier for the white population's probability 
+#' of opting in. All probabilities are normalized using the data so the mean is 
+#' prob
 #' 
 #' @return A dataframe of starting data with probability column added
 #'
