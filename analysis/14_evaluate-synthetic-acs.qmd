@@ -5,6 +5,7 @@ format:
     embed-resources: true
     toc: true
     df-print: paged
+    fig-width: 6.5
 editor: source
 execute:
   echo: true
@@ -39,6 +40,9 @@ source(here("R", "regression_ci_overlap.R"))
 source(here("R", "membership_inference_test.R"))
 
 source(here("R", "summarize_results.R"))
+
+theme_urbn_print <- theme_update(strip.background = ggplot2::element_rect(fill = "#ffffff", colour = NA))
+
 
 ```
 
@@ -104,6 +108,7 @@ specs <- read_csv(here::here("data", "results", "specs.csv")) |>
 
 ```{r}
 #| label: proportions
+#| fig-height: 4
 
 bind_cols(
   specs |> 
@@ -115,12 +120,25 @@ bind_cols(
     ) |>
     mutate(abs_error = abs(original - synthetic))
 ) |>
+  mutate(
+    variable = case_match(
+      variable,
+      "empstat" ~ "Employment",
+      "hcovany" ~ "Health insurance\ncoverage",
+      "hispan" ~ "Hispanicity",
+      "labforce" ~ "Labor force\nparticipation",
+      "marst" ~ "Marital status",
+      "race" ~ "Race",
+      "sex" ~ "Sex",
+      "statefip" ~ "State"
+    )
+  ) |>
   filter(white_multiplier == "1") |>
   ggplot(aes(opt_in, abs_error)) +
   geom_point(alpha = 0.4) +
-  facet_wrap(~variable) +
+  facet_wrap(~ variable, nrow = 2) +
   labs(
-    x = "Proportion Opt In",
+    x = "Opt-In Rate",
     y = "Absolute Error In Proportion"
   ) +
   scatter_grid()
@@ -137,11 +155,22 @@ bind_cols(
 ) |>
   filter(white_multiplier == 1) |>
   filter(!variable %in% c("hispan", "race")) |>
+  mutate(
+    variable = case_match(
+      variable,
+      "empstat" ~ "Employment",
+      "hcovany" ~ "Health insurance coverage",
+      "labforce" ~ "Labor force participation",
+      "marst" ~ "Marital status",
+      "sex" ~ "Sex",
+      "statefip" ~ "State"
+    )
+  ) |>
   ggplot(aes(opt_in, error, color = race_eth)) +
   geom_point(alpha = 0.4) +
-  facet_wrap(~variable) +
+  facet_wrap(~ variable, nrow = 2) +
   labs(
-    x = "Proportion Opt In",
+    x = "Opt-In Rate",
     y = "Error In Proportion"
   ) +
   scatter_grid()
@@ -158,11 +187,22 @@ bind_cols(
 ) |>
   filter(white_multiplier == 1) |>
   filter(!variable %in% c("hispan", "race")) |>
+  mutate(
+    variable = case_match(
+      variable,
+      "empstat" ~ "Employment",
+      "hcovany" ~ "Health insurance coverage",
+      "labforce" ~ "Labor force participation",
+      "marst" ~ "Marital status",
+      "sex" ~ "Sex",
+      "statefip" ~ "State"
+    )
+  ) |>  
   ggplot(aes(opt_in, abs_error, color = race_eth)) +
   geom_point(alpha = 0.4) +
-  facet_wrap(~variable) +
+  facet_wrap(~ variable, nrow = 2) +
   labs(
-    x = "Proportion Opt In",
+    x = "Opt-In Rate",
     y = "Absolute Error In Proportion"
   ) +
   scatter_grid()
@@ -181,6 +221,37 @@ bind_cols(
 
 ```
 
+### Proportions For Three Variables
+
+```{r}
+#| label: proportions-special
+#| fig-height: 4
+
+bind_cols(
+  specs |>
+    slice(rep(1:n(), each = 12)),
+  results |>
+    map("proportions_race_eth") |>
+    map_dfr(.f = ~.x |> 
+              pivot_wider(id_cols = c(variable, class, race_eth), names_from = source, values_from = prop)) |>
+    filter(class %in% c("Never married/single", "Employed", "With health insurance coverage"))
+) |>
+  filter(white_multiplier == 1) |>
+  mutate(diff = original - synthetic) |>
+  group_by(opt_in, race_eth, class) |>
+  summarize(median_diff = median(diff)) |>
+  ggplot(aes(opt_in, median_diff, color = race_eth)) +
+  geom_hline(yintercept = 0) +
+  geom_line(aes(group = race_eth), alpha = 0.5) +
+  geom_point(alpha = 0.5) +
+  facet_wrap(~ class) +
+  labs(
+    x = "Opt-In Rate",
+    y = "Median Errors in Estimated Proportions"
+  )
+
+```
+
 ### Proportion with Wages
 
 ```{r}
@@ -195,9 +266,12 @@ bind_cols(
   ggplot(aes(opt_in, proportion_difference, color = white_multiplier)) +
   geom_point(alpha = 0.3) +
   labs(
-    y = "Error in Proportion with Salaries and Wages"
+    x = "Opt-In Rate",
+    y = "Error in Proportion with Salaries and Wages",
+    color = "White Multiplier"
   ) +
-  scatter_grid()
+  scatter_grid() +
+  theme(legend.title = element_text())
 
 bind_cols(
   specs |> 
@@ -211,10 +285,12 @@ bind_cols(
   geom_hline(yintercept = 0) +
   facet_wrap(~race) +
   labs(
+    x = "Opt-In Rate",
     y = "Error in Proportion with Salaries and Wages",
     color = "White Multiplier"
   ) +
-  scatter_grid()
+  scatter_grid() +
+  theme(legend.title = element_text())
 
 bind_cols(
   specs |> 
@@ -228,10 +304,12 @@ bind_cols(
   geom_hline(yintercept = 0) +
   facet_wrap(~ race_eth) +
   labs(
+    x = "Opt-In Rate",
     y = "Error in Proportion with Salaries and Wages",
     color = "White Multiplier"
   ) +
-  scatter_grid()
+  scatter_grid() +
+  theme(legend.title = element_text())
 
 ```
 
@@ -249,10 +327,12 @@ bind_cols(
   ggplot(aes(opt_in, proportion_difference, color = white_multiplier)) +
   geom_point(alpha = 0.3) +
   labs(
-    x = "Proportion Opt In",
-    y = "Proportion Error in Mean Wage and Salary Income"
+    x = "Opt-In Rate",
+    y = "Proportion Error in Mean Wage and Salary Income",
+    color = "White Multiplier"
   ) +
-  scatter_grid()
+  scatter_grid() +
+  theme(legend.title = element_text())
 
 bind_cols(
   specs |> 
@@ -266,11 +346,12 @@ bind_cols(
   geom_hline(yintercept = 0) +
   facet_wrap(~race) +
   labs(
-    x = "Proportion Opt In",
+    x = "Opt-In Rate",
     y = "Proportion Error in Mean Wage and Salary Income",
     color = "White Multiplier"
   ) +
-  scatter_grid()
+  scatter_grid() +
+  theme(legend.title = element_text())
   
 ```
 
@@ -280,6 +361,7 @@ Increasing opt in for small groups can increase their utility.
 
 ```{r}
 #| label: percentiles
+#| fig-height: 3
 
 bind_cols(
   specs |>
@@ -289,15 +371,16 @@ bind_cols(
     map_dfr(.f = ~ .x |> filter(variable == "incwage"))
 ) |>
   mutate(proportion_difference = if_else(is.nan(proportion_difference), 0, proportion_difference)) |>
+  mutate(opt_in = paste("Opt-In Rate:", opt_in)) |>
   ggplot(aes(p, proportion_difference, group = id)) +
   geom_line(alpha = 0.5) +
-  facet_wrap(~opt_in) +
+  facet_wrap(~ opt_in, nrow = 1) +
   labs(
-    x = "Percentile",
-    y = "Proportion Error"
+    x = "Salary and Income Percentile",
+    y = "Proportion Error in Salary and Income Percentile"
   ) +
-  scatter_grid()
-
+  scatter_grid() +
+  theme(panel.spacing = ggplot2::unit(16L, "pt"))
 
 bind_cols(
   specs |>
@@ -307,14 +390,16 @@ bind_cols(
     map_dfr(.f = ~ .x |> filter(variable == "ftotinc"))
 ) |>
   mutate(proportion_difference = if_else(is.nan(proportion_difference), 0, proportion_difference)) |>
+  mutate(opt_in = paste("Opt-In Rate:", opt_in)) |>  
   ggplot(aes(p, proportion_difference, group = id)) +
   geom_line(alpha = 0.5) +
-  facet_wrap(~opt_in) +
+  facet_wrap(~ opt_in, nrow = 1) +
   labs(
-    x = "Percentile",
-    y = "Proportion Error"
+    x = "Family Income Percentile",
+    y = "Proportion Error in Family Income Percentile"
   ) +
-  scatter_grid()
+  scatter_grid() +
+  theme(panel.spacing = ggplot2::unit(16L, "pt"))
 
 bind_cols(
   specs |>
@@ -324,14 +409,16 @@ bind_cols(
     map_dfr(.f = ~ .x |> filter(variable == "inctot"))
 ) |>
   mutate(proportion_difference = if_else(is.nan(proportion_difference), 0, proportion_difference)) |>
+  mutate(opt_in = paste("Opt-In Rate:", opt_in)) |>  
   ggplot(aes(p, proportion_difference, group = id)) +
   geom_line(alpha = 0.5) +
-  facet_wrap(~opt_in) +
+  facet_wrap(~ opt_in, nrow = 1) +
   labs(
-    x = "Percentile",
-    y = "Proportion Error"
+    x = "Total Income Percentile",
+    y = "Proportion Error in Total Income Percentile"
   ) +
-  scatter_grid()
+  scatter_grid() +
+  theme(panel.spacing = ggplot2::unit(16L, "pt"))
 
 bind_cols(
   specs |>
@@ -340,15 +427,17 @@ bind_cols(
     map("percentiles") |>
     map_dfr(.f = ~ .x |> filter(variable == "incresid"))
 ) |>
+  mutate(opt_in = paste("Opt-In Rate:", opt_in)) |>  
   mutate(proportion_difference = if_else(is.nan(proportion_difference), 0, proportion_difference)) |>
   ggplot(aes(p, proportion_difference, group = id)) +
   geom_line(alpha = 0.5) +
-  facet_wrap(~opt_in) +
+  facet_wrap(~ opt_in, nrow = 1) +
   labs(
-    x = "Percentile",
-    y = "Proportion Error"
+    x = "Income Residual Percentile",
+    y = "Proportion Error in Residual Income Percentile"
   ) +
-  scatter_grid()
+  scatter_grid() +
+  theme(panel.spacing = ggplot2::unit(16L, "pt"))
 
 ```
 
@@ -356,6 +445,7 @@ bind_cols(
 
 ```{r}
 #| label: correlation-difference
+#| fig-height: 4
 
 bind_cols(
   specs,
@@ -366,10 +456,12 @@ bind_cols(
   geom_point(alpha = 0.3) +
   scale_y_continuous(limits = c(0, NA)) +
   labs(
-    x = "Proportion Opt In",
-    y = "Mean Absolute Error in Pairwise Correlation Coefficient"
+    x = "Opt-In Rate",
+    y = "Mean Absolute Error in Pairwise Correlation Coefficient",
+    color = "White Multiplier"
   ) +
-  scatter_grid()
+  scatter_grid() +
+  theme(legend.title = element_text())
 
 bind_cols(
   specs,
@@ -383,10 +475,12 @@ bind_cols(
   geom_line() +
   geom_point() +
   labs(
-    x = "Proportion Opt In",
-    y = "Median Mean Absolute Error in Pairwise Correlation Coefficient"
+    x = "Opt-In Rate",
+    y = "Median Mean Absolute Error in Pairwise Correlation Coefficient",
+    color = "White Multiplier"
   ) +
-  scatter_grid()
+  scatter_grid() +
+  theme(legend.title = element_text())
 
 ```
 
@@ -394,6 +488,7 @@ bind_cols(
 
 ```{r}
 #| label: kmarginals
+#| fig-height: 4
 
 
 k1_benchmark <- kmarginals(
@@ -414,9 +509,11 @@ bind_cols(
   labs(
     subtitle = "Score from Holdout Data in Red",
     x = "Opt-In Rate",
-    y = "1-Marginal Score"
+    y = "1-Marginal Score",
+    color = "White Multiplier"
   ) +
-  scatter_grid()
+  scatter_grid() +
+  theme(legend.title = element_text())
 
 k2_benchmark <- kmarginals(
   postsynth = holdout, 
@@ -436,9 +533,11 @@ bind_cols(
   labs(
     subtitle = "Score from Holdout Data in Red",
     x = "Opt-In Rate",
-    y = "2-Marginal Score"
+    y = "2-Marginal Score",
+    color = "White Multiplier"
   ) +  
-  scatter_grid()
+  scatter_grid() +
+  theme(legend.title = element_text())
 
 k3_benchmark <- kmarginals(
   postsynth = holdout, 
@@ -458,9 +557,11 @@ bind_cols(
   labs(
     subtitle = "Score from Holdout Data in Red",
     x = "Opt-In Rate",
-    y = "3-Marginal Score"
+    y = "3-Marginal Score",
+    color = "White Multiplier"
   ) +    
-  scatter_grid()
+  scatter_grid() +
+  theme(legend.title = element_text())
 
 k1 <- bind_cols(
   specs,
@@ -473,9 +574,11 @@ k1 <- bind_cols(
   scale_y_continuous(limits = c(NA, 1000)) +
   labs(
     x = "Opt-In Rate",
-    y = "1-Marginal Score"
+    y = "1-Marginal Score",
+    color = "White Multiplier"
   ) +
-  scatter_grid()
+  scatter_grid() +
+  theme(legend.title = element_text())
 
 k3 <- bind_cols(
   specs,
@@ -488,9 +591,11 @@ k3 <- bind_cols(
   scale_y_continuous(limits = c(NA, 1000)) +  
   labs(
     x = "Opt-In Rate",
-    y = "3-Marginal Score"
+    y = "3-Marginal Score",
+    color = "White Multiplier"
   ) +    
-  scatter_grid()
+  scatter_grid() +
+  theme(legend.title = element_text())
 
 k1 + k3
 
@@ -500,6 +605,7 @@ As `k` increases, the opt-in has a much bigger relative impact than the white mu
 
 ```{r}
 #| label: discriminator-auc
+#| fig-height: 3
 
 bind_cols(
   specs,
@@ -509,9 +615,12 @@ bind_cols(
   ggplot(aes(opt_in, discriminator_auc, color = white_multiplier)) +
   geom_point(alpha = 0.3) +
   labs(
-    y = "AUC for Discrimnator Model"
+    x = "Opt-In Rate",
+    y = "AUC for Discrimnator Model",
+    color = "White Multiplier"
   ) +
-  scatter_grid()
+  scatter_grid() +
+  theme(legend.title = element_text())
 
 ```
 
@@ -519,6 +628,7 @@ bind_cols(
 
 ```{r}
 #| label: regression-overlap 
+#| fig-height: 4
 
 regression_ci_overlap <- bind_cols(
   specs,
@@ -539,9 +649,12 @@ regression_ci_overlap |>
   ggplot(aes(opt_in, abs_std_coef_diff, color = white_multiplier)) +
   geom_point(alpha = 0.3) +
   labs(
-    x = "Opt-In Rate"
+    x = "Opt-In Rate",
+    y = "Absolute Standardized Coefficient Difference",
+    color = "White Multiplier"
   ) +
-  scatter_grid()
+  scatter_grid() +
+  theme(legend.title = element_text())
 
 # overlap
 regression_ci_overlap |>
@@ -549,27 +662,33 @@ regression_ci_overlap |>
   geom_point(alpha = 0.3) +
   labs(
     x = "Opt-In Rate",
-    y = "Regression Confidence Interval Overlap"
+    y = "Regression Confidence Interval Overlap",
+    color = "White Multiplier"
   ) +
-  scatter_grid()
+  scatter_grid() +
+  theme(legend.title = element_text())
 
 # sign match
 regression_ci_overlap |>
   ggplot(aes(opt_in, sign_match, color = white_multiplier)) +
   geom_point(alpha = 0.3) +
   labs(
-    x = "Opt-In Rate"
+    x = "Opt-In Rate",
+    color = "White Multiplier"
   ) +
-  scatter_grid()
+  scatter_grid() +
+  theme(legend.title = element_text())
 
 # significance match
 regression_ci_overlap |>
   ggplot(aes(opt_in, inference_match, color = white_multiplier)) +
   geom_point(alpha = 0.3) +
   labs(
-    x = "Opt-In Rate"
+    x = "Opt-In Rate",
+    color = "White Multiplier"
   ) +
-  scatter_grid()
+  scatter_grid() +
+  theme(legend.title = element_text())
 
 ```
 
@@ -625,6 +744,7 @@ bind_cols(
 
 ```{r}
 #| label: membership-inference
+#| fig-height: 3.2
 
 bind_cols(
   specs,
@@ -633,20 +753,19 @@ bind_cols(
     map_dbl("auc")
 ) |>
   ggplot(aes(opt_in, membership_inference_auc, color = white_multiplier)) +
+  geom_hline(aes(yintercept = 0.5), color = "red") +
   geom_point(alpha = 0.5) +
   labs(
     x = "Opt-In Rate",
     y = "Membership Inference Test AUC",
     color = "White Multiplier"
   ) +
-  scatter_grid()
+  scatter_grid() +
+  theme(legend.title = element_text())
 
 results |>
     map("membership_inference_test") |>
     map("conf_mat")
-
-
-
 
 ```
 
